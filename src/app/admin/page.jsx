@@ -12,7 +12,8 @@ import {
     Image as ImageIcon,
     Bell,
     Home,
-    Layers
+    Layers,
+    Tag
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import AdminGuard from '@/components/admin/AdminGuard'
@@ -21,6 +22,7 @@ import ProductManager from '@/components/admin/ProductManager'
 import OrderManager from '@/components/admin/OrderManager'
 import SectionBannerManager from '@/components/admin/SectionBannerManager'
 import CategoryBannerManager from '@/components/admin/CategoryBannerManager'
+import BrandManager from '@/components/admin/BrandManager'
 
 function AdminDashboard() {
     const router = useRouter()
@@ -115,6 +117,7 @@ function AdminDashboard() {
     const menuItems = [
         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
         { id: 'products', label: 'Products', icon: Package },
+        { id: 'brands', label: 'Brands', icon: Tag },
         { id: 'sliders', label: 'Sliders', icon: ImageIcon },
         { id: 'banners', label: 'Banners', icon: Layers },
         { id: 'orders', label: 'Orders', icon: ShoppingCart },
@@ -312,6 +315,11 @@ function AdminDashboard() {
                     {/* Products Tab */}
                     {activeTab === 'products' && (
                         <ProductManager getToken={getToken} />
+                    )}
+
+                    {/* Brands Tab */}
+                    {activeTab === 'brands' && (
+                        <BrandManager getToken={getToken} />
                     )}
 
                     {/* Banners Tab */}
