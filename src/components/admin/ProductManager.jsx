@@ -37,6 +37,7 @@ export default function ProductManager({ getToken }) {
     const [filterStatus, setFilterStatus] = useState('all')
     const [selectedProducts, setSelectedProducts] = useState([])
     const [categories, setCategories] = useState([])  // loaded from /api/category
+    const [brands, setBrands] = useState([])            // loaded from /api/brand
     const [newCategoryName, setNewCategoryName] = useState('')
     const [newSubcategoryName, setNewSubcategoryName] = useState('')
     const [subTab, setSubTab] = useState('products') // 'products' | 'categories'
@@ -46,6 +47,7 @@ export default function ProductManager({ getToken }) {
         slug: '',
         description: '',
         shortDescription: '',
+        brand: '',
         category: { main: '', sub: '' },
         sku: '',
         condition: 'new',
@@ -117,6 +119,7 @@ export default function ProductManager({ getToken }) {
     useEffect(() => {
         fetchProducts()
         fetchCategories()
+        fetchBrands()
     }, [pagination.page])
 
     const fetchCategories = async () => {
@@ -126,6 +129,16 @@ export default function ProductManager({ getToken }) {
             if (data.categories) setCategories(data.categories)
         } catch (err) {
             console.error('Failed to load categories:', err)
+        }
+    }
+
+    const fetchBrands = async () => {
+        try {
+            const res = await fetch('/api/brand')
+            const data = await res.json()
+            if (data.brands) setBrands(data.brands)
+        } catch (err) {
+            console.error('Failed to load brands:', err)
         }
     }
 
@@ -188,14 +201,15 @@ export default function ProductManager({ getToken }) {
     }
 
     const openCreateModal = async () => {
-        // Always fetch fresh categories from DB before opening modal
-        await fetchCategories()
+        // Always fetch fresh categories and brands from DB before opening modal
+        await Promise.all([fetchCategories(), fetchBrands()])
         setEditingProduct(null)
         setFormData({
             name: '',
             slug: '',
             description: '',
             shortDescription: '',
+            brand: '',
             category: { main: '', sub: '' },
             sku: '',
             condition: 'new',
@@ -224,8 +238,8 @@ export default function ProductManager({ getToken }) {
     }
 
     const openEditModal = async (product) => {
-        // Always fetch fresh categories from DB before opening
-        await fetchCategories()
+        // Always fetch fresh categories and brands from DB before opening
+        await Promise.all([fetchCategories(), fetchBrands()])
         setEditingProduct(product)
         const parsedSpecs = parseSpecPairs(product.specifications)
         setFormData({
@@ -233,6 +247,7 @@ export default function ProductManager({ getToken }) {
             slug: product.slug || '',
             description: product.description || '',
             shortDescription: product.shortDescription || '',
+            brand: product.brand || '',
             category: typeof product.category === 'string'
                 ? { main: product.category, sub: product.subcategory || '' }
                 : (product.category || { main: '', sub: '' }),
@@ -385,6 +400,7 @@ export default function ProductManager({ getToken }) {
                 slug: formData.slug || formData.name.toLowerCase().replace(/\s+/g, '-'),
                 description: formData.description,
                 shortDescription: formData.shortDescription,
+                brand: formData.brand || '',
                 category: categoryMain,
                 subcategory: categorySub,
                 sku: formData.sku,
@@ -1041,6 +1057,24 @@ export default function ProductManager({ getToken }) {
                                                 <option value="used">Used</option>
                                             </select>
                                         </div>
+                                    </div>
+
+                                    {/* Brand */}
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">Brand</label>
+                                        <select
+                                            value={formData.brand}
+                                            onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6B35]"
+                                        >
+                                            <option value="">— No brand —</option>
+                                            {brands.map((b) => (
+                                                <option key={b._id} value={b.name}>{b.name}</option>
+                                            ))}
+                                        </select>
+                                        {brands.length === 0 && (
+                                            <p className="text-xs text-gray-400 mt-1">No brands yet — add them in the Brands tab.</p>
+                                        )}
                                     </div>
 
                                     {/* Category & Subcategory */}
