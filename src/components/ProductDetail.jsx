@@ -292,10 +292,54 @@ export default function ProductDetail({ product, relatedProducts = [] }) {
                 transition={{ duration: 0.2 }}
               >
                 {activeTab === "description" ? (
-                  <div className="text-gray-600 text-[14px] leading-relaxed space-y-4 max-w-4xl p-6 bg-[#fcfaf8] rounded-md border border-gray-100">
-                    {descriptionParagraphs.map((para, i) => (
-                      <p key={i}>{para}</p>
-                    ))}
+                  <div className="text-gray-700 text-[14px] leading-relaxed max-w-4xl p-6 bg-[#fcfaf8] rounded-md border border-gray-100">
+                    {/* ── Multi-section descriptions ── */}
+                    {Array.isArray(product.descriptions) && product.descriptions.length > 0 ? (
+                      <div className="space-y-10">
+                        {product.descriptions.map((section, i) => (
+                          <div key={section.id || i} className="space-y-4">
+                            {/* Section title */}
+                            {section.title && (
+                              <h2 className="text-lg font-bold text-gray-900 leading-tight border-b border-gray-200 pb-2">
+                                {section.title}
+                              </h2>
+                            )}
+                            {/* Section image */}
+                            {section.imageUrl && (
+                              <div className="my-4">
+                                <img
+                                  src={section.imageUrl}
+                                  alt={section.title || `Section ${i + 1}`}
+                                  className="w-full rounded-lg object-contain max-h-[500px] border border-gray-100"
+                                />
+                              </div>
+                            )}
+                            {/* Section body — each line as its own paragraph */}
+                            {section.body && (
+                              <div className="space-y-3 text-gray-700">
+                                {section.body
+                                  .split('\n')
+                                  .map((line, li) =>
+                                    line.trim() ? (
+                                      <p key={li} className="leading-relaxed">{line}</p>
+                                    ) : (
+                                      <div key={li} className="h-1" />
+                                    )
+                                  )}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      /* Fallback — render old plain description */
+                      <div className="space-y-3">
+                        {descriptionParagraphs.map((para, i) => (
+                          <p key={i}>{para}</p>
+                        ))}
+                      </div>
+                    )}
+
                     {customFields.length > 0 && (
                       <div className="mt-8 pt-6 border-t border-gray-100">
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

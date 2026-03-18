@@ -18,7 +18,11 @@ import {
     DollarSign,
     Tag,
     BarChart3,
-    AlertCircle
+    AlertCircle,
+    ChevronUp,
+    ChevronDown,
+    GripVertical,
+    FileText
 } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 import CategoryManager from '@/components/admin/CategoryManager'
@@ -46,7 +50,6 @@ export default function ProductManager({ getToken }) {
         name: '',
         slug: '',
         description: '',
-        shortDescription: '',
         brand: '',
         category: { main: '', sub: '' },
         sku: '',
@@ -70,6 +73,10 @@ export default function ProductManager({ getToken }) {
         specifications: {},
         customFields: {}
     })
+
+    // Description sections: each has { id, title, body, imageUrl, imagePublicId, _localFile, _localPreview }
+    const [descSections, setDescSections] = useState([])
+    const descImageRefs = useRef({}) // keyed by section id
 
     // Features helpers
     const [newFeature, setNewFeature] = useState('')
@@ -208,7 +215,6 @@ export default function ProductManager({ getToken }) {
             name: '',
             slug: '',
             description: '',
-            shortDescription: '',
             brand: '',
             category: { main: '', sub: '' },
             sku: '',
@@ -224,6 +230,7 @@ export default function ProductManager({ getToken }) {
             specifications: {},
             customFields: {}
         })
+        setDescSections([])
         setImageFiles([])
         setImagePreviews([])
         setSpecPairs([{ key: '', value: '' }])
@@ -246,7 +253,6 @@ export default function ProductManager({ getToken }) {
             name: product.name || '',
             slug: product.slug || '',
             description: product.description || '',
-            shortDescription: product.shortDescription || '',
             brand: product.brand || '',
             category: typeof product.category === 'string'
                 ? { main: product.category, sub: product.subcategory || '' }
@@ -272,6 +278,9 @@ export default function ProductManager({ getToken }) {
             specifications: product.specifications || {},
             customFields: product.customFields || {}
         })
+        // Populate description sections from saved product
+        const savedDesc = Array.isArray(product.descriptions) ? product.descriptions : []
+        setDescSections(savedDesc.map(s => ({ ...s, _localFile: null, _localPreview: null })))
         setSpecPairs(parsedSpecs)
         setNewFeature('')
         setNewCategoryName('')
@@ -395,11 +404,21 @@ export default function ProductManager({ getToken }) {
                 finalCustomFields[customFieldKey.trim()] = customFieldValue
             }
 
+            // Build descriptions array (strip local-only fields before sending)
+            const cleanDescriptions = descSections
+                .filter(s => s.title?.trim() || s.body?.trim())
+                .map(({ id, title, body, imageUrl, imagePublicId }) => ({
+                    id: id || crypto.randomUUID(),
+                    title: title || '',
+                    body: body || '',
+                    imageUrl: imageUrl || null,
+                    imagePublicId: imagePublicId || null,
+                }))
+
             const productData = {
                 name: formData.name,
                 slug: formData.slug || formData.name.toLowerCase().replace(/\s+/g, '-'),
                 description: formData.description,
-                shortDescription: formData.shortDescription,
                 brand: formData.brand || '',
                 category: categoryMain,
                 subcategory: categorySub,
@@ -423,6 +442,28 @@ export default function ProductManager({ getToken }) {
                 features: finalFeatures,
                 specifications: builtSpecs,
                 customFields: finalCustomFields,
+                descriptions: cleanDescriptions,
+            }
+
+            // Helper to upload description section images after product is saved
+            const uploadDescriptionImages = async (productId) => {
+                const sectionsWithNewImages = descSections.filter(s => s._localFile)
+                for (const section of sectionsWithNewImages) {
+                    try {
+                        const fd = new FormData()
+                        fd.append('productId', productId)
+                        fd.append('sectionId', section.id)
+                        fd.append('image', section._localFile)
+                        const res = await fetch('/api/product?action=upload-description-image', {
+                            method: 'PUT',
+                            headers: { Authorization: `Bearer ${token}` },
+                            body: fd,
+                        })
+                        if (!res.ok) console.error('Failed to upload description image for section', section.id)
+                    } catch (err) {
+                        console.error('Error uploading description image:', err)
+                    }
+                }
             }
 
             const uploadImages = async (productId) => {
@@ -440,9 +481,7 @@ export default function ProductManager({ getToken }) {
             }
 
             if (editingProduct) {
-                // For edit: upload images first (productId already known), then update
-                await uploadImages(editingProduct._id)
-
+                // 1. Save text fields first (so descriptions array with section IDs is stored)
                 const response = await fetch('/api/product', {
                     method: 'PUT',
                     headers: {
@@ -453,6 +492,12 @@ export default function ProductManager({ getToken }) {
                 })
                 const data = await response.json()
                 if (!data.success) throw new Error(data.error || 'Failed to update product')
+
+                // 2. Upload product gallery images + description section images in parallel
+                await Promise.all([
+                    uploadImages(editingProduct._id),
+                    uploadDescriptionImages(editingProduct._id),
+                ])
             } else {
                 // For create: create product first, then upload images with returned _id
                 const response = await fetch('/api/product', {
@@ -466,9 +511,10 @@ export default function ProductManager({ getToken }) {
                 const data = await response.json()
                 if (!data.success) throw new Error(data.error || 'Failed to create product')
 
-                // Upload images using the new product's _id
+                // Upload product images + description section images using the new product's _id
                 if (data.product?._id) {
                     await uploadImages(data.product._id)
+                    await uploadDescriptionImages(data.product._id)
                 }
             }
 
@@ -943,18 +989,173 @@ export default function ProductManager({ getToken }) {
                                         </div>
                                     </div>
 
-                                    {/* Description */}
-                                    <div>
-                                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                            Description
-                                        </label>
-                                        <textarea
-                                            value={formData.description}
-                                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                            rows="4"
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6B35] resize-none"
-                                            placeholder="Product description..."
-                                        />
+                                    {/* ── Page Descriptions (dynamic sections) ── */}
+                                    <div className="space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <label className="block text-sm font-semibold text-gray-700">
+                                                    Page Descriptions
+                                                </label>
+                                                <p className="text-xs text-gray-400 mt-0.5">
+                                                    Each section renders as: Heading → Image (optional) → Body text. Displayed in order on the product page.
+                                                </p>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const newId = crypto.randomUUID()
+                                                    setDescSections(prev => [...prev, { id: newId, title: '', body: '', imageUrl: null, imagePublicId: null, _localFile: null, _localPreview: null }])
+                                                }}
+                                                className="flex items-center gap-1.5 px-3 py-2 bg-[#FF6B35] text-white rounded-lg text-sm font-semibold hover:bg-[#E85A2A] transition-colors flex-shrink-0"
+                                            >
+                                                <Plus size={14} /> Add Section
+                                            </button>
+                                        </div>
+
+                                        {descSections.length === 0 && (
+                                            <div className="flex flex-col items-center justify-center py-10 border-2 border-dashed border-gray-200 rounded-xl text-center bg-gray-50">
+                                                <FileText size={36} className="text-gray-300 mb-2" />
+                                                <p className="text-sm text-gray-500 font-medium">No description sections yet</p>
+                                                <p className="text-xs text-gray-400 mt-1">Click "Add Section" to create your first description block</p>
+                                            </div>
+                                        )}
+
+                                        <div className="space-y-4">
+                                            {descSections.map((section, idx) => (
+                                                <div key={section.id} className="bg-gray-50 rounded-xl border border-gray-200 p-4 space-y-3">
+                                                    {/* Section header row */}
+                                                    <div className="flex items-center justify-between gap-2">
+                                                        <span className="text-xs font-bold text-gray-400 tracking-wide uppercase">
+                                                            Section {idx + 1}
+                                                        </span>
+                                                        <div className="flex items-center gap-1 ml-auto">
+                                                            <button
+                                                                type="button"
+                                                                disabled={idx === 0}
+                                                                onClick={() => {
+                                                                    const s = [...descSections]
+                                                                    ;[s[idx - 1], s[idx]] = [s[idx], s[idx - 1]]
+                                                                    setDescSections(s)
+                                                                }}
+                                                                className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded disabled:opacity-30 transition-colors"
+                                                                title="Move up"
+                                                            >
+                                                                <ChevronUp size={14} />
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                disabled={idx === descSections.length - 1}
+                                                                onClick={() => {
+                                                                    const s = [...descSections]
+                                                                    ;[s[idx], s[idx + 1]] = [s[idx + 1], s[idx]]
+                                                                    setDescSections(s)
+                                                                }}
+                                                                className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded disabled:opacity-30 transition-colors"
+                                                                title="Move down"
+                                                            >
+                                                                <ChevronDown size={14} />
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setDescSections(prev => prev.filter(s => s.id !== section.id))}
+                                                                className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                                                title="Remove section"
+                                                            >
+                                                                <X size={14} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Title */}
+                                                    <input
+                                                        type="text"
+                                                        value={section.title}
+                                                        onChange={(e) => {
+                                                            const s = [...descSections]
+                                                            s[idx] = { ...s[idx], title: e.target.value }
+                                                            setDescSections(s)
+                                                        }}
+                                                        placeholder="Section heading (optional) — e.g. Why Buy from Us?"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#FF6B35] bg-white"
+                                                    />
+
+                                                    {/* Body */}
+                                                    <textarea
+                                                        value={section.body}
+                                                        onChange={(e) => {
+                                                            const s = [...descSections]
+                                                            s[idx] = { ...s[idx], body: e.target.value }
+                                                            setDescSections(s)
+                                                        }}
+                                                        rows={6}
+                                                        placeholder={"Write the content for this section.\n\nEach new line will be shown as a separate paragraph.\n\nExample:\nGuaranteed Lowest Price: We promise you the best value...\n\nDazzle Care+ (1-Year Replacement Guarantee): Go beyond repair..."}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B35] resize-y bg-white"
+                                                    />
+
+                                                    {/* Image upload area for this section */}
+                                                    <div>
+                                                        <p className="text-xs font-semibold text-gray-500 mb-2">Section Image <span className="font-normal text-gray-400">(optional)</span></p>
+
+                                                        {section._localPreview || section.imageUrl ? (
+                                                            <div className="relative inline-block group">
+                                                                <img
+                                                                    src={section._localPreview || section.imageUrl}
+                                                                    alt="Section preview"
+                                                                    className="h-32 w-auto max-w-full rounded-lg border border-gray-200 object-contain bg-white"
+                                                                />
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={async () => {
+                                                                        // If saved server image, delete via API
+                                                                        if (section.imageUrl && section.imagePublicId && editingProduct) {
+                                                                            try {
+                                                                                const token = await getToken()
+                                                                                await fetch('/api/product?action=delete-description-image', {
+                                                                                    method: 'PUT',
+                                                                                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                                                                                    body: JSON.stringify({ productId: editingProduct._id, sectionId: section.id, publicId: section.imagePublicId }),
+                                                                                })
+                                                                            } catch (e) { console.error('Failed to delete description image:', e) }
+                                                                        }
+                                                                        const s = [...descSections]
+                                                                        s[idx] = { ...s[idx], imageUrl: null, imagePublicId: null, _localFile: null, _localPreview: null }
+                                                                        setDescSections(s)
+                                                                    }}
+                                                                    className="absolute -top-2 -right-2 p-1 bg-red-600 text-white rounded-full shadow opacity-90 hover:opacity-100"
+                                                                >
+                                                                    <X size={12} />
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    // Create a hidden file input and click it
+                                                                    const inp = document.createElement('input')
+                                                                    inp.type = 'file'
+                                                                    inp.accept = 'image/*'
+                                                                    inp.onchange = (e) => {
+                                                                        const file = e.target.files?.[0]
+                                                                        if (!file) return
+                                                                        const sId = section.id
+                                                                        const previewUrl = URL.createObjectURL(file)
+                                                                        setDescSections(prev => prev.map(s =>
+                                                                            s.id === sId
+                                                                                ? { ...s, _localFile: file, _localPreview: previewUrl }
+                                                                                : s
+                                                                        ))
+                                                                    }
+                                                                    inp.click()
+                                                                }}
+                                                                className="flex items-center gap-2 px-3 py-2 border-2 border-dashed border-gray-300 rounded-lg text-xs text-gray-500 hover:border-[#FF6B35] hover:text-[#FF6B35] hover:bg-orange-50 transition-all"
+                                                            >
+                                                                <Upload size={14} /> Click to upload an image for this section
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
 
                                     {/* Pricing */}

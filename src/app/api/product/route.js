@@ -223,6 +223,7 @@ export async function POST(req) {
         const stockQty = body.stockQty !== undefined ? Math.max(0, parseInt(body.stockQty, 10) || 0) :
             (body.inventory?.totalStock !== undefined ? Math.max(0, parseInt(body.inventory.totalStock, 10) || 0) : 0)
         const sku = sanitizeString(body.sku || '', 100)
+        const brand = sanitizeString(body.brand || '', 200)
         const inventory = body.inventory && typeof body.inventory === 'object' ? {
             totalStock: stockQty,
             lowStockThreshold: Math.max(0, parseInt(body.inventory.lowStockThreshold, 10) || 10),
@@ -268,14 +269,25 @@ export async function POST(req) {
                     .filter(([k]) => k)
             ) : {}
 
+        // descriptions: array of { id, title, body, imageUrl, imagePublicId }
+        const descriptions = Array.isArray(body.descriptions)
+            ? body.descriptions.slice(0, 20).map(s => ({
+                id: sanitizeString(String(s.id || ''), 100) || crypto.randomUUID(),
+                title: sanitizeString(String(s.title || ''), 300),
+                body: sanitizeString(String(s.body || ''), 10000),
+                imageUrl: s.imageUrl ? sanitizeString(String(s.imageUrl), 500) : null,
+                imagePublicId: s.imagePublicId ? sanitizeString(String(s.imagePublicId), 300) : null,
+            })).filter(s => s.title || s.body)
+            : []
+
         const client = await clientPromise
         const db = client.db('ECOM2')
 
         const newProduct = {
-            name, description,
+            name, description, brand,
             category, subcategory, sku,
             condition, stock, stockQty, inventory, price, originalPrice, discount,
-            features, specifications, customFields,
+            features, specifications, customFields, descriptions,
             images: [],
             isNewArrival, isLovedProduct, isTrending, isActive, status,
             createdBy: user.dbUserId || user.userId,
@@ -367,6 +379,93 @@ export async function PUT(req) {
             return NextResponse.json({ success: true, message: 'Images uploaded successfully', images: uploadedImages, product: updated })
         }
 
+        // ── Upload description section image ──
+        if (action === 'upload-description-image') {
+            checkUploadRateLimit(req)
+            const formData = await req.formData()
+            const productId = sanitizeString(formData.get('productId') || '', 100)
+            const sectionId = sanitizeString(formData.get('sectionId') || '', 100)
+            const imageFile = formData.get('image')
+
+            if (!productId || !sectionId) return NextResponse.json({ error: 'productId and sectionId are required' }, { status: 400 })
+            if (!imageFile || typeof imageFile === 'string') return NextResponse.json({ error: 'image file is required' }, { status: 400 })
+            if (imageFile.size > MAX_IMAGE_SIZE_ADMIN) return NextResponse.json({ error: 'Image too large (max 100MB)' }, { status: 400 })
+
+            let oid
+            try { oid = new ObjectId(productId) } catch {
+                return NextResponse.json({ error: 'Invalid productId' }, { status: 400 })
+            }
+
+            const client = await clientPromise
+            const db = client.db('ECOM2')
+            const product = await db.collection('products').findOne({ _id: oid })
+            if (!product) return NextResponse.json({ error: 'Product not found' }, { status: 404 })
+
+            // Delete old image for this section if it exists
+            const existingSection = (product.descriptions || []).find(s => s.id === sectionId)
+            if (existingSection?.imagePublicId) {
+                try { await deleteImage(existingSection.imagePublicId) } catch (e) { console.error('Old desc image delete error:', e) }
+            }
+
+            // Upload new image
+            const buffer = Buffer.from(await imageFile.arrayBuffer())
+            const result = await uploadImage(buffer, {
+                folder: 'ecom2/products/descriptions',
+                publicId: `desc_${productId}_${sectionId.slice(0, 8)}_${Date.now()}`,
+                transformation: [{ width: 1200, crop: 'limit' }],
+            })
+            const imageUrl = result.secure_url || result.url
+            const imagePublicId = result.publicId
+
+            // Update the matching section in the descriptions array
+            const updatedDescriptions = (product.descriptions || []).map(s =>
+                s.id === sectionId ? { ...s, imageUrl, imagePublicId } : s
+            )
+            // If section not yet in DB (new product just created), append it
+            if (!updatedDescriptions.find(s => s.id === sectionId)) {
+                updatedDescriptions.push({ id: sectionId, title: '', body: '', imageUrl, imagePublicId })
+            }
+
+            await db.collection('products').updateOne(
+                { _id: oid },
+                { $set: { descriptions: updatedDescriptions, updatedAt: new Date() } }
+            )
+            logAudit('PRODUCT_DESC_IMAGE_UPLOADED', { userId: user.userId, productId, sectionId }, req)
+            return NextResponse.json({ success: true, imageUrl, imagePublicId })
+        }
+
+        // ── Delete description section image ──
+        if (action === 'delete-description-image') {
+            const body = await req.json()
+            const productId = sanitizeString(body.productId || '', 100)
+            const sectionId = sanitizeString(body.sectionId || '', 100)
+            const publicId = sanitizeString(body.publicId || '', 300)
+
+            if (!productId || !sectionId || !publicId) return NextResponse.json({ error: 'productId, sectionId and publicId are required' }, { status: 400 })
+
+            let oid
+            try { oid = new ObjectId(productId) } catch {
+                return NextResponse.json({ error: 'Invalid productId' }, { status: 400 })
+            }
+
+            try { await deleteImage(publicId) } catch (e) { console.error('Desc image cloudinary delete error:', e) }
+
+            const client = await clientPromise
+            const db = client.db('ECOM2')
+            const product = await db.collection('products').findOne({ _id: oid })
+            if (product) {
+                const updatedDescriptions = (product.descriptions || []).map(s =>
+                    s.id === sectionId ? { ...s, imageUrl: null, imagePublicId: null } : s
+                )
+                await db.collection('products').updateOne(
+                    { _id: oid },
+                    { $set: { descriptions: updatedDescriptions, updatedAt: new Date() } }
+                )
+            }
+            logAudit('PRODUCT_DESC_IMAGE_DELETED', { userId: user.userId, productId, sectionId }, req)
+            return NextResponse.json({ success: true, message: 'Description image deleted' })
+        }
+
         // ── Delete single image ──
         if (action === 'delete-image') {
             const body = await req.json()
@@ -411,6 +510,7 @@ export async function PUT(req) {
         const updateData = { updatedAt: new Date() }
         if (body.name !== undefined) updateData.name = sanitizeString(body.name, 200)
         if (body.description !== undefined) updateData.description = sanitizeString(body.description, 1000)
+        if (body.brand !== undefined) updateData.brand = sanitizeString(body.brand || '', 200)
         if (body.category !== undefined) updateData.category = sanitizeString(body.category, 200)
         if (body.subcategory !== undefined) updateData.subcategory = sanitizeString(body.subcategory, 200)
         if (body.sku !== undefined) updateData.sku = sanitizeString(body.sku || '', 100)
@@ -438,6 +538,15 @@ export async function PUT(req) {
             updateData.status = body.status
         }
         if (body.features !== undefined && Array.isArray(body.features)) updateData.features = body.features.map(f => sanitizeString(f, 300)).filter(Boolean).slice(0, 50)
+        if (body.descriptions !== undefined && Array.isArray(body.descriptions)) {
+            updateData.descriptions = body.descriptions.slice(0, 20).map(s => ({
+                id: sanitizeString(String(s.id || ''), 100) || crypto.randomUUID(),
+                title: sanitizeString(String(s.title || ''), 300),
+                body: sanitizeString(String(s.body || ''), 10000),
+                imageUrl: s.imageUrl ? sanitizeString(String(s.imageUrl), 500) : null,
+                imagePublicId: s.imagePublicId ? sanitizeString(String(s.imagePublicId), 300) : null,
+            })).filter(s => s.title || s.body)
+        }
         if (body.customFields !== undefined && typeof body.customFields === 'object' && !Array.isArray(body.customFields)) {
             updateData.customFields = Object.fromEntries(
                 Object.entries(body.customFields).slice(0, 30)
