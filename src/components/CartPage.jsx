@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart, Trash2, Minus, Plus, ArrowLeft, MapPin, Truck, CheckCircle, ChevronDown, X, Loader2 } from "lucide-react";
+import { ShoppingCart, Trash2, Minus, Plus, ArrowLeft, MapPin, Truck, CheckCircle, ChevronDown, X, Loader2, Tag, AlertCircle } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 
 const dhakaAreas = [
@@ -47,6 +47,12 @@ export default function CartPage() {
   const [orderedCount, setOrderedCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Coupon state
+  const [couponInput, setCouponInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState(null); // { code, discountAmount, reason }
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState("");
+
   // Form state
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -83,6 +89,8 @@ export default function CartPage() {
         price: salePrice,
         originalPrice: regularPrice,
         brand: p.customFields?.brand || p.brand || p.category || "",
+        category: p.category || "",
+        subcategory: p.subcategory || "",
         image: p.images && p.images.length > 0 ? p.images[0].url : (p.image || "/placeholder.png"),
         qty: item.qty
       };
@@ -135,7 +143,84 @@ export default function CartPage() {
     0
   );
   const shippingCost = shippingZone === "inside" ? SHIPPING_INSIDE_DHAKA : SHIPPING_OUTSIDE_DHAKA;
-  const total = subtotal + shippingCost;
+
+  // ── Live coupon discount — recomputed every render from current cart ──────
+  const couponDiscount = (() => {
+    if (!appliedCoupon) return 0;
+    const c = appliedCoupon;
+    // Determine the eligible sub-total based on scope
+    let eligibleTotal = 0;
+    if (c.scope === "all") {
+      eligibleTotal = subtotal;
+    } else if (c.scope === "category" && c.categories?.length > 0) {
+      eligibleTotal = selectedItems
+        .filter(i => c.categories.includes(i.category))
+        .reduce((sum, i) => sum + i.price * i.qty, 0);
+    } else if (c.scope === "subcategory" && c.subcategories?.length > 0) {
+      eligibleTotal = selectedItems
+        .filter(i => c.categories?.includes(i.category) && c.subcategories.includes(i.subcategory))
+        .reduce((sum, i) => sum + i.price * i.qty, 0);
+    } else if (c.scope === "product" && c.productIds?.length > 0) {
+      eligibleTotal = selectedItems
+        .filter(i => c.productIds.includes(String(i.id)))
+        .reduce((sum, i) => sum + i.price * i.qty, 0);
+    }
+    // Enforce minimum order amount on eligible total
+    if (eligibleTotal <= 0 || eligibleTotal < (c.minOrderAmount || 0)) return 0;
+    let disc = 0;
+    if (c.discountType === "percent") {
+      disc = (eligibleTotal * c.discountValue) / 100;
+      if (c.maxDiscountAmount > 0) disc = Math.min(disc, c.maxDiscountAmount);
+    } else {
+      disc = Math.min(c.discountValue, eligibleTotal);
+    }
+    return Math.min(parseFloat(disc.toFixed(2)), subtotal);
+  })();
+
+  const total = Math.max(0, subtotal + shippingCost - couponDiscount);
+
+  // Apply coupon via the validate endpoint
+  const applyCoupon = async () => {
+    const code = couponInput.trim().toUpperCase();
+    if (!code) return;
+    setCouponLoading(true);
+    setCouponError("");
+    try {
+      const itemsForValidation = selectedItems.map(i => ({
+        productId: i.id,
+        price: i.price,
+        quantity: i.qty,
+        category: i.category || "",
+        subcategory: i.subcategory || "",
+      }));
+      const params = new URLSearchParams({
+        code,
+        total: subtotal.toString(),
+        items: encodeURIComponent(JSON.stringify(itemsForValidation)),
+      });
+      const res = await fetch(`/api/coupon?${params}`);
+      const data = await res.json();
+      if (res.ok && data.valid) {
+        // Store full coupon params — discount is recomputed live from cart, not stored statically
+        setAppliedCoupon(data.coupon);
+        setCouponInput("");
+        setCouponError("");
+      } else {
+        setCouponError(data.reason || "Invalid coupon code");
+        setAppliedCoupon(null);
+      }
+    } catch {
+      setCouponError("Failed to validate coupon. Please try again.");
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponInput("");
+    setCouponError("");
+  };
 
   const validate = () => {
     const errs = {};
@@ -165,6 +250,7 @@ export default function CartPage() {
           streetAddress: streetAddress
         },
         paymentMethod: "cash_on_delivery",
+        couponCode: appliedCoupon?.code || "",
         items: selectedItems.map(item => ({
           productId: item.id,
           name: item.name,
@@ -172,7 +258,9 @@ export default function CartPage() {
           price: item.price,
           originalPrice: item.originalPrice,
           quantity: item.qty,
-          image: item.image
+          image: item.image,
+          category: item.category || "",
+          subcategory: item.subcategory || "",
         }))
       };
 
@@ -187,6 +275,8 @@ export default function CartPage() {
 
       setOrderedCount(selectedItems.length);
       selectedItems.forEach((item) => removeFromCart(item.id));
+      setAppliedCoupon(null);
+      setCouponInput("");
       setOrderPlaced(true);
     } catch (error) {
       console.error(error);
@@ -586,12 +676,68 @@ export default function CartPage() {
                   </span>
                   <span className="font-semibold text-text-primary">Tk {shippingCost}</span>
                 </div>
+                {appliedCoupon && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-green-700 font-medium flex items-center gap-1">
+                      <Tag size={13} /> {appliedCoupon.code}
+                    </span>
+                    <span className="font-semibold text-green-600">- Tk {couponDiscount.toFixed(2)}</span>
+                  </div>
+                )}
               </div>
 
-              <div className="border-t border-gray-100 pt-4 mb-4">
+              {/* Coupon Input */}
+              <div className="mb-4">
+                {!appliedCoupon ? (
+                  <>
+                    <div className="flex gap-2">
+                      <input
+                        value={couponInput}
+                        onChange={e => { setCouponInput(e.target.value.toUpperCase()); setCouponError(""); }}
+                        onKeyDown={e => e.key === "Enter" && applyCoupon()}
+                        placeholder="Enter coupon code"
+                        className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-purple-mid font-mono uppercase transition-colors"
+                      />
+                      <button
+                        onClick={applyCoupon}
+                        disabled={!couponInput.trim() || couponLoading}
+                        className="px-4 py-2 bg-gray-900 hover:bg-gray-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 flex-shrink-0"
+                      >
+                        {couponLoading ? <Loader2 size={14} className="animate-spin" /> : <Tag size={14} />}
+                        Apply
+                      </button>
+                    </div>
+                    {couponError && (
+                      <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
+                        <AlertCircle size={12} /> {couponError}
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg px-3 py-2.5">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle size={15} className="text-green-600" />
+                      <div>
+                        <p className="text-xs font-bold text-green-800">{appliedCoupon.code} applied</p>
+                        <p className="text-[11px] text-green-600">You save Tk {couponDiscount.toFixed(2)}</p>
+                      </div>
+                    </div>
+                    <button onClick={removeCoupon} className="text-gray-400 hover:text-red-500 transition-colors" title="Remove coupon">
+                      <X size={16} />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="border-t border-gray-100 pt-4 mb-5">
                 <div className="flex items-center justify-between">
                   <span className="text-base font-bold text-text-primary">Total</span>
-                  <span className="text-xl font-bold text-orange-600">Tk {total.toFixed(2)}</span>
+                  <div className="text-right">
+                    {couponDiscount > 0 && (
+                      <p className="text-xs line-through text-text-muted">Tk {(subtotal + shippingCost).toFixed(2)}</p>
+                    )}
+                    <span className="text-xl font-bold text-orange-600">Tk {total.toFixed(2)}</span>
+                  </div>
                 </div>
               </div>
 
@@ -629,7 +775,7 @@ export default function CartPage() {
                   ) : (
                     <CheckCircle size={18} />
                   )}
-                  {isSubmitting ? "Placing Order..." : `Confirm Order — Tk ${total.toFixed(2)}`}
+                {isSubmitting ? "Placing Order..." : `Confirm Order — Tk ${total.toFixed(2)}`}
                 </button>
               )}
 

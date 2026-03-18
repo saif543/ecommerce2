@@ -165,14 +165,60 @@ export async function POST(req) {
             return NextResponse.json({ error: `Valid payment method required: ${VALID_PAYMENT_METHODS.join(', ')}` }, { status: 400 })
         }
 
-        const SHIPPING_INSIDE_DHAKA = 60;
-        const SHIPPING_OUTSIDE_DHAKA = 120;
         const shippingCost = deliveryAddress.shippingZone === 'inside' ? SHIPPING_INSIDE_DHAKA : SHIPPING_OUTSIDE_DHAKA;
         const subtotal = parseFloat(items.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2))
-        const totalAmount = parseFloat((subtotal + shippingCost).toFixed(2))
 
         const client = await clientPromise
         const db = client.db('ECOM2')
+
+        // ── Server-side coupon validation (scope-aware) ────────────────────
+        let couponDiscount = 0
+        let appliedCouponCode = null
+        let couponDocId = null
+
+        const rawCode = sanitizeString(body.couponCode || '', 100)
+        if (rawCode) {
+            const code = rawCode.toUpperCase()
+            const coupon = await db.collection('coupons').findOne({ code, isActive: true })
+            if (coupon) {
+                const now = new Date()
+                const expired = coupon.expiresAt && new Date(coupon.expiresAt) < now
+                const usedUp = coupon.usageLimit > 0 && coupon.usedCount >= coupon.usageLimit
+                if (!expired && !usedUp) {
+                    // Calculate eligible sub-total based on coupon scope
+                    let eligibleTotal = 0
+                    if (coupon.scope === 'all') {
+                        eligibleTotal = subtotal
+                    } else if (coupon.scope === 'category' && coupon.categories?.length > 0) {
+                        eligibleTotal = items
+                            .filter(i => coupon.categories.includes(i.category))
+                            .reduce((sum, i) => sum + i.price * i.quantity, 0)
+                    } else if (coupon.scope === 'subcategory' && coupon.subcategories?.length > 0) {
+                        eligibleTotal = items
+                            .filter(i => coupon.categories?.includes(i.category) && coupon.subcategories.includes(i.subcategory))
+                            .reduce((sum, i) => sum + i.price * i.quantity, 0)
+                    } else if (coupon.scope === 'product' && coupon.productIds?.length > 0) {
+                        eligibleTotal = items
+                            .filter(i => coupon.productIds.includes(String(i.productId)))
+                            .reduce((sum, i) => sum + i.price * i.quantity, 0)
+                    }
+                    // Apply only if eligible total meets minimum order requirement
+                    if (eligibleTotal > 0 && eligibleTotal >= (coupon.minOrderAmount || 0)) {
+                        if (coupon.discountType === 'percent') {
+                            couponDiscount = (eligibleTotal * coupon.discountValue) / 100
+                            if (coupon.maxDiscountAmount > 0) couponDiscount = Math.min(couponDiscount, coupon.maxDiscountAmount)
+                        } else {
+                            couponDiscount = Math.min(coupon.discountValue, eligibleTotal)
+                        }
+                        couponDiscount = parseFloat(Math.min(couponDiscount, subtotal).toFixed(2))
+                        appliedCouponCode = code
+                        couponDocId = coupon._id
+                    }
+                }
+            }
+        }
+
+        const totalAmount = parseFloat((subtotal + shippingCost - couponDiscount).toFixed(2))
         const newOrder = {
             userId: user?.dbUserId || user?.userId || 'guest',
             userEmail: deliveryAddress.email || user?.email || '',
@@ -181,7 +227,9 @@ export async function POST(req) {
             items,
             subtotal,
             shippingCost,
-            totalAmount,
+            couponCode: appliedCouponCode,
+            couponDiscount,
+            totalAmount: Math.max(0, totalAmount),
             deliveryAddress,
             paymentMethod,
             status: 'pending',
@@ -192,7 +240,16 @@ export async function POST(req) {
         const result = await db.collection('orders').insertOne(newOrder)
         const created = await db.collection('orders').findOne({ _id: result.insertedId })
 
-        logAudit('ORDER_PLACED', { userId: newOrder.userId, userEmail: newOrder.userEmail, orderId: result.insertedId.toString(), totalAmount, itemCount: items.length }, req)
+        logAudit('ORDER_PLACED', { userId: newOrder.userId, userEmail: newOrder.userEmail, orderId: result.insertedId.toString(), totalAmount: newOrder.totalAmount, couponCode: appliedCouponCode, couponDiscount, itemCount: items.length }, req)
+
+        // Increment coupon usedCount asynchronously after successful order
+        if (couponDocId) {
+            setImmediate(async () => {
+                try { await db.collection('coupons').updateOne({ _id: couponDocId }, { $inc: { usedCount: 1 } }) }
+                catch (e) { console.error('Failed to increment coupon usedCount:', e) }
+            })
+        }
+
         return NextResponse.json({ success: true, message: 'Order placed successfully', order: created }, { status: 201 })
 
     } catch (err) {

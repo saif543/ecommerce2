@@ -13,7 +13,8 @@ import {
     Bell,
     Home,
     Layers,
-    Tag
+    Tag,
+    Ticket
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import AdminGuard from '@/components/admin/AdminGuard'
@@ -23,6 +24,7 @@ import OrderManager from '@/components/admin/OrderManager'
 import SectionBannerManager from '@/components/admin/SectionBannerManager'
 import CategoryBannerManager from '@/components/admin/CategoryBannerManager'
 import BrandManager from '@/components/admin/BrandManager'
+import CouponManager from '@/components/admin/CouponManager'
 
 function AdminDashboard() {
     const router = useRouter()
@@ -120,6 +122,7 @@ function AdminDashboard() {
         { id: 'brands', label: 'Brands', icon: Tag },
         { id: 'sliders', label: 'Sliders', icon: ImageIcon },
         { id: 'banners', label: 'Banners', icon: Layers },
+        { id: 'coupons', label: 'Coupons', icon: Ticket },
         { id: 'orders', label: 'Orders', icon: ShoppingCart },
     ]
 
@@ -330,6 +333,11 @@ function AdminDashboard() {
                                 <CategoryBannerManager getToken={getToken} />
                             </div>
                         </div>
+                    )}
+
+                    {/* Coupons Tab */}
+                    {activeTab === 'coupons' && (
+                        <CouponManager getToken={getToken} />
                     )}
 
                     {/* Orders Tab */}
