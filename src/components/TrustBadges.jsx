@@ -2,23 +2,28 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Truck, Award, RefreshCw } from "lucide-react";
+import { Headset, CreditCard, ShieldCheck, Rocket } from "lucide-react";
 
 const badges = [
   {
-    icon: <Truck size={36} strokeWidth={1.5} />,
-    title: "Free Shipping",
-    desc: "On all orders over $99",
+    icon: <Headset size={36} strokeWidth={1.5} />,
+    title: "24/7 Support",
+    desc: "Round-the-clock online assistance",
   },
   {
-    icon: <Award size={36} strokeWidth={1.5} />,
-    title: "Quality Guaranteed",
-    desc: "100% Authentic Products",
+    icon: <CreditCard size={36} strokeWidth={1.5} />,
+    title: "Secure Payment",
+    desc: "Hassle-free cashless transactions",
   },
   {
-    icon: <RefreshCw size={36} strokeWidth={1.5} />,
-    title: "30-Day Return",
-    desc: "Money Back Guarantee",
+    icon: <ShieldCheck size={36} strokeWidth={1.5} />,
+    title: "100% Genuine",
+    desc: "Every product is verified authentic",
+  },
+  {
+    icon: <Rocket size={36} strokeWidth={1.5} />,
+    title: "Express Delivery",
+    desc: "Swift shipping right to your door",
   },
 ];
 

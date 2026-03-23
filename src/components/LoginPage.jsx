@@ -101,8 +101,8 @@ export default function LoginPage() {
       >
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 mb-8 justify-center">
-          <div className="w-9 h-9 rounded-full bg-black flex items-center justify-center">
-            <span className="text-[#C4A265] font-bold text-sm">Z</span>
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#3F72AF] to-[#1a1a2e] flex items-center justify-center">
+            <span className="text-[#5C9AE5] font-bold text-sm">Z</span>
           </div>
           <span className="font-serif text-2xl tracking-tight text-purple-dark">ZenTech</span>
         </Link>

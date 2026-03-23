@@ -1,20 +1,20 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-purple-dark: #1a1a1a;
-  --color-purple-mid: #B8860B;
-  --color-purple-light: #D4A843;
-  --color-purple-accent: #E6C068;
-  --color-purple-soft: #FDF6E3;
-  --color-purple-muted: #F5E6C8;
-  --color-offwhite: #FAFAF8;
-  --color-cream: #F5F3EF;
+  --color-purple-dark: #1a1a2e;
+  --color-purple-mid: #3F72AF;
+  --color-purple-light: #5C9AE5;
+  --color-purple-accent: #7BAAF7;
+  --color-purple-soft: #E8EAF6;
+  --color-purple-muted: #C5CAE9;
+  --color-offwhite: #F5F5F5;
+  --color-cream: #EFEFEF;
   --color-card-white: #FFFFFF;
-  --color-text-primary: #1a1a1a;
-  --color-text-secondary: #6B7280;
-  --color-text-muted: #9CA3AF;
-  --color-gold-start: #B8860B;
-  --color-gold-end: #E6C068;
+  --color-text-primary: #1a1a2e;
+  --color-text-secondary: #3a3a5c;
+  --color-text-muted: #7a7a9a;
+  --color-gold-start: #3F72AF;
+  --color-gold-end: #5C9AE5;
   --font-sans: var(--font-poppins), "Poppins", sans-serif;
   --font-serif: var(--font-poppins), "Poppins", sans-serif;
   --font-mono: var(--font-poppins), "Poppins", sans-serif;
@@ -51,7 +51,7 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--color-gold-start), var(--color-gold-end));
+  background: linear-gradient(180deg, var(--color-purple-mid), var(--color-purple-light));
   border-radius: 4px;
 }
 
@@ -65,4 +65,25 @@ html {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* Smooth transitions for interactive elements */
+a, button {
+  transition: all 0.2s ease;
+}
+
+/* Fade-in animation utility */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out both;
 }

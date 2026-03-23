@@ -203,7 +203,7 @@ export default function BrandManager({ getToken }) {
     if (loading) {
         return (
             <div className="flex items-center justify-center py-20">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-[#FF6B35]" />
+                <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-[#3F72AF]" />
             </div>
         )
     }
@@ -236,7 +236,7 @@ export default function BrandManager({ getToken }) {
                         {brands.length} brand{brands.length !== 1 ? 's' : ''} · Brands appear in the product form dropdown
                     </p>
                 </div>
-                <div className="flex items-center gap-2 bg-orange-50 border border-orange-200 px-3 py-2 rounded-lg text-xs text-orange-700">
+                <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 px-3 py-2 rounded-lg text-xs text-blue-700">
                     <Tag size={14} />
                     Brands persist independently of products
                 </div>
@@ -251,7 +251,7 @@ export default function BrandManager({ getToken }) {
                     <div
                         onClick={() => newLogoRef.current?.click()}
                         className={`flex items-center gap-4 p-4 rounded-xl border-2 border-dashed cursor-pointer transition-all
-                            ${newBrandPreview ? 'border-[#FF6B35] bg-orange-50' : 'border-gray-200 hover:border-[#FF6B35] hover:bg-orange-50'}`}
+                            ${newBrandPreview ? 'border-[#3F72AF] bg-blue-50' : 'border-gray-200 hover:border-[#3F72AF] hover:bg-blue-50'}`}
                     >
                         {newBrandPreview ? (
                             <>
@@ -261,7 +261,7 @@ export default function BrandManager({ getToken }) {
                                     className="w-14 h-14 object-contain rounded-lg bg-white border border-gray-200 flex-shrink-0 p-1"
                                 />
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium text-[#FF6B35] truncate">{newBrandLogo?.name}</p>
+                                    <p className="text-sm font-medium text-[#3F72AF] truncate">{newBrandLogo?.name}</p>
                                     <p className="text-xs text-gray-400">Click to change logo</p>
                                 </div>
                                 <button
@@ -307,12 +307,12 @@ export default function BrandManager({ getToken }) {
                         onChange={(e) => setNewBrandName(e.target.value)}
                         onKeyDown={(e) => { if (e.key === 'Enter') handleAddBrand() }}
                         placeholder="e.g. Samsung, Apple, Sony"
-                        className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent"
+                        className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3F72AF] focus:border-transparent"
                     />
                     <button
                         onClick={handleAddBrand}
                         disabled={addingBrand || !newBrandName.trim()}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#FF6B35] to-[#E85A2A] text-white rounded-lg text-sm font-semibold hover:from-[#E85A2A] hover:to-[#D94A1A] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                        className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#3F72AF] to-[#2D5F8A] text-white rounded-lg text-sm font-semibold hover:from-[#2D5F8A] hover:to-[#1E4D6D] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                     >
                         {addingBrand ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />}
                         {addingBrand ? 'Adding...' : 'Add Brand'}
@@ -342,7 +342,7 @@ export default function BrandManager({ getToken }) {
                             >
                                 {/* Logo */}
                                 <div
-                                    className="relative flex-shrink-0 w-14 h-14 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center cursor-pointer overflow-hidden hover:border-[#FF6B35] transition-colors"
+                                    className="relative flex-shrink-0 w-14 h-14 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center cursor-pointer overflow-hidden hover:border-[#3F72AF] transition-colors"
                                     title="Click to update logo"
                                     onClick={() => {
                                         // Programmatically open file picker for this brand
@@ -357,7 +357,7 @@ export default function BrandManager({ getToken }) {
                                     }}
                                 >
                                     {isUpdatingLogo ? (
-                                        <Loader2 size={22} className="animate-spin text-[#FF6B35]" />
+                                        <Loader2 size={22} className="animate-spin text-[#3F72AF]" />
                                     ) : brand.logo ? (
                                         <>
                                             <img
@@ -391,7 +391,7 @@ export default function BrandManager({ getToken }) {
                                                 if (e.key === 'Enter') handleRename(brand)
                                                 if (e.key === 'Escape') setRenamingId(null)
                                             }}
-                                            className="w-full px-2 py-1 border border-[#FF6B35] rounded-lg text-sm font-semibold focus:outline-none"
+                                            className="w-full px-2 py-1 border border-[#3F72AF] rounded-lg text-sm font-semibold focus:outline-none"
                                         />
                                     ) : (
                                         <p className="font-semibold text-gray-900 text-sm truncate">{brand.name}</p>

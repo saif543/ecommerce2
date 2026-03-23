@@ -25,14 +25,20 @@ const socialIcons = [Facebook, Instagram, Twitter, Youtube];
 
 export default function Footer() {
   return (
-    <footer className="bg-text-primary text-white">
+    <footer className="bg-gradient-to-b from-[#1a1a2e] via-[#16213e] to-[#0f3460] text-white overflow-hidden">
       <div className="max-w-[1440px] mx-auto px-6 py-14">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
           {/* Brand */}
-          <div className="lg:col-span-2">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="lg:col-span-2"
+          >
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center">
-                <span className="text-[#C4A265] font-bold text-xs">Z</span>
+              <div className="w-8 h-8 bg-[#3F72AF] rounded-full flex items-center justify-center">
+                <span className="text-white font-bold text-xs">Z</span>
               </div>
               <span className="text-xl font-semibold tracking-tight">ZenTech</span>
             </div>
@@ -51,11 +57,17 @@ export default function Footer() {
                 </motion.a>
               ))}
             </div>
-          </div>
+          </motion.div>
 
           {/* Links */}
-          {Object.entries(footerLinks).map(([title, links]) => (
-            <div key={title}>
+          {Object.entries(footerLinks).map(([title, links], i) => (
+            <motion.div
+              key={title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 * (i + 1) }}
+            >
               <h4 className="font-semibold text-sm mb-4">{title}</h4>
               <ul className="space-y-2.5">
                 {links.map((link) => (
@@ -66,16 +78,22 @@ export default function Footer() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </motion.div>
           ))}
         </div>
 
         {/* Bottom */}
-        <div className="border-t border-white/10 mt-12 pt-6 text-center">
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="border-t border-white/10 mt-12 pt-6 text-center"
+        >
           <p className="text-white/30 text-xs">
             &copy; 2026 ZenTech. All rights reserved.
           </p>
-        </div>
+        </motion.div>
       </div>
     </footer>
   );

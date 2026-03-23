@@ -4,17 +4,61 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Search, ShoppingCart, ChevronDown, ChevronRight, X, User, LogOut, Menu, Home, TrendingUp, HeadphonesIcon, Info } from "lucide-react";
+import { Search, ShoppingCart, ChevronDown, ChevronRight, X, User, LogOut, Menu, Home, TrendingUp, HeadphonesIcon, Info, Tag } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/hooks/useAuth";
+import { sampleCategories } from "@/data/sampleProducts";
 import Swal from "sweetalert2";
+
+// Fallback categories for when DB is unavailable
+const fallbackCategories = sampleCategories;
 
 // Convert a category name to a URL-friendly slug
 function toSlug(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
+// Animated logo text — typewriter effect: types out then erases, loops
+function AnimatedLogo({ className = "text-xl", color = "text-purple-dark" }) {
+  const text = "ZenTech";
+  const [displayCount, setDisplayCount] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const typeSpeed = isDeleting ? 80 : 150;
+    const pauseAtEnd = 2000;
+    const pauseAtStart = 500;
+
+    if (!isDeleting && displayCount === text.length) {
+      const t = setTimeout(() => setIsDeleting(true), pauseAtEnd);
+      return () => clearTimeout(t);
+    }
+    if (isDeleting && displayCount === 0) {
+      const t = setTimeout(() => setIsDeleting(false), pauseAtStart);
+      return () => clearTimeout(t);
+    }
+
+    const t = setTimeout(() => {
+      setDisplayCount((c) => c + (isDeleting ? -1 : 1));
+    }, typeSpeed);
+    return () => clearTimeout(t);
+  }, [displayCount, isDeleting]);
+
+  return (
+    <span className={`${className} tracking-tight font-semibold ${color} inline-flex items-baseline`} style={{ minWidth: "5.5ch" }}>
+      {text.slice(0, displayCount)}
+      <motion.span
+        className="inline-block w-[2px] ml-[1px] bg-current rounded-full"
+        style={{ height: "1em" }}
+        animate={{ opacity: [1, 0] }}
+        transition={{ duration: 0.6, repeat: Infinity, repeatType: "reverse" }}
+      />
+    </span>
+  );
+}
+
 const navLinks = [
+  { label: "Brands", href: "/brands" },
   { label: "Trending", href: "/trending" },
   { label: "Support", href: "/support" },
   { label: "About Us", href: "/about" },
@@ -32,16 +76,21 @@ export default function Navbar() {
   const [signingOut, setSigningOut] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [expandedMobileCategory, setExpandedMobileCategory] = useState(null);
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState(fallbackCategories);
   const searchRef = useRef(null);
   const { cartCount } = useCart();
 
-  // Fetch categories from DB
+  // Fetch categories from DB, keep fallback if it fails
   useEffect(() => {
     fetch("/api/category")
       .then((r) => r.ok ? r.json() : Promise.reject(r.status))
-      .then((data) => setCategories(data.categories || []))
-      .catch((err) => console.error("Failed to load categories:", err));
+      .then((data) => {
+        const dbCats = data.categories || [];
+        if (dbCats.length > 0) setCategories(dbCats);
+      })
+      .catch(() => {
+        // Keep fallback categories (already set as initial state)
+      });
   }, []);
 
   useEffect(() => {
@@ -77,7 +126,7 @@ export default function Navbar() {
         text: 'You have been successfully logged out',
         timer: 1500,
         showConfirmButton: false,
-        confirmButtonColor: '#4C1D95',
+        confirmButtonColor: '#0f3460',
       });
       router.push('/');
     } catch (error) {
@@ -86,7 +135,7 @@ export default function Navbar() {
         icon: 'error',
         title: 'Logout Failed',
         text: 'Failed to log out. Please try again.',
-        confirmButtonColor: '#4C1D95',
+        confirmButtonColor: '#0f3460',
       });
     } finally {
       setSigningOut(false);
@@ -116,10 +165,10 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/">
             <motion.div whileHover={{ scale: 1.03 }} className="flex items-center gap-2.5 cursor-pointer">
-              <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center">
-                <span className="text-[#C4A265] font-bold text-xs">Z</span>
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#3F72AF] to-[#1a1a2e] flex items-center justify-center">
+                <span className="text-white font-bold text-xs">Z</span>
               </div>
-              <span className={`text-xl tracking-tight transition-colors ${pathname === "/" ? "text-purple-mid" : "text-purple-dark"}`}>ZenTech</span>
+              <AnimatedLogo className="text-xl" color={pathname === "/" ? "text-purple-mid" : "text-purple-dark"} />
             </motion.div>
           </Link>
 
@@ -305,8 +354,8 @@ export default function Navbar() {
               </div>
             ) : (
               /* Login Button */
-              <Link href="/login" className="relative text-sm font-semibold px-4 py-1.5 rounded-full bg-black hover:bg-black/85 transition-all group">
-                <span className="bg-gradient-to-r from-[#C4A265] via-[#D4B978] to-[#C4A265] bg-clip-text text-transparent">
+              <Link href="/login" className="relative text-sm font-semibold px-4 py-1.5 rounded-full bg-[#1a1a2e] hover:bg-[#16213e] transition-all group shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-[#0f3460]/40">
+                <span className="text-white">
                   Login / Register
                 </span>
               </Link>
@@ -423,10 +472,10 @@ export default function Navbar() {
                   transition={{ duration: 0.15 }}
                 >
                   <Link href="/" className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-black flex items-center justify-center">
-                      <span className="text-[#C4A265] font-bold text-[10px]">Z</span>
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#3F72AF] to-[#1a1a2e] flex items-center justify-center">
+                      <span className="text-white font-bold text-[10px]">Z</span>
                     </div>
-                    <span className={`text-lg tracking-tight transition-colors ${pathname === "/" ? "text-purple-mid" : "text-purple-dark"}`}>ZenTech</span>
+                    <AnimatedLogo className="text-lg" color={pathname === "/" ? "text-purple-mid" : "text-purple-dark"} />
                   </Link>
                 </motion.div>
               )}
@@ -472,10 +521,10 @@ export default function Navbar() {
               {/* Sidebar header */}
               <div className="flex items-center justify-between px-4 py-4 border-b border-gray-100">
                 <Link href="/" className="flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
-                  <div className="w-7 h-7 rounded-full bg-black flex items-center justify-center">
-                    <span className="text-[#C4A265] font-bold text-[10px]">Z</span>
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#3F72AF] to-[#1a1a2e] flex items-center justify-center">
+                    <span className="text-white font-bold text-[10px]">Z</span>
                   </div>
-                  <span className="text-lg text-purple-dark tracking-tight">ZenTech</span>
+                  <AnimatedLogo className="text-lg" color="text-purple-dark" />
                 </Link>
                 <button
                   onClick={() => setMobileMenuOpen(false)}
@@ -564,6 +613,15 @@ export default function Navbar() {
               {/* Other links */}
               <div className="border-t border-gray-100 py-2">
                 <p className="px-4 py-2 text-[11px] font-semibold text-text-muted uppercase tracking-wider">More</p>
+                <Link
+                  href="/brands"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center gap-3 px-4 py-3 text-sm transition-colors ${pathname === "/brands" || pathname.startsWith("/brands/") ? "text-purple-mid font-semibold" : "text-text-primary hover:bg-gray-50"
+                    }`}
+                >
+                  <Tag size={18} className="text-text-muted" />
+                  Brands
+                </Link>
                 <Link
                   href="/support"
                   onClick={() => setMobileMenuOpen(false)}

@@ -94,7 +94,7 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative w-full overflow-hidden select-none" style={{ aspectRatio: '21/7', minHeight: '220px', maxHeight: '520px' }}>
+    <section className="relative w-full overflow-hidden select-none lg:max-h-[400px]" style={{ aspectRatio: '21/7', minHeight: '220px', maxHeight: '520px' }}>
       {/* Background Images */}
       <AnimatePresence initial={false} custom={direction} mode="popLayout">
         <motion.div
@@ -163,7 +163,7 @@ export default function Hero() {
           initial={{ width: "0%" }}
           animate={{ width: "100%" }}
           transition={{ duration: 5, ease: "linear" }}
-          className="h-full bg-purple-light"
+          className="h-full bg-gradient-to-r from-[#0f3460] to-[#5C9AE5]"
         />
       </div>
     </section>

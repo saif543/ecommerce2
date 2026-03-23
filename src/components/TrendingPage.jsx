@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Grid3X3, LayoutList, Star, SlidersHorizontal, X, TrendingUp, Flame, Loader2 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import ProductCard from "./ProductCard";
+import { sampleProducts } from "@/data/sampleProducts";
 
 const sortOptions = [
   { label: "Most Popular", value: "default" },
@@ -18,7 +19,6 @@ const sortOptions = [
   { label: "Newest First", value: "newest" },
 ];
 
-const trendingTags = ["All", "Hot Deals", "Best Sellers", "New Arrivals", "Top Rated"];
 
 function FilterSection({ title, isOpen, onToggle, children }) {
   return (
@@ -41,7 +41,6 @@ function FilterSection({ title, isOpen, onToggle, children }) {
 export default function TrendingPage() {
   const [sortBy, setSortBy] = useState("default");
   const [gridView, setGridView] = useState("grid");
-  const [activeTag, setActiveTag] = useState("All");
   const [openFilter, setOpenFilter] = useState("price");
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [priceMin, setPriceMin] = useState(0);
@@ -63,15 +62,23 @@ export default function TrendingPage() {
     fetch("/api/product?isTrending=true&limit=100")
       .then((r) => r.ok ? r.json() : Promise.reject(r.status))
       .then((data) => {
-        const prods = data.products || [];
+        let prods = data.products || [];
+        if (prods.length === 0) {
+          prods = sampleProducts.filter((p) => p.isTrending);
+        }
         setProducts(prods);
-        // Set price range based on actual products
         if (prods.length > 0) {
           const prices = prods.map((p) => p.price || 0);
           setPriceMax(Math.max(...prices));
         }
       })
-      .catch((err) => console.error("Failed to fetch trending products:", err))
+      .catch((err) => {
+        console.error("Failed to fetch trending products:", err);
+        const fallback = sampleProducts.filter((p) => p.isTrending);
+        setProducts(fallback);
+        const prices = fallback.map((p) => p.price || 0);
+        if (prices.length > 0) setPriceMax(Math.max(...prices));
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -160,34 +167,18 @@ export default function TrendingPage() {
   );
 
   return (
-    <section className="max-w-[1440px] mx-auto px-2 min-[480px]:px-4 min-[640px]:px-5 min-[768px]:px-6 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 bg-purple-soft rounded-full flex items-center justify-center">
-            <TrendingUp size={20} className="text-purple-dark" />
-          </div>
-          <h1 className="text-xl min-[480px]:text-2xl min-[768px]:text-3xl md:text-4xl font-semibold text-text-primary">Trending Now</h1>
-        </div>
-        <p className="text-text-secondary text-xs min-[480px]:text-sm min-[768px]:text-base">The hottest products people are loving right now</p>
+    <section className="max-w-[1440px] mx-auto px-2 min-[480px]:px-4 min-[640px]:px-5 min-[768px]:px-6 pt-4 min-[768px]:pt-6 pb-8">
+      {/* Banner */}
+      <div className="relative w-full h-20 min-[480px]:h-24 min-[640px]:h-28 min-[768px]:h-32 min-[1024px]:h-36 rounded-xl min-[480px]:rounded-2xl overflow-hidden mb-4 min-[768px]:mb-5"
+        style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%)" }}
+      />
+
+      {/* Heading */}
+      <div className="mb-4 min-[768px]:mb-5">
+        <h1 className="text-lg min-[480px]:text-xl min-[768px]:text-2xl font-bold text-gray-900">Trending Now</h1>
+        <p className="text-gray-400 text-[10px] min-[480px]:text-xs min-[768px]:text-sm mt-0.5">The hottest products people are loving right now</p>
       </div>
 
-      {/* Trending tags — hidden on mobile, scrollable row on tablet+ */}
-      <div className="hidden min-[640px]:flex flex-wrap gap-2 min-[768px]:gap-3 mb-4 min-[768px]:mb-8">
-        {trendingTags.map((tag) => (
-          <button
-            key={tag}
-            onClick={() => setActiveTag(tag)}
-            className={`px-3 min-[768px]:px-4 py-1.5 min-[768px]:py-2 rounded-full text-xs min-[768px]:text-sm font-medium transition-all ${activeTag === tag
-              ? "bg-purple-dark text-white shadow-md"
-              : "bg-white text-text-secondary border border-gray-200 hover:border-purple-mid hover:text-purple-mid"
-              }`}
-          >
-            {tag === "Hot Deals" && <Flame size={14} className="inline mr-1.5 -mt-0.5" />}
-            {tag}
-          </button>
-        ))}
-      </div>
 
       {/* Mobile filter drawer */}
       <AnimatePresence>
@@ -211,7 +202,7 @@ export default function TrendingPage() {
                 <span className="text-base font-bold text-text-primary">Filter By</span>
                 <div className="flex items-center gap-3">
                   {hasActiveFilters && (
-                    <button onClick={resetAll} className="text-sm font-semibold text-orange-600 hover:text-orange-700 transition-colors">Reset</button>
+                    <button onClick={resetAll} className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">Reset</button>
                   )}
                   <button onClick={() => setMobileFilterOpen(false)} className="p-1 text-text-muted hover:text-text-primary transition-colors">
                     <X size={20} />
@@ -236,7 +227,7 @@ export default function TrendingPage() {
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
               <span className="text-base font-bold text-text-primary">Filter By</span>
               {hasActiveFilters && (
-                <button onClick={resetAll} className="text-sm font-semibold text-orange-600 hover:text-orange-700 transition-colors">Reset</button>
+                <button onClick={resetAll} className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">Reset</button>
               )}
             </div>
             <div className="px-4">{filterContent}</div>
@@ -246,41 +237,38 @@ export default function TrendingPage() {
         {/* Right content */}
         <div className="flex-1">
           {/* Toolbar */}
-          <div className="flex flex-wrap items-center justify-between gap-2 min-[480px]:gap-3 mb-3 min-[480px]:mb-4 min-[768px]:mb-6">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between gap-2 bg-white rounded-xl border border-gray-100 px-3 min-[480px]:px-4 py-2 min-[480px]:py-2.5 mb-3 min-[480px]:mb-4 shadow-sm">
+            <div className="flex items-center gap-2 min-[480px]:gap-3">
               <button
                 onClick={() => setMobileFilterOpen(true)}
-                className="min-[768px]:hidden flex items-center gap-2 bg-white border border-gray-200 text-xs min-[480px]:text-sm font-medium text-text-primary px-2.5 min-[480px]:px-3 py-1.5 min-[480px]:py-2 rounded-lg hover:border-purple-mid transition-colors"
+                className="min-[768px]:hidden flex items-center gap-1.5 text-[11px] min-[480px]:text-xs font-semibold text-gray-600 hover:text-gray-900 transition-colors"
               >
-                <SlidersHorizontal size={16} />
-                Filters
-                {hasActiveFilters && <span className="w-2 h-2 bg-purple-mid rounded-full" />}
+                <SlidersHorizontal size={14} />
+                Filter
+                {hasActiveFilters && <span className="w-1.5 h-1.5 bg-purple-mid rounded-full" />}
               </button>
-              <span className="text-[10px] min-[480px]:text-xs min-[768px]:text-sm text-text-muted">
-                Showing <span className="font-semibold text-text-primary">{loading ? "..." : sortedProducts.length}</span> products
+              <span className="text-[10px] min-[480px]:text-xs text-gray-400">
+                <span className="font-semibold text-gray-600">{loading ? "..." : sortedProducts.length}</span> products
               </span>
             </div>
 
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-text-muted hidden sm:inline">Sort by:</span>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="bg-white border border-gray-200 text-[10px] min-[480px]:text-xs min-[768px]:text-sm text-text-primary font-medium px-2 min-[480px]:px-3 py-1.5 min-[480px]:py-2 rounded-lg outline-none cursor-pointer hover:border-purple-mid focus:border-purple-mid transition-colors"
-                >
-                  {sortOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
-              </div>
+            <div className="flex items-center gap-2 min-[480px]:gap-3">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="bg-gray-50 border border-gray-200 text-[10px] min-[480px]:text-xs text-gray-600 font-medium px-2 min-[480px]:px-2.5 py-1.5 rounded-lg outline-none cursor-pointer hover:border-gray-300 focus:border-gray-400 transition-colors"
+              >
+                {sortOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
 
-              <div className="flex items-center bg-gray-100 rounded-lg p-1">
-                <button onClick={() => setGridView("grid")} className={`p-1.5 rounded-md transition-colors ${gridView === "grid" ? "bg-white shadow-sm text-purple-dark" : "text-text-muted"}`}>
-                  <Grid3X3 size={16} />
+              <div className="flex items-center bg-gray-100 rounded-lg p-0.5">
+                <button onClick={() => setGridView("grid")} className={`p-1.5 rounded-md transition-colors ${gridView === "grid" ? "bg-white shadow-sm text-gray-800" : "text-gray-400"}`}>
+                  <Grid3X3 size={14} />
                 </button>
-                <button onClick={() => setGridView("list")} className={`p-1.5 rounded-md transition-colors ${gridView === "list" ? "bg-white shadow-sm text-purple-dark" : "text-text-muted"}`}>
-                  <LayoutList size={16} />
+                <button onClick={() => setGridView("list")} className={`p-1.5 rounded-md transition-colors ${gridView === "list" ? "bg-white shadow-sm text-gray-800" : "text-gray-400"}`}>
+                  <LayoutList size={14} />
                 </button>
               </div>
             </div>

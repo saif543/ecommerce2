@@ -8,6 +8,19 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight, ChevronDown, Grid3X3, LayoutList, SlidersHorizontal, X, Loader2 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import ProductCard from "./ProductCard";
+import { sampleProducts, sampleHeadphones, sampleBrandProducts } from "@/data/sampleProducts";
+
+const allSampleProducts = [...sampleProducts, ...sampleHeadphones, ...sampleBrandProducts];
+
+function getFallbackProducts(category, subcategory) {
+    let filtered = allSampleProducts;
+    if (subcategory) {
+        filtered = filtered.filter(p => p.subcategory === subcategory);
+    } else if (category) {
+        filtered = filtered.filter(p => p.category === category);
+    }
+    return filtered;
+}
 
 function formatPrice(n) {
     return Math.round(n).toLocaleString("en-IN");
@@ -120,13 +133,23 @@ export default function ProductsView() {
             .then((r) => r.ok ? r.json() : Promise.reject(r.status))
             .then((data) => {
                 const prods = data.products || [];
-                setProducts(prods);
                 if (prods.length > 0) {
+                    setProducts(prods);
                     const prices = prods.map((p) => p.price || 0);
                     setPriceMax(Math.max(...prices));
+                } else {
+                    // DB returned empty — use sample fallback
+                    const fallback = getFallbackProducts(categoryParam, subcategoryParam);
+                    setProducts(fallback);
+                    if (fallback.length > 0) setPriceMax(Math.max(...fallback.map(p => p.price || 0)));
                 }
             })
-            .catch((err) => console.error("Failed to fetch products:", err))
+            .catch(() => {
+                // API failed — use sample fallback
+                const fallback = getFallbackProducts(categoryParam, subcategoryParam);
+                setProducts(fallback);
+                if (fallback.length > 0) setPriceMax(Math.max(...fallback.map(p => p.price || 0)));
+            })
             .finally(() => setLoading(false));
     }, [categoryParam, subcategoryParam]);
 
@@ -231,39 +254,40 @@ export default function ProductsView() {
     return (
         <>
             {/* Category Hero Banner */}
-            <div className="relative w-full h-[106px] min-[480px]:h-[123px] min-[640px]:h-[141px] min-[768px]:h-[158px] min-[1024px]:h-[176px] overflow-hidden">
-                {heroBannerImage ? (
-                    <img
-                        src={heroBannerImage}
-                        alt={categoryParam || "Category"}
-                        className="w-full h-full object-cover"
-                    />
-                ) : (
-                    <div
-                        className="w-full h-full"
-                        style={{ background: "linear-gradient(135deg, #1a1a1a 0%, #2d1f3d 40%, #B8860B 100%)" }}
-                    />
-                )}
-            </div>
-
-            {/* Heading below banner */}
-            <div className="max-w-[1440px] mx-auto px-4 min-[480px]:px-6 min-[768px]:px-8 pt-5 min-[480px]:pt-6 min-[768px]:pt-8">
-                {/* Breadcrumb */}
-                <div className="flex items-center gap-1.5 min-[480px]:gap-2 text-[10px] min-[480px]:text-xs min-[768px]:text-sm text-text-muted mb-2 min-[480px]:mb-3">
-                    <Link href="/" className="hover:text-text-primary transition-colors">Home</Link>
-                    <ChevronRight size={12} className="min-[768px]:w-[14px] min-[768px]:h-[14px]" />
-                    {categoryParam && subcategoryParam ? (
-                        <>
-                            <Link href={`/products?category=${encodeURIComponent(categoryParam)}`} className="hover:text-text-primary transition-colors">{categoryParam}</Link>
-                            <ChevronRight size={12} className="min-[768px]:w-[14px] min-[768px]:h-[14px]" />
-                            <span className="text-text-primary font-medium">{subcategoryParam}</span>
-                        </>
+            <div className="max-w-[1440px] mx-auto px-2 min-[480px]:px-4 min-[640px]:px-5 min-[768px]:px-6 pt-4 min-[768px]:pt-6">
+                <div className="relative w-full h-20 min-[480px]:h-24 min-[640px]:h-28 min-[768px]:h-32 min-[1024px]:h-36 rounded-xl min-[480px]:rounded-2xl overflow-hidden">
+                    {heroBannerImage ? (
+                        <img
+                            src={heroBannerImage}
+                            alt={categoryParam || "Category"}
+                            className="w-full h-full object-cover"
+                        />
                     ) : (
-                        <span className="text-text-primary font-medium">{pageTitle}</span>
+                        <div
+                            className="w-full h-full"
+                            style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%)" }}
+                        />
                     )}
                 </div>
-                <h1 className="text-xl min-[480px]:text-2xl min-[768px]:text-3xl font-semibold text-text-primary mb-1">{pageTitle}</h1>
-                <p className="text-text-secondary text-[10px] min-[480px]:text-xs min-[768px]:text-sm max-w-lg">{pageDescription}</p>
+
+                {/* Heading below banner */}
+                <div className="mt-4 min-[768px]:mt-5">
+                    <div className="flex items-center gap-1.5 text-[10px] min-[480px]:text-xs text-gray-400 mb-1">
+                        <Link href="/" className="hover:text-gray-600 transition-colors">Home</Link>
+                        <ChevronRight size={10} />
+                        {categoryParam && subcategoryParam ? (
+                            <>
+                                <Link href={`/products?category=${encodeURIComponent(categoryParam)}`} className="hover:text-gray-600 transition-colors">{categoryParam}</Link>
+                                <ChevronRight size={10} />
+                                <span className="text-gray-600 font-medium">{subcategoryParam}</span>
+                            </>
+                        ) : (
+                            <span className="text-gray-600 font-medium">{pageTitle}</span>
+                        )}
+                    </div>
+                    <h1 className="text-lg min-[480px]:text-xl min-[768px]:text-2xl font-bold text-gray-900">{pageTitle}</h1>
+                    <p className="text-gray-400 text-[10px] min-[480px]:text-xs min-[768px]:text-sm mt-0.5 max-w-lg">{pageDescription}</p>
+                </div>
             </div>
 
             <section className="max-w-[1440px] mx-auto px-2 min-[480px]:px-4 min-[640px]:px-5 min-[768px]:px-6 py-6 min-[768px]:py-8">
@@ -290,7 +314,7 @@ export default function ProductsView() {
                                     <span className="text-sm min-[480px]:text-base font-bold text-text-primary">Filter By</span>
                                     <div className="flex items-center gap-3">
                                         {hasActiveFilters && (
-                                            <button onClick={resetAll} className="text-xs min-[480px]:text-sm font-semibold text-orange-600 hover:text-orange-700 transition-colors">
+                                            <button onClick={resetAll} className="text-xs min-[480px]:text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
                                                 Reset
                                             </button>
                                         )}
@@ -305,9 +329,9 @@ export default function ProductsView() {
                                 <div className="sticky bottom-0 bg-white border-t border-gray-100 p-3 min-[480px]:p-4">
                                     <button
                                         onClick={() => setMobileFilterOpen(false)}
-                                        className="w-full bg-black text-sm font-semibold py-3 rounded-lg transition-colors"
+                                        className="w-full bg-[#1a1a2e] text-sm font-semibold py-3 rounded-lg transition-colors"
                                     >
-                                        <span className="bg-gradient-to-r from-[#C4A265] via-[#D4B978] to-[#C4A265] bg-clip-text text-transparent">
+                                        <span className="text-white">
                                             Show {sortedProducts.length} Products
                                         </span>
                                     </button>
@@ -324,7 +348,7 @@ export default function ProductsView() {
                             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
                                 <span className="text-base font-bold text-text-primary">Filter By</span>
                                 {hasActiveFilters && (
-                                    <button onClick={resetAll} className="text-sm font-semibold text-orange-600 hover:text-orange-700 transition-colors">
+                                    <button onClick={resetAll} className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
                                         Reset
                                     </button>
                                 )}
@@ -338,47 +362,44 @@ export default function ProductsView() {
                     {/* Right content */}
                     <div className="flex-1 min-w-0">
                         {/* Toolbar */}
-                        <div className="flex flex-wrap items-center justify-between gap-2 min-[480px]:gap-3 mb-4 min-[768px]:mb-6">
+                        <div className="flex items-center justify-between gap-2 bg-white rounded-xl border border-gray-100 px-3 min-[480px]:px-4 py-2 min-[480px]:py-2.5 mb-3 min-[480px]:mb-4 shadow-sm">
                             <div className="flex items-center gap-2 min-[480px]:gap-3">
                                 <button
                                     onClick={() => setMobileFilterOpen(true)}
-                                    className="min-[768px]:hidden flex items-center gap-1.5 min-[480px]:gap-2 bg-white border border-gray-200 text-[10px] min-[480px]:text-sm font-medium text-text-primary px-2 min-[480px]:px-3 py-1.5 min-[480px]:py-2 rounded-lg hover:border-purple-mid transition-colors"
+                                    className="min-[768px]:hidden flex items-center gap-1.5 text-[11px] min-[480px]:text-xs font-semibold text-gray-600 hover:text-gray-900 transition-colors"
                                 >
-                                    <SlidersHorizontal size={14} className="min-[480px]:w-4 min-[480px]:h-4" />
-                                    Filters
-                                    {hasActiveFilters && <span className="w-1.5 h-1.5 min-[480px]:w-2 min-[480px]:h-2 bg-purple-mid rounded-full" />}
+                                    <SlidersHorizontal size={14} />
+                                    Filter
+                                    {hasActiveFilters && <span className="w-1.5 h-1.5 bg-purple-mid rounded-full" />}
                                 </button>
-                                <span className="text-[10px] min-[480px]:text-xs min-[768px]:text-sm text-text-muted">
-                                    Showing <span className="font-semibold text-text-primary">{loading ? "..." : sortedProducts.length}</span> products
+                                <span className="text-[10px] min-[480px]:text-xs text-gray-400">
+                                    <span className="font-semibold text-gray-600">{loading ? "..." : sortedProducts.length}</span> products
                                 </span>
                             </div>
 
-                            <div className="flex items-center gap-2 min-[480px]:gap-4">
-                                <div className="flex items-center gap-1 min-[480px]:gap-2">
-                                    <span className="text-xs min-[480px]:text-sm text-text-muted hidden min-[640px]:inline">Sort by:</span>
-                                    <select
-                                        value={sortBy}
-                                        onChange={(e) => setSortBy(e.target.value)}
-                                        className="bg-white border border-gray-200 text-[10px] min-[480px]:text-sm text-text-primary font-medium px-2 min-[480px]:px-3 py-1.5 min-[480px]:py-2 rounded-lg outline-none cursor-pointer hover:border-purple-mid focus:border-purple-mid transition-colors"
-                                    >
-                                        {sortOptions.map((opt) => (
-                                            <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                        ))}
-                                    </select>
-                                </div>
+                            <div className="flex items-center gap-2 min-[480px]:gap-3">
+                                <select
+                                    value={sortBy}
+                                    onChange={(e) => setSortBy(e.target.value)}
+                                    className="bg-gray-50 border border-gray-200 text-[10px] min-[480px]:text-xs text-gray-600 font-medium px-2 min-[480px]:px-2.5 py-1.5 rounded-lg outline-none cursor-pointer hover:border-gray-300 focus:border-gray-400 transition-colors"
+                                >
+                                    {sortOptions.map((opt) => (
+                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                    ))}
+                                </select>
 
-                                <div className="flex items-center bg-gray-100 rounded-lg p-0.5 min-[480px]:p-1">
+                                <div className="flex items-center bg-gray-100 rounded-lg p-0.5">
                                     <button
                                         onClick={() => setGridView("grid")}
-                                        className={`p-1 min-[480px]:p-1.5 rounded-md transition-colors ${gridView === "grid" ? "bg-white shadow-sm text-purple-dark" : "text-text-muted"}`}
+                                        className={`p-1.5 rounded-md transition-colors ${gridView === "grid" ? "bg-white shadow-sm text-gray-800" : "text-gray-400"}`}
                                     >
-                                        <Grid3X3 size={14} className="min-[480px]:w-4 min-[480px]:h-4" />
+                                        <Grid3X3 size={14} />
                                     </button>
                                     <button
                                         onClick={() => setGridView("list")}
-                                        className={`p-1 min-[480px]:p-1.5 rounded-md transition-colors ${gridView === "list" ? "bg-white shadow-sm text-purple-dark" : "text-text-muted"}`}
+                                        className={`p-1.5 rounded-md transition-colors ${gridView === "list" ? "bg-white shadow-sm text-gray-800" : "text-gray-400"}`}
                                     >
-                                        <LayoutList size={14} className="min-[480px]:w-4 min-[480px]:h-4" />
+                                        <LayoutList size={14} />
                                     </button>
                                 </div>
                             </div>
