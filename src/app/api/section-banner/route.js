@@ -7,7 +7,7 @@ import clientPromise from '@/lib/mongodb'
 
 // 🔐 SECURITY CONSTANTS
 const MAX_IMAGE_SIZE = 100 * 1024 * 1024 // 100 MB
-const VALID_SECTIONS = ['most-loved', 'new-arrivals'] // extensible list
+const VALID_SECTIONS = ['most-loved', 'new-arrivals', 'headphones'] // extensible list
 
 // Upload rate limiting
 const uploadTracker = new Map()
