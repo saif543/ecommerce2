@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Loader2 } from "lucide-react";
+import { Loader2, ArrowRight } from "lucide-react";
+import Link from "next/link";
 import ProductCard from "./ProductCard";
+import { sampleProducts, sampleHeadphones } from "@/data/sampleProducts";
 
 /*
   Responsive breakpoints:
@@ -25,6 +27,8 @@ export default function Products({
   section = null,
   // fallback gradient if no banner image is set from admin
   bannerGradient = null,
+  // link for the "See All" button
+  seeAllLink = "/products",
 }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,8 +37,28 @@ export default function Products({
   useEffect(() => {
     fetch(apiUrl)
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-      .then((data) => setProducts(data.products || []))
-      .catch((err) => console.error("Failed to fetch products:", err))
+      .then((data) => {
+        const prods = data.products || [];
+        const params = new URL(apiUrl, window.location.origin).searchParams;
+        const limit = parseInt(params.get("limit")) || 12;
+        if (prods.length > 0) {
+          setProducts(prods.slice(0, limit));
+        } else {
+          // Fallback to sample data when DB is empty
+          let fallback = sampleProducts;
+          const cat = params.get("category");
+          if (cat && cat.toLowerCase() === "headphones") fallback = sampleHeadphones;
+          else if (params.get("isLovedProduct") === "true") fallback = sampleProducts.filter((p) => p.isLovedProduct);
+          else if (params.get("isNewArrival") === "true") fallback = sampleProducts.filter((p) => p.isNewArrival);
+          setProducts(fallback.slice(0, limit));
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch products:", err);
+        const params = new URL(apiUrl, window.location.origin).searchParams;
+        const limit = parseInt(params.get("limit")) || 12;
+        setProducts(sampleProducts.slice(0, limit));
+      })
       .finally(() => setLoading(false));
   }, [apiUrl]);
 
@@ -59,7 +83,7 @@ export default function Products({
       {hasBanner && (
         <div className="max-w-[1440px] mx-auto px-2 min-[480px]:px-4 min-[640px]:px-5 min-[768px]:px-6 pt-8 min-[768px]:pt-16">
           <div
-            className="relative w-full h-24 min-[480px]:h-28 min-[640px]:h-32 min-[768px]:h-36 min-[1024px]:h-40 rounded-xl min-[480px]:rounded-2xl overflow-hidden"
+            className="relative w-full h-20 min-[480px]:h-24 min-[640px]:h-28 min-[768px]:h-32 min-[1024px]:h-36 rounded-xl min-[480px]:rounded-2xl overflow-hidden"
             style={!bannerImage && bannerGradient ? { background: bannerGradient } : undefined}
           >
             {bannerImage && (
@@ -94,11 +118,22 @@ export default function Products({
         ) : products.length === 0 ? (
           <div className="text-center py-16 text-text-muted text-sm">No products available yet.</div>
         ) : (
-          <div className="grid grid-cols-2 min-[640px]:grid-cols-3 min-[1024px]:grid-cols-4 min-[1280px]:grid-cols-5 gap-2 min-[480px]:gap-3 min-[640px]:gap-4 min-[768px]:gap-5">
-            {products.map((product, i) => (
-              <ProductCard key={String(product._id || product.id)} product={product} index={i} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-2 min-[640px]:grid-cols-3 min-[1024px]:grid-cols-4 min-[1280px]:grid-cols-5 gap-2 min-[480px]:gap-3 min-[640px]:gap-4 min-[768px]:gap-5">
+              {products.map((product, i) => (
+                <ProductCard key={String(product._id || product.id)} product={product} index={i} />
+              ))}
+            </div>
+            <div className="text-center mt-8 min-[768px]:mt-12">
+              <Link
+                href={seeAllLink}
+                className="inline-flex items-center gap-2 px-6 py-2.5 min-[768px]:px-8 min-[768px]:py-3 bg-purple-dark text-white text-sm min-[768px]:text-base font-semibold rounded-full hover:bg-purple-mid transition-colors"
+              >
+                See All
+                <ArrowRight size={18} />
+              </Link>
+            </div>
+          </>
         )}
       </div>
     </section>

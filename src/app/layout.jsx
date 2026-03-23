@@ -4,6 +4,7 @@ import { WishlistProvider } from "@/context/WishlistContext";
 import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
 import MessengerChat from "@/components/MessengerChat";
+import ClientLayout from "@/components/ClientLayout";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -23,7 +24,7 @@ export default function RootLayout({ children }) {
         <AuthProvider>
           <CartProvider>
             <WishlistProvider>
-              {children}
+              <ClientLayout>{children}</ClientLayout>
               <MessengerChat />
             </WishlistProvider>
           </CartProvider>

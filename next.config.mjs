@@ -17,6 +17,22 @@ const nextConfig = {
         protocol: "https",
         hostname: "res.cloudinary.com",
       },
+      {
+        protocol: "https",
+        hostname: "logo.clearbit.com",
+      },
+      {
+        protocol: "https",
+        hostname: "www.google.com",
+      },
+      {
+        protocol: "https",
+        hostname: "t1.gstatic.com",
+      },
+      {
+        protocol: "https",
+        hostname: "t2.gstatic.com",
+      },
     ],
   },
 
@@ -41,19 +57,7 @@ const nextConfig = {
 
   turbopack: {},
 
-  webpack(config, { dev }) {
-    if (dev) {
-      config.module.rules.unshift({
-        test: /\.(jsx|js)$/,
-        exclude: /node_modules/,
-        enforce: "pre",
-        use: [
-          {
-            loader: require.resolve("./component-tagger-loader.js"),
-          },
-        ],
-      });
-    }
+  webpack(config) {
     return config;
   },
 };

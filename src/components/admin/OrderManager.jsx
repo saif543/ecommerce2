@@ -108,7 +108,7 @@ export default function OrderManager({ getToken }) {
                     title: 'Success!',
                     text: `Order status updated to ${newStatus}`,
                     icon: 'success',
-                    confirmButtonColor: '#FF6B35'
+                    confirmButtonColor: '#3F72AF'
                 })
                 // Refresh list to show updated status
                 fetchOrders()
@@ -179,7 +179,7 @@ export default function OrderManager({ getToken }) {
                     title: 'Success!',
                     text: 'Order details updated successfully',
                     icon: 'success',
-                    confirmButtonColor: '#FF6B35'
+                    confirmButtonColor: '#3F72AF'
                 })
                 fetchOrders()
                 setSelectedOrder(data.order)
@@ -222,7 +222,7 @@ export default function OrderManager({ getToken }) {
         return (
             <div className="flex items-center justify-center py-20">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#FF6B35] mx-auto"></div>
+                    <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#3F72AF] mx-auto"></div>
                     <p className="mt-4 text-gray-600 font-medium">Loading orders...</p>
                 </div>
             </div>
@@ -248,7 +248,7 @@ export default function OrderManager({ getToken }) {
                         placeholder="Search by ID, name, email, or phone..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/50 focus:bg-white transition-all"
+                        className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3F72AF]/50 focus:bg-white transition-all"
                     />
                 </div>
 
@@ -257,7 +257,7 @@ export default function OrderManager({ getToken }) {
                     <select
                         value={filterStatus}
                         onChange={(e) => setFilterStatus(e.target.value)}
-                        className="w-full md:w-48 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/50 focus:bg-white transition-all font-medium text-gray-700"
+                        className="w-full md:w-48 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3F72AF]/50 focus:bg-white transition-all font-medium text-gray-700"
                     >
                         <option value="all">All Statuses</option>
                         <option value="pending">Pending</option>
@@ -300,14 +300,14 @@ export default function OrderManager({ getToken }) {
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         key={order._id}
-                                        className="hover:bg-orange-50/30 transition-colors group cursor-pointer"
+                                        className="hover:bg-blue-50/30 transition-colors group cursor-pointer"
                                         onClick={() => viewOrderDetails(order)}
                                     >
                                         {/* Order ID & Date */}
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
-                                                    <Package className="text-[#FF6B35]" size={18} />
+                                                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                                                    <Package className="text-[#3F72AF]" size={18} />
                                                 </div>
                                                 <div>
                                                     <p className="font-semibold text-gray-900 text-sm">{order.orderNumber || order._id.substring(order._id.length - 6).toUpperCase()}</p>
@@ -353,7 +353,7 @@ export default function OrderManager({ getToken }) {
                                         <td className="px-6 py-4 whitespace-nowrap text-center" onClick={(e) => e.stopPropagation()}>
                                             {updatingStatus === order._id ? (
                                                 <div className="flex justify-center items-center gap-2">
-                                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#FF6B35]"></div>
+                                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#3F72AF]"></div>
                                                 </div>
                                             ) : (
                                                 <select
@@ -374,7 +374,7 @@ export default function OrderManager({ getToken }) {
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); viewOrderDetails(order); }}
-                                                className="text-[#FF6B35] hover:text-[#E85A2A] bg-orange-50 hover:bg-orange-100 p-2 rounded-lg transition-colors inline-flex items-center justify-center"
+                                                className="text-[#3F72AF] hover:text-[#2D5F8A] bg-blue-50 hover:bg-blue-100 p-2 rounded-lg transition-colors inline-flex items-center justify-center"
                                                 title="View Details"
                                             >
                                                 <Eye size={18} />
@@ -436,7 +436,7 @@ export default function OrderManager({ getToken }) {
                                     <div className="bg-white rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-gray-100 overflow-hidden">
                                         <div className="px-6 md:px-8 py-5 border-b border-gray-50 bg-white">
                                             <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                                                <Package className="text-[#FF6B35]" size={20} /> Items Ordered
+                                                <Package className="text-[#3F72AF]" size={20} /> Items Ordered
                                                 <span className="ml-2 px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 text-xs font-semibold">{selectedOrder.items?.length || 0}</span>
                                             </h3>
                                         </div>
@@ -471,7 +471,7 @@ export default function OrderManager({ getToken }) {
                                     <div className="bg-white rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-gray-100 overflow-hidden">
                                         <div className="px-6 md:px-8 py-5 border-b border-gray-50 bg-white">
                                             <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                                                <DollarSign className="text-[#FF6B35]" size={20} /> Payment Summary
+                                                <DollarSign className="text-[#3F72AF]" size={20} /> Payment Summary
                                             </h3>
                                         </div>
                                         <div className="p-6 md:p-8 space-y-4">
@@ -486,11 +486,11 @@ export default function OrderManager({ getToken }) {
                                             <div className="pt-6 mt-2 border-t border-dashed border-gray-200 flex justify-between items-end">
                                                 <div>
                                                     <span className="text-xs text-gray-500 font-bold uppercase tracking-widest block mb-2">Total Paid</span>
-                                                    <span className="inline-block px-2.5 py-1 bg-[#FF6B35]/10 text-[#FF6B35] rounded ring-1 ring-[#FF6B35]/20 text-[10px] md:text-xs font-bold uppercase tracking-wider">
+                                                    <span className="inline-block px-2.5 py-1 bg-[#3F72AF]/10 text-[#3F72AF] rounded ring-1 ring-[#3F72AF]/20 text-[10px] md:text-xs font-bold uppercase tracking-wider">
                                                         {selectedOrder.paymentMethod?.replace(/_/g, ' ') || 'Cash on Delivery'}
                                                     </span>
                                                 </div>
-                                                <span className="text-3xl md:text-4xl font-black text-[#FF6B35] tracking-tight">{formatCurrency(selectedOrder.totalAmount || 0)}</span>
+                                                <span className="text-3xl md:text-4xl font-black text-[#3F72AF] tracking-tight">{formatCurrency(selectedOrder.totalAmount || 0)}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -501,10 +501,10 @@ export default function OrderManager({ getToken }) {
 
                                     {/* Combined Customer & Shipping Card */}
                                     <div className="bg-white rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-gray-100 overflow-hidden relative">
-                                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF6B35] to-[#E85A2A]"></div>
+                                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#3F72AF] to-[#2D5F8A]"></div>
                                         <div className="px-6 pt-7 pb-5 border-b border-gray-50 flex justify-between items-center bg-white">
                                             <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                                                <User className="text-[#FF6B35]" size={20} /> Customer & Address
+                                                <User className="text-[#3F72AF]" size={20} /> Customer & Address
                                             </h3>
                                             {!isEditingDetails ? (
                                                 <div className="flex items-center gap-2">
@@ -518,7 +518,7 @@ export default function OrderManager({ getToken }) {
                                                     </button>
                                                     <button
                                                         onClick={() => setIsEditingDetails(true)}
-                                                        className="text-xs text-[#FF6B35] bg-orange-50 hover:bg-orange-100 font-bold px-3 py-1.5 rounded-lg transition-all shadow-sm ring-1 ring-[#FF6B35]/20 active:scale-95"
+                                                        className="text-xs text-[#3F72AF] bg-blue-50 hover:bg-blue-100 font-bold px-3 py-1.5 rounded-lg transition-all shadow-sm ring-1 ring-[#3F72AF]/20 active:scale-95"
                                                     >
                                                         Edit
                                                     </button>
@@ -534,7 +534,7 @@ export default function OrderManager({ getToken }) {
                                                     <button
                                                         onClick={handleSaveDetails}
                                                         disabled={updatingStatus === selectedOrder._id}
-                                                        className="text-xs bg-[#FF6B35] text-white px-4 py-1.5 rounded-lg font-bold hover:bg-[#E85A2A] shadow-md shadow-[#FF6B35]/20 disabled:opacity-50 transition-all active:scale-95"
+                                                        className="text-xs bg-[#3F72AF] text-white px-4 py-1.5 rounded-lg font-bold hover:bg-[#2D5F8A] shadow-md shadow-[#3F72AF]/20 disabled:opacity-50 transition-all active:scale-95"
                                                     >
                                                         {updatingStatus === selectedOrder._id ? 'Saving...' : 'Save'}
                                                     </button>
@@ -546,7 +546,7 @@ export default function OrderManager({ getToken }) {
                                             {!isEditingDetails ? (
                                                 <div className="space-y-8 animate-in fade-in duration-300">
                                                     <div>
-                                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-[#FF6B35] mb-4">Contact Info</h4>
+                                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-[#3F72AF] mb-4">Contact Info</h4>
                                                         <div className="space-y-4">
                                                             <div>
                                                                 <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-0.5">Full Name</span>
@@ -564,8 +564,8 @@ export default function OrderManager({ getToken }) {
                                                     </div>
 
                                                     <div className="border-t border-gray-100 pt-6">
-                                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-[#FF6B35] mb-4">Delivery Address</h4>
-                                                        <div className="bg-orange-50/30 rounded-xl p-5 border border-orange-100/50">
+                                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-[#3F72AF] mb-4">Delivery Address</h4>
+                                                        <div className="bg-blue-50/30 rounded-xl p-5 border border-blue-100/50">
                                                             <p className="text-sm font-bold text-gray-900 mb-2 leading-relaxed">
                                                                 {selectedOrder.deliveryAddress?.streetAddress || 'No Street Address Provided'}
                                                             </p>
@@ -591,30 +591,30 @@ export default function OrderManager({ getToken }) {
                                                 <div className="space-y-5 animate-in fade-in zoom-in-95 duration-200">
                                                     <div>
                                                         <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">Full Name</label>
-                                                        <input type="text" value={editedDetails.userName} onChange={(e) => setEditedDetails({ ...editedDetails, userName: e.target.value })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold focus:bg-white focus:ring-2 focus:ring-[#FF6B35]/20 focus:border-[#FF6B35] outline-none transition-all placeholder:font-normal" placeholder="Customer Name" />
+                                                        <input type="text" value={editedDetails.userName} onChange={(e) => setEditedDetails({ ...editedDetails, userName: e.target.value })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold focus:bg-white focus:ring-2 focus:ring-[#3F72AF]/20 focus:border-[#3F72AF] outline-none transition-all placeholder:font-normal" placeholder="Customer Name" />
                                                     </div>
                                                     <div>
                                                         <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">Phone Number</label>
-                                                        <input type="text" value={editedDetails.userPhone} onChange={(e) => setEditedDetails({ ...editedDetails, userPhone: e.target.value })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold focus:bg-white focus:ring-2 focus:ring-[#FF6B35]/20 focus:border-[#FF6B35] outline-none transition-all placeholder:font-normal" placeholder="+8801XXXXXXXXX" />
+                                                        <input type="text" value={editedDetails.userPhone} onChange={(e) => setEditedDetails({ ...editedDetails, userPhone: e.target.value })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold focus:bg-white focus:ring-2 focus:ring-[#3F72AF]/20 focus:border-[#3F72AF] outline-none transition-all placeholder:font-normal" placeholder="+8801XXXXXXXXX" />
                                                     </div>
                                                     <div>
                                                         <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">Email</label>
-                                                        <input type="email" value={editedDetails.userEmail} onChange={(e) => setEditedDetails({ ...editedDetails, userEmail: e.target.value })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold focus:bg-white focus:ring-2 focus:ring-[#FF6B35]/20 focus:border-[#FF6B35] outline-none transition-all placeholder:font-normal" placeholder="name@example.com" />
+                                                        <input type="email" value={editedDetails.userEmail} onChange={(e) => setEditedDetails({ ...editedDetails, userEmail: e.target.value })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold focus:bg-white focus:ring-2 focus:ring-[#3F72AF]/20 focus:border-[#3F72AF] outline-none transition-all placeholder:font-normal" placeholder="name@example.com" />
                                                     </div>
 
                                                     <div className="pt-6 mt-2 border-t border-gray-100 space-y-5">
                                                         <div>
                                                             <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">Street Address</label>
-                                                            <textarea value={editedDetails.deliveryAddress.streetAddress} onChange={(e) => setEditedDetails({ ...editedDetails, deliveryAddress: { ...editedDetails.deliveryAddress, streetAddress: e.target.value } })} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold focus:bg-white focus:ring-2 focus:ring-[#FF6B35]/20 focus:border-[#FF6B35] outline-none transition-all min-h-[90px] resize-none" placeholder="House/Flat No, Road, Block, etc." />
+                                                            <textarea value={editedDetails.deliveryAddress.streetAddress} onChange={(e) => setEditedDetails({ ...editedDetails, deliveryAddress: { ...editedDetails.deliveryAddress, streetAddress: e.target.value } })} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold focus:bg-white focus:ring-2 focus:ring-[#3F72AF]/20 focus:border-[#3F72AF] outline-none transition-all min-h-[90px] resize-none" placeholder="House/Flat No, Road, Block, etc." />
                                                         </div>
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                                             <div>
                                                                 <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">Area / City</label>
-                                                                <input type="text" value={editedDetails.deliveryAddress.area} onChange={(e) => setEditedDetails({ ...editedDetails, deliveryAddress: { ...editedDetails.deliveryAddress, area: e.target.value } })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold focus:bg-white focus:ring-2 focus:ring-[#FF6B35]/20 focus:border-[#FF6B35] outline-none transition-all" placeholder="Mirpur, Gulshan, etc." />
+                                                                <input type="text" value={editedDetails.deliveryAddress.area} onChange={(e) => setEditedDetails({ ...editedDetails, deliveryAddress: { ...editedDetails.deliveryAddress, area: e.target.value } })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold focus:bg-white focus:ring-2 focus:ring-[#3F72AF]/20 focus:border-[#3F72AF] outline-none transition-all" placeholder="Mirpur, Gulshan, etc." />
                                                             </div>
                                                             <div>
                                                                 <label className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5 block">Shipping Zone</label>
-                                                                <select value={editedDetails.deliveryAddress.shippingZone} onChange={(e) => setEditedDetails({ ...editedDetails, deliveryAddress: { ...editedDetails.deliveryAddress, shippingZone: e.target.value } })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold focus:bg-white focus:ring-2 focus:ring-[#FF6B35]/20 focus:border-[#FF6B35] outline-none transition-all cursor-pointer appearance-none">
+                                                                <select value={editedDetails.deliveryAddress.shippingZone} onChange={(e) => setEditedDetails({ ...editedDetails, deliveryAddress: { ...editedDetails.deliveryAddress, shippingZone: e.target.value } })} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold focus:bg-white focus:ring-2 focus:ring-[#3F72AF]/20 focus:border-[#3F72AF] outline-none transition-all cursor-pointer appearance-none">
                                                                     <option value="inside">Inside Dhaka</option>
                                                                     <option value="outside">Outside Dhaka</option>
                                                                 </select>
@@ -630,14 +630,14 @@ export default function OrderManager({ getToken }) {
                                     <div className="bg-white rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-gray-100 overflow-hidden relative">
                                         <div className="p-6 md:p-8">
                                             <div className="flex justify-between items-center mb-4">
-                                                <label className="text-[11px] font-black uppercase tracking-widest text-[#FF6B35] flex items-center gap-2 m-0 p-0 leading-none">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-[#FF6B35] animate-pulse relative top-[0.5px]"></div>
+                                                <label className="text-[11px] font-black uppercase tracking-widest text-[#3F72AF] flex items-center gap-2 m-0 p-0 leading-none">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-[#3F72AF] animate-pulse relative top-[0.5px]"></div>
                                                     Update Order Status
                                                 </label>
                                             </div>
                                             <div className="relative">
                                                 <select
-                                                    className={`w-full px-5 py-4 rounded-xl text-base font-black border-2 outline-none cursor-pointer appearance-none transition-all duration-200 focus:bg-white focus:border-[#FF6B35] hover:border-gray-300 shadow-sm ${getStatusColor(selectedOrder.status)}`}
+                                                    className={`w-full px-5 py-4 rounded-xl text-base font-black border-2 outline-none cursor-pointer appearance-none transition-all duration-200 focus:bg-white focus:border-[#3F72AF] hover:border-gray-300 shadow-sm ${getStatusColor(selectedOrder.status)}`}
                                                     value={selectedOrder.status}
                                                     onChange={(e) => handleStatusChange(selectedOrder._id, e.target.value)}
                                                     disabled={updatingStatus === selectedOrder._id}

@@ -35,7 +35,7 @@ export default function ProductCard({ product, index = 0 }) {
       transition={{ duration: 0.4, delay: index * 0.05 }}
       whileHover={{ y: -8, rotateX: 2, rotateY: -1 }}
       style={{ transformPerspective: 800 }}
-      className="bg-card-white rounded-lg min-[480px]:rounded-xl overflow-hidden group shadow-[0_2px_12px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_32px_rgba(45,24,84,0.15)] transition-all duration-300 flex flex-col"
+      className="bg-card-white rounded-lg min-[480px]:rounded-xl overflow-hidden group shadow-[0_2px_12px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_32px_rgba(15,52,96,0.22)] transition-all duration-300 flex flex-col"
     >
       <Link href={`/product/${productId}`} className="flex-1 flex flex-col">
         {/* Image */}
@@ -91,9 +91,9 @@ export default function ProductCard({ product, index = 0 }) {
             <Link href={`/product/${productId}`} className="w-[35%] min-[768px]:w-[38%] border border-purple-mid text-purple-mid hover:bg-purple-soft text-[9px] min-[425px]:text-[11px] min-[480px]:text-[11px] min-[768px]:text-xs font-bold min-[768px]:font-semibold py-2 min-[480px]:py-2.5 min-[768px]:py-3 rounded min-[480px]:rounded-md transition-colors text-center whitespace-nowrap tracking-normal">
               VIEW
             </Link>
-            <button onClick={() => addToCart(productId)} className="flex-1 relative overflow-hidden bg-gradient-to-b from-[#2a2a2a] via-[#1a1a1a] to-[#0a0a0a] hover:from-[#333] hover:via-[#222] hover:to-[#111] text-[9px] min-[425px]:text-[11px] min-[480px]:text-[11px] min-[768px]:text-xs font-bold min-[768px]:font-semibold py-2 min-[480px]:py-2.5 min-[768px]:py-3 rounded min-[480px]:rounded-md transition-all whitespace-nowrap tracking-normal shadow-[0_2px_4px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] active:shadow-[0_0px_1px_rgba(0,0,0,0.4),inset_0_1px_3px_rgba(0,0,0,0.3)] active:translate-y-[1px] border border-[rgba(196,162,101,0.2)]">
-              <span className="absolute inset-x-0 top-0 h-[45%] bg-gradient-to-b from-white/10 to-transparent rounded-t pointer-events-none"></span>
-              <span className="relative bg-gradient-to-r from-[#C4A265] via-[#D4B978] to-[#C4A265] bg-clip-text text-transparent">ADD TO CART</span>
+            <button onClick={() => addToCart(productId)} className="flex-1 relative overflow-hidden bg-gradient-to-b from-[#16213e] via-[#1a1a2e] to-[#0f3460] hover:from-[#1e2d4f] hover:via-[#1a1a2e] hover:to-[#0f3460] text-[9px] min-[425px]:text-[11px] min-[480px]:text-[11px] min-[768px]:text-xs font-bold min-[768px]:font-semibold py-2 min-[480px]:py-2.5 min-[768px]:py-3 rounded min-[480px]:rounded-md transition-all whitespace-nowrap tracking-normal shadow-[0_2px_4px_rgba(15,52,96,0.4),inset_0_1px_0_rgba(63,114,175,0.15)] active:shadow-[0_0px_1px_rgba(15,52,96,0.4),inset_0_1px_3px_rgba(0,0,0,0.3)] active:translate-y-[1px] border border-[rgba(63,114,175,0.15)]">
+              <span className="absolute inset-x-0 top-0 h-[45%] bg-gradient-to-b from-[rgba(15,52,96,0.15)] to-transparent rounded-t pointer-events-none"></span>
+              <span className="relative text-white">ADD TO CART</span>
             </button>
           </div>
         ) : (
