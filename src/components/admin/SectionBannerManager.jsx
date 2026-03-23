@@ -16,6 +16,12 @@ const SECTIONS = [
         description: 'Displayed above the "New Arrivals" section on the homepage.',
         fallbackGradient: 'linear-gradient(135deg, #0f0f0f 0%, #1a2a1a 40%, #2d6a4f 100%)',
     },
+    {
+        key: 'headphones',
+        label: 'Headphones Banner',
+        description: 'Displayed above the "Headphones" section on the homepage.',
+        fallbackGradient: 'linear-gradient(135deg, #0f3460 0%, #16213e 40%, #1a1a2e 100%)',
+    },
 ]
 
 function SectionBanner({ section, getToken }) {
