@@ -78,6 +78,14 @@ function buildSeeAllLink(section) {
   return `/products?${section.filterValue}`
 }
 
+function buildBannerKey(section) {
+  if (section.sectionBannerKey) return section.sectionBannerKey
+  if (section.filterType === 'flag') {
+    return section.filterValue.split('=')[0] // 'isLovedProduct'
+  }
+  return `category-${section.filterValue.toLowerCase().replace(/\s+/g, '-')}`
+}
+
 export default function Home() {
   const [sections, setSections] = useState(DEFAULT_SECTIONS)
   const [videoConfig, setVideoConfig] = useState(DEFAULT_VIDEO)
@@ -110,7 +118,7 @@ export default function Home() {
           subtitle={section.subtitle}
           apiUrl={buildApiUrl(section)}
           bg={section.bg}
-          section={section.sectionBannerKey || section.id}
+          section={buildBannerKey(section)}
           bannerGradient={section.bannerGradient}
           seeAllLink={buildSeeAllLink(section)}
         />

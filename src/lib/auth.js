@@ -161,7 +161,7 @@ export function createAuthError(message, status = 401) {
 // Upgrade to Redis (e.g. Upstash) for multi-instance deployments
 // ============================================================
 const requestCounts = new Map()
-const RATE_LIMIT = 100
+const RATE_LIMIT = 500
 const WINDOW_MS = 15 * 60 * 1000
 
 export function checkRateLimit(req) {
