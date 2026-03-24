@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
@@ -50,12 +50,21 @@ export default function TrendingPage() {
   const [selectedAvailability, setSelectedAvailability] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [heroBannerImage, setHeroBannerImage] = useState(null);
 
   const toggleFilter = (key) => {
     setOpenFilter((prev) => (prev === key ? null : key));
   };
 
   const { addToCart } = useCart();
+
+  // Fetch trending banner
+  useEffect(() => {
+    fetch('/api/section-banner?section=isTrending')
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(data => setHeroBannerImage(data.banner?.image || null))
+      .catch(() => setHeroBannerImage(null))
+  }, []);
 
   // Fetch trending products from DB
   useEffect(() => {
@@ -169,9 +178,14 @@ export default function TrendingPage() {
   return (
     <section className="max-w-[1440px] mx-auto px-2 min-[480px]:px-4 min-[640px]:px-5 min-[768px]:px-6 pt-4 min-[768px]:pt-6 pb-8">
       {/* Banner */}
-      <div className="relative w-full h-20 min-[480px]:h-24 min-[640px]:h-28 min-[768px]:h-32 min-[1024px]:h-36 rounded-xl min-[480px]:rounded-2xl overflow-hidden mb-4 min-[768px]:mb-5"
-        style={{ background: "linear-gradient(135deg, #111111 0%, #1a1a1a 40%, #222222 100%)" }}
-      />
+      <div
+        className="relative w-full h-20 min-[480px]:h-24 min-[640px]:h-28 min-[768px]:h-32 min-[1024px]:h-36 rounded-xl min-[480px]:rounded-2xl overflow-hidden mb-4 min-[768px]:mb-5"
+        style={!heroBannerImage ? { background: "linear-gradient(135deg, #111111 0%, #1a1a1a 40%, #222222 100%)" } : undefined}
+      >
+        {heroBannerImage && (
+          <img src={heroBannerImage} alt="Trending Banner" className="w-full h-full object-cover" />
+        )}
+      </div>
 
       {/* Heading */}
       <div className="mb-4 min-[768px]:mb-5">

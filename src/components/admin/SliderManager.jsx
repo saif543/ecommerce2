@@ -15,6 +15,10 @@ import {
     Edit2,
     ArrowUp,
     ArrowDown,
+    Tag,
+    Package,
+    Search,
+    Percent,
 } from 'lucide-react'
 
 const MySwal = Swal
@@ -23,7 +27,14 @@ const MySwal = Swal
 const DEFAULT_FORM = {
     id: '',
     link: '',
+    title: '',
     isActive: true,
+    offerType: 'none',          // 'none' | 'custom'
+    customOfferScope: 'brand',  // 'brand' | 'category' | 'products'
+    targetBrands: [],
+    targetCategories: [],
+    targetProducts: [],         // [{ productId, productName, discountPercentage }]
+    globalDiscountPercentage: 0,
 }
 
 // ── Main Component ────────────────────────────────────────────
@@ -39,6 +50,13 @@ export default function SliderManagement({ getToken }) {
     const [imageFile, setImageFile] = useState(null)
     const [imagePreview, setImagePreview] = useState(null)
     const fileInputRef = useRef(null)
+
+    // For product/brand/category selection
+    const [brands, setBrands] = useState([])
+    const [categories, setCategories] = useState([])
+    const [allProducts, setAllProducts] = useState([])
+    const [productSearch, setProductSearch] = useState('')
+    const [loadingProducts, setLoadingProducts] = useState(false)
 
     useEffect(() => {
         fetchSlides()
@@ -60,23 +78,55 @@ export default function SliderManagement({ getToken }) {
         }
     }
 
-    const openCreateModal = () => {
+    const fetchBrandsAndProducts = async () => {
+        setLoadingProducts(true)
+        try {
+            const [brandRes, productRes, catRes] = await Promise.all([
+                fetch('/api/brand'),
+                fetch('/api/product?limit=200'),
+                fetch('/api/category'),
+            ])
+            const brandData = await brandRes.json()
+            const productData = await productRes.json()
+            const catData = await catRes.json()
+            if (brandData.brands) setBrands(brandData.brands)
+            if (productData.products) setAllProducts(productData.products)
+            if (catData.categories) setCategories(catData.categories)
+        } catch (err) {
+            console.error('Error loading brands/products/categories:', err)
+        } finally {
+            setLoadingProducts(false)
+        }
+    }
+
+    const openCreateModal = async () => {
         setEditingSlide(null)
         setFormData({ ...DEFAULT_FORM, id: `slide-${Date.now()}` })
         setImageFile(null)
         setImagePreview(null)
+        setProductSearch('')
+        await fetchBrandsAndProducts()
         setShowModal(true)
     }
 
-    const openEditModal = (slide) => {
+    const openEditModal = async (slide) => {
         setEditingSlide(slide)
         setFormData({
             id: slide.id,
             link: slide.link || '',
+            title: slide.title || '',
             isActive: slide.isActive !== false,
+            offerType: slide.offerType || 'none',
+            customOfferScope: slide.customOfferScope || 'brand',
+            targetBrands: Array.isArray(slide.targetBrands) ? slide.targetBrands : [],
+            targetCategories: Array.isArray(slide.targetCategories) ? slide.targetCategories : [],
+            targetProducts: Array.isArray(slide.targetProducts) ? slide.targetProducts : [],
+            globalDiscountPercentage: slide.globalDiscountPercentage || 0,
         })
         setImagePreview(typeof slide.image === 'string' ? slide.image : (slide.image?.url || null))
         setImageFile(null)
+        setProductSearch('')
+        await fetchBrandsAndProducts()
         setShowModal(true)
     }
 
@@ -98,20 +148,110 @@ export default function SliderManagement({ getToken }) {
 
     const set = (key, val) => setFormData(prev => ({ ...prev, [key]: val }))
 
+    // Toggle a product in/out of the target list
+    const toggleProduct = (product) => {
+        setFormData(prev => {
+            const exists = prev.targetProducts.find(p => p.productId === product._id)
+            if (exists) {
+                return { ...prev, targetProducts: prev.targetProducts.filter(p => p.productId !== product._id) }
+            }
+            return {
+                ...prev,
+                targetProducts: [...prev.targetProducts, {
+                    productId: product._id,
+                    productName: product.name,
+                    discountPercentage: 0,   // default: use global
+                }]
+            }
+        })
+    }
+
+    // Update per-product discount %
+    const setProductDiscount = (productId, pct) => {
+        setFormData(prev => ({
+            ...prev,
+            targetProducts: prev.targetProducts.map(p =>
+                p.productId === productId
+                    ? { ...p, discountPercentage: Math.min(100, Math.max(0, parseFloat(pct) || 0)) }
+                    : p
+            )
+        }))
+    }
+
+    const filteredProducts = allProducts.filter(p => {
+        const matchesSearch = p.name.toLowerCase().includes(productSearch.toLowerCase()) || p.brand?.toLowerCase().includes(productSearch.toLowerCase())
+        if (formData.offerType === 'custom') {
+            if (formData.customOfferScope === 'brand' && formData.targetBrands.length > 0) return matchesSearch && formData.targetBrands.includes(p.brand)
+            if (formData.customOfferScope === 'category' && formData.targetCategories.length > 0) return matchesSearch && formData.targetCategories.includes(p.category)
+        }
+        return matchesSearch
+    })
+
+    // Select all currently filtered products
+    const selectAllFilteredProducts = () => {
+        setFormData(prev => {
+            const newTargetProducts = [...prev.targetProducts]
+            let changed = false
+            for (const fp of filteredProducts) {
+                if (!newTargetProducts.find(p => p.productId === fp._id)) {
+                    newTargetProducts.push({
+                        productId: fp._id,
+                        productName: fp.name,
+                        discountPercentage: 0,
+                    })
+                    changed = true
+                }
+            }
+            return changed ? { ...prev, targetProducts: newTargetProducts } : prev
+        })
+    }
+
+    // Clear all selected products
+    const clearSelectedProducts = () => {
+        setFormData(prev => ({ ...prev, targetProducts: [] }))
+    }
+
     const handleSaveSlide = async (e) => {
         e.preventDefault()
         if (!editingSlide && !imageFile) {
             MySwal.fire({ icon: 'warning', title: 'Image Required', text: 'Please select an image for the slide', confirmButtonColor: '#f26e21' })
             return
         }
+        if (formData.offerType === 'custom') {
+            if (!formData.title?.trim()) {
+                MySwal.fire({ icon: 'warning', title: 'Title Required', text: 'Please enter a title for this custom offer', confirmButtonColor: '#f26e21' })
+                return
+            }
+            if (formData.customOfferScope === 'brand' && formData.targetBrands.length === 0) {
+                MySwal.fire({ icon: 'warning', title: 'Brand Required', text: 'Please select at least one brand for the offer', confirmButtonColor: '#f26e21' })
+                return
+            }
+            if (formData.customOfferScope === 'category' && formData.targetCategories.length === 0) {
+                MySwal.fire({ icon: 'warning', title: 'Category Required', text: 'Please select at least one category for the offer', confirmButtonColor: '#f26e21' })
+                return
+            }
+            if (formData.customOfferScope === 'products' && formData.targetProducts.length === 0) {
+                MySwal.fire({ icon: 'warning', title: 'No Products', text: 'Please select at least one product for the offer', confirmButtonColor: '#f26e21' })
+                return
+            }
+        }
         setSaving(true)
         try {
             const token = await getToken()
             if (!token) throw new Error('Authentication required')
 
+            const slidePayload = {
+                ...formData,
+                globalDiscountPercentage: parseFloat(formData.globalDiscountPercentage) || 0,
+            }
+            // If offer slider, auto-generate link (API will do it too, but keep UI consistent)
+            if (formData.offerType !== 'none' && !formData.link) {
+                slidePayload.link = `/products?slider=${formData.id}`
+            }
+
             const slideData = {
                 action: editingSlide ? 'update' : 'create',
-                slideData: { ...formData },
+                slideData: slidePayload,
             }
             if (editingSlide) slideData.id = editingSlide.id
 
@@ -139,10 +279,14 @@ export default function SliderManagement({ getToken }) {
                 setUploading(false)
             }
 
+            const successMsg = formData.offerType !== 'none'
+                ? `Slide saved and discount applied to ${formData.customOfferScope === 'brand' ? `selected brands` : formData.customOfferScope === 'category' ? `selected categories` : `${formData.targetProducts.length} selected product(s)`}!`
+                : `Slide ${editingSlide ? 'updated' : 'created'} successfully`
+
             MySwal.fire({
                 icon: 'success', title: 'Success!',
-                text: `Slide ${editingSlide ? 'updated' : 'created'} successfully`,
-                timer: 1500, showConfirmButton: false, confirmButtonColor: '#f26e21',
+                text: successMsg,
+                timer: 2500, showConfirmButton: false, confirmButtonColor: '#f26e21',
             })
             setShowModal(false)
             setTimeout(() => fetchSlides(), 500)
@@ -234,6 +378,12 @@ export default function SliderManagement({ getToken }) {
         }
     }
 
+    const offerTypeLabel = (type) => {
+        if (type === 'brand') return '🏷️ Brand Offer'
+        if (type === 'products') return '🛍️ Product Offer'
+        return null
+    }
+
     if (loading) {
         return (
             <div className="flex items-center justify-center py-20">
@@ -251,7 +401,7 @@ export default function SliderManagement({ getToken }) {
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h2 className="text-2xl font-bold text-gray-900">Hero Sliders</h2>
-                    <p className="text-gray-600 mt-1">Manage homepage slider images and links</p>
+                    <p className="text-gray-600 mt-1">Manage homepage slider images, links and promotional offers</p>
                 </div>
                 <button
                     onClick={openCreateModal}
@@ -278,6 +428,7 @@ export default function SliderManagement({ getToken }) {
                 <div className="space-y-4">
                     {slides.map((slide, index) => {
                         const imgSrc = typeof slide.image === 'string' ? slide.image : (slide.image?.url || null)
+                        const offerLabel = offerTypeLabel(slide.offerType)
                         return (
                             <motion.div
                                 key={slide.id}
@@ -302,9 +453,27 @@ export default function SliderManagement({ getToken }) {
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-start justify-between mb-2">
                                                 <div className="min-w-0 flex-1">
-                                                    <h3 className="text-lg font-semibold text-gray-900 truncate">
-                                                        Slide #{index + 1}
-                                                    </h3>
+                                                    <div className="flex items-center gap-2 flex-wrap">
+                                                        <h3 className="text-lg font-semibold text-gray-900 truncate">
+                                                            Slide #{index + 1}
+                                                        </h3>
+                                                        {offerLabel && (
+                                                            <span className="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs font-semibold rounded-full">
+                                                                {offerLabel}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    {slide.offerType === 'custom' && (
+                                                        <p className="text-sm text-gray-600 mt-0.5">
+                                                            Scope: <strong>{slide.customOfferScope}</strong>
+                                                            {slide.customOfferScope === 'brand' && ` (${slide.targetBrand})`}
+                                                            {slide.customOfferScope === 'category' && ` (${slide.targetCategory})`}
+                                                            {slide.targetProducts?.length > 0 && ` | ${slide.targetProducts.length} specific products`}
+                                                            {slide.globalDiscountPercentage > 0 && (
+                                                                <span className="ml-2 text-green-700 font-semibold">{slide.globalDiscountPercentage}% off</span>
+                                                            )}
+                                                        </p>
+                                                    )}
                                                     {slide.link ? (
                                                         <a
                                                             href={slide.link}
@@ -383,10 +552,10 @@ export default function SliderManagement({ getToken }) {
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.97, opacity: 0, y: 10 }}
                             onClick={e => e.stopPropagation()}
-                            className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden"
+                            className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
                         >
                             {/* Modal Header */}
-                            <div className="bg-gradient-to-r from-[#f26e21] to-[#C45A00] text-white p-5 flex items-center justify-between">
+                            <div className="bg-gradient-to-r from-[#f26e21] to-[#C45A00] text-white p-5 flex items-center justify-between sticky top-0 z-10 rounded-t-2xl">
                                 <h2 className="text-xl font-bold">
                                     {editingSlide ? '✏️ Edit Slider' : '✨ Create New Slider'}
                                 </h2>
@@ -395,7 +564,7 @@ export default function SliderManagement({ getToken }) {
                                 </button>
                             </div>
 
-                            <form onSubmit={handleSaveSlide} className="p-6 space-y-5">
+                            <form onSubmit={handleSaveSlide} className="p-6 space-y-6">
 
                                 {/* Image Upload */}
                                 <div>
@@ -431,19 +600,267 @@ export default function SliderManagement({ getToken }) {
                                     </div>
                                 </div>
 
-                                {/* Link */}
+
+
+                                {/* ── OFFER TYPE ── */}
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-800 mb-2">
-                                        🔗 Slide Link <span className="font-normal text-gray-400 text-xs">(clicking the slider goes here)</span>
+                                    <label className="block text-sm font-bold text-gray-800 mb-3">
+                                        🎁 Offer Type
                                     </label>
-                                    <input
-                                        type="text"
-                                        value={formData.link}
-                                        onChange={e => set('link', e.target.value)}
-                                        placeholder="https://example.com/products (optional)"
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#f26e21]"
-                                    />
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {[
+                                            { value: 'none', label: '🔗 Standard Link', desc: 'No offer attached' },
+                                            { value: 'custom', label: '✨ Custom Offer', desc: 'Create a brand, category, or product offer' },
+                                        ].map(opt => (
+                                            <button
+                                                key={opt.value}
+                                                type="button"
+                                                onClick={() => set('offerType', opt.value)}
+                                                className={`p-3 rounded-xl border-2 text-left transition-all ${formData.offerType === opt.value
+                                                    ? 'border-[#f26e21] bg-orange-50'
+                                                    : 'border-gray-200 hover:border-orange-300'}`}
+                                            >
+                                                <div className="font-semibold text-sm text-gray-800">{opt.label}</div>
+                                                <div className="text-xs text-gray-500 mt-0.5">{opt.desc}</div>
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
+
+                                {/* ── CUSTOM OFFER fields ── */}
+                                {formData.offerType === 'custom' && (
+                                    <div className="bg-orange-50 rounded-xl p-4 space-y-4 border border-orange-200">
+                                        <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                                            <Tag size={16} className="text-orange-600" /> Custom Offer Settings
+                                        </h3>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Offer Title / Event Name <span className="text-red-500">*</span></label>
+                                            <input
+                                                type="text"
+                                                value={formData.title}
+                                                onChange={e => set('title', e.target.value)}
+                                                placeholder="e.g., Eid Mubarak Sale"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#f26e21]"
+                                                required
+                                            />
+                                            <p className="text-xs text-gray-500 mt-1">This title will be displayed as the main heading on the offer's product page.</p>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Offer Scope</label>
+                                            <div className="flex gap-4">
+                                                {['brand', 'category', 'products'].map(scope => (
+                                                    <label key={scope} className="flex items-center gap-2 cursor-pointer">
+                                                        <input
+                                                            type="radio"
+                                                            name="customOfferScope"
+                                                            value={scope}
+                                                            checked={formData.customOfferScope === scope}
+                                                            onChange={e => {
+                                                                set('customOfferScope', e.target.value)
+                                                                set('targetProducts', []) // Clear products when changing scope
+                                                            }}
+                                                            className="accent-[#f26e21]"
+                                                        />
+                                                        <span className="text-sm font-medium text-gray-800 capitalize">{scope}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {formData.customOfferScope === 'brand' && (
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Select Brands <span className="text-red-500">*</span></label>
+                                                <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 max-h-40 overflow-y-auto p-2 border border-gray-200 rounded-lg bg-white">
+                                                    {brands.map(b => (
+                                                        <label key={b._id || b.name} className="flex items-center gap-2 cursor-pointer text-sm text-gray-700 hover:bg-gray-50 p-1.5 rounded transition-colors group">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={formData.targetBrands.includes(b.name)}
+                                                                onChange={(e) => {
+                                                                    const newBrands = e.target.checked 
+                                                                        ? [...formData.targetBrands, b.name]
+                                                                        : formData.targetBrands.filter(name => name !== b.name)
+                                                                    setFormData(prev => ({ ...prev, targetBrands: newBrands, targetProducts: [] }))
+                                                                }}
+                                                                className="accent-[#f26e21] w-4 h-4"
+                                                            />
+                                                            <span className="truncate group-hover:text-gray-900">{b.name}</span>
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                                <p className="text-xs text-gray-500 mt-2">Leave specific products empty to apply offer to ALL products in selected brands.</p>
+                                            </div>
+                                        )}
+
+                                        {formData.customOfferScope === 'category' && (
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Select Categories <span className="text-red-500">*</span></label>
+                                                <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 max-h-40 overflow-y-auto p-2 border border-gray-200 rounded-lg bg-white">
+                                                    {categories.map(c => (
+                                                        <label key={c._id || c.name} className="flex items-center gap-2 cursor-pointer text-sm text-gray-700 hover:bg-gray-50 p-1.5 rounded transition-colors group">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={formData.targetCategories.includes(c.name)}
+                                                                onChange={(e) => {
+                                                                    const newCategories = e.target.checked 
+                                                                        ? [...formData.targetCategories, c.name]
+                                                                        : formData.targetCategories.filter(name => name !== c.name)
+                                                                    setFormData(prev => ({ ...prev, targetCategories: newCategories, targetProducts: [] }))
+                                                                }}
+                                                                className="accent-[#f26e21] w-4 h-4"
+                                                            />
+                                                            <span className="truncate group-hover:text-gray-900">{c.name}</span>
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                                <p className="text-xs text-gray-500 mt-2">Leave specific products empty to apply offer to ALL products in selected categories.</p>
+                                            </div>
+                                        )}
+
+                                        {/* Global discount */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                Global Discount % <span className="text-gray-400 font-normal">(applies to {formData.customOfferScope} with no individual override)</span>
+                                            </label>
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="number"
+                                                    min="0" max="100" step="0.5"
+                                                    value={formData.globalDiscountPercentage}
+                                                    onChange={e => set('globalDiscountPercentage', parseFloat(e.target.value) || 0)}
+                                                    className="w-24 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#f26e21]"
+                                                />
+                                                <Percent size={16} className="text-gray-500" />
+                                            </div>
+                                        </div>
+
+                                        {/* Selected products summary */}
+                                        {formData.targetProducts.length > 0 && (
+                                            <div>
+                                                <p className="text-sm font-semibold text-gray-700 mb-2">
+                                                    Selected Products ({formData.targetProducts.length}) — Set individual discounts:
+                                                </p>
+                                                <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                                                    {formData.targetProducts.map(tp => (
+                                                        <div key={tp.productId} className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 border border-gray-200">
+                                                            <div className="flex-1 text-sm text-gray-800 truncate">{tp.productName}</div>
+                                                            <div className="flex items-center gap-1.5 flex-shrink-0">
+                                                                <input
+                                                                    type="number"
+                                                                    min="0" max="100" step="0.5"
+                                                                    placeholder={formData.globalDiscountPercentage > 0 ? `Global: ${formData.globalDiscountPercentage}%` : '0'}
+                                                                    value={tp.discountPercentage || ''}
+                                                                    onChange={e => setProductDiscount(tp.productId, e.target.value)}
+                                                                    className="w-20 px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-[#f26e21]"
+                                                                />
+                                                                <span className="text-gray-500 text-xs">%</span>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => toggleProduct({ _id: tp.productId, name: tp.productName })}
+                                                                    className="p-1 text-red-500 hover:bg-red-50 rounded"
+                                                                >
+                                                                    <X size={14} />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Product search + pick */}
+                                        <div className={formData.customOfferScope !== 'products' && (formData.targetBrands.length === 0 && formData.targetCategories.length === 0) ? 'opacity-50 pointer-events-none' : ''}>
+                                            <div className="flex items-center justify-between mb-2">
+                                                <label className="block text-sm font-semibold text-gray-700">
+                                                    {formData.customOfferScope === 'products' ? 'Select Products' : `Select Products from selected ${formData.customOfferScope === 'brand' ? 'brands' : 'categories'} (Optional)`}
+                                                    {formData.customOfferScope === 'products' && <span className="text-red-500 ml-1">*</span>}
+                                                </label>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={selectAllFilteredProducts}
+                                                        className="px-2 py-1 bg-orange-100 text-orange-700 hover:bg-orange-200 rounded text-xs font-semibold transition-colors"
+                                                    >
+                                                        Select All Filtered
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={clearSelectedProducts}
+                                                        disabled={formData.targetProducts.length === 0}
+                                                        className="px-2 py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded text-xs font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    >
+                                                        Clear Selection
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div className="relative mb-2">
+                                                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                                <input
+                                                    type="text"
+                                                    placeholder={`Search by name...`}
+                                                    value={productSearch}
+                                                    onChange={e => setProductSearch(e.target.value)}
+                                                    className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#f26e21]"
+                                                />
+                                            </div>
+                                            {loadingProducts ? (
+                                                <div className="text-center py-6 text-gray-500 text-sm">Loading products...</div>
+                                            ) : (
+                                                <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-lg bg-white divide-y divide-gray-100">
+                                                    {filteredProducts.length === 0 && (
+                                                        <div className="text-center py-6 text-gray-400 text-sm">No products found</div>
+                                                    )}
+                                                    {filteredProducts.map(p => {
+                                                        const isSelected = formData.targetProducts.some(tp => tp.productId === p._id)
+                                                        return (
+                                                            <button
+                                                                key={p._id}
+                                                                type="button"
+                                                                onClick={() => toggleProduct(p)}
+                                                                className={`w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-orange-50 transition-colors ${isSelected ? 'bg-orange-50' : ''}`}
+                                                            >
+                                                                {p.images?.[0]?.url && (
+                                                                    <img src={p.images[0].url} alt={p.name} className="w-10 h-10 object-cover rounded flex-shrink-0" />
+                                                                )}
+                                                                <div className="flex-1 min-w-0">
+                                                                    <div className="text-sm font-medium text-gray-800 truncate">{p.name}</div>
+                                                                    <div className="text-xs text-gray-500">{p.brand || 'No Brand'} · ৳{p.price?.toLocaleString()}</div>
+                                                                </div>
+                                                                <div className={`w-5 h-5 rounded border-2 flex-shrink-0 flex items-center justify-center transition-all ${isSelected ? 'bg-[#f26e21] border-[#f26e21]' : 'border-gray-300'}`}>
+                                                                    {isSelected && <span className="text-white text-xs font-bold">✓</span>}
+                                                                </div>
+                                                            </button>
+                                                        )
+                                                    })}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Link (shown only for 'none' offer type, or for manual override) */}
+                                {formData.offerType === 'none' && (
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-800 mb-2">
+                                            🔗 Slide Link <span className="font-normal text-gray-400 text-xs">(clicking the slider goes here)</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={formData.link}
+                                            onChange={e => set('link', e.target.value)}
+                                            placeholder="https://example.com/products (optional)"
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#f26e21]"
+                                        />
+                                    </div>
+                                )}
+                                {formData.offerType !== 'none' && (
+                                    <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg border border-blue-200 text-sm text-blue-700">
+                                        <span>🔗</span>
+                                        <span>Link will be auto-set to <strong>/products?slider={formData.id}</strong> to show offer products.</span>
+                                    </div>
+                                )}
 
                                 {/* Active toggle */}
                                 <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg border border-orange-200">

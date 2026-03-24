@@ -1,5 +1,5 @@
 // Slider API - Firebase Token Authentication
-// Hero carousel management — image + link only
+// Hero carousel management — image + link + offer management
 import { NextResponse } from 'next/server'
 import { verifyApiToken, requireRole, createAuthError, checkRateLimit } from '@/lib/auth'
 import { uploadImage, deleteImage } from '@/lib/cloudinary'
@@ -75,6 +75,77 @@ async function logAudit(action, data, req) {
 }
 
 // ============================================================
+// 💰 OFFER HELPERS — Apply discounts to products for a slider
+// ============================================================
+
+/**
+ * Apply discounts to products based on slider offer configuration.
+ * - targetProducts: array of { productId, discountPercentage } — per-product override
+ * - When offerType=brand: apply globalDiscountPercentage to all products of targetBrand
+ * - When offerType=products: apply per-product discountPercentage (fallback to globalDiscountPercentage)
+ */
+async function applySliderDiscounts(db, slideData) {
+    const { ObjectId } = await import('mongodb')
+    const {
+        offerType, customOfferScope, targetBrands, targetCategories,
+        targetProducts, globalDiscountPercentage
+    } = slideData
+
+    if (offerType !== 'custom') return
+    const globalPct = parseFloat(globalDiscountPercentage) || 0
+
+    const hasSpecificProducts = Array.isArray(targetProducts) && targetProducts.length > 0
+
+    if (hasSpecificProducts) {
+        // Only apply to specific products
+        const bulkOps = []
+        for (const entry of targetProducts) {
+            if (!entry.productId) continue
+            let oid
+            try { oid = new ObjectId(String(entry.productId)) } catch { continue }
+
+            const pct = parseFloat(entry.discountPercentage) > 0 ? parseFloat(entry.discountPercentage) : globalPct
+            if (pct <= 0) continue
+
+            const product = await db.collection('products').findOne({ _id: oid }, { projection: { price: 1 } })
+            if (!product) continue
+
+            const salePrice = parseFloat((product.price * (1 - pct / 100)).toFixed(2))
+            bulkOps.push({
+                updateOne: {
+                    filter: { _id: oid },
+                    update: { $set: { discount: salePrice, updatedAt: new Date() } }
+                }
+            })
+        }
+        if (bulkOps.length > 0) await db.collection('products').bulkWrite(bulkOps)
+    } else {
+        // Apply to entire brand or category
+        if (globalPct <= 0) return
+        let query = { isActive: true }
+        if (customOfferScope === 'brand' && targetBrands?.length > 0) {
+            query.brand = { $in: targetBrands.map(b => new RegExp(`^${b}$`, 'i')) }
+        } else if (customOfferScope === 'category' && targetCategories?.length > 0) {
+            query.category = { $in: targetCategories.map(c => new RegExp(`^${c}$`, 'i')) }
+        } else {
+            return // No valid scope
+        }
+
+        const products = await db.collection('products').find(query).project({ _id: 1, price: 1 }).toArray()
+        const bulkOps = products.map(p => {
+            const salePrice = parseFloat((p.price * (1 - globalPct / 100)).toFixed(2))
+            return {
+                updateOne: {
+                    filter: { _id: p._id },
+                    update: { $set: { discount: salePrice, updatedAt: new Date() } }
+                }
+            }
+        })
+        if (bulkOps.length > 0) await db.collection('products').bulkWrite(bulkOps)
+    }
+}
+
+// ============================================================
 // 📦 GET — Get all active sliders (Public, sorted by order)
 // ============================================================
 export async function GET(req) {
@@ -83,9 +154,17 @@ export async function GET(req) {
 
         const { searchParams } = new URL(req.url)
         const includeInactive = searchParams.get('includeInactive') === 'true'
+        const slideId = searchParams.get('id')
 
         const client = await clientPromise
         const db = client.db('ECOM2')
+
+        // Fetch single slide by id (used by storefront for offer metadata)
+        if (slideId) {
+            const slider = await db.collection('sliders').findOne({ id: slideId })
+            if (!slider) return NextResponse.json({ error: 'Slide not found' }, { status: 404 })
+            return NextResponse.json({ success: true, slide: slider })
+        }
 
         // Only admin can request inactive sliders (token needed)
         let query = { isActive: true }
@@ -127,7 +206,7 @@ export async function POST(req) {
 
     try {
         const contentLength = parseInt(req.headers.get('content-length') || '0', 10)
-        if (contentLength > 50_000) {
+        if (contentLength > 200_000) {
             return NextResponse.json({ error: 'Request body too large' }, { status: 413 })
         }
 
@@ -158,17 +237,46 @@ export async function POST(req) {
                 return NextResponse.json({ error: 'slideData is required' }, { status: 400 })
             }
 
-            const link = sanitizeString(slideData.link || '', MAX_CTA_LINK_LENGTH)
+            // Offer fields
+            const offerType = ['none', 'custom'].includes(slideData.offerType) ? slideData.offerType : 'none'
+            const customOfferScope = offerType === 'custom' && ['brand', 'category', 'products'].includes(slideData.customOfferScope) ? slideData.customOfferScope : null
+            const targetBrands = customOfferScope === 'brand' && Array.isArray(slideData.targetBrands) ? slideData.targetBrands.map(s => sanitizeString(s, 200)).filter(Boolean) : []
+            const targetCategories = customOfferScope === 'category' && Array.isArray(slideData.targetCategories) ? slideData.targetCategories.map(s => sanitizeString(s, 200)).filter(Boolean) : []
+            
+            const targetProducts = offerType === 'custom' && Array.isArray(slideData.targetProducts)
+                ? slideData.targetProducts.slice(0, 200).map(entry => ({
+                    productId: String(entry.productId || ''),
+                    productName: sanitizeString(entry.productName || '', 300) || '',
+                    discountPercentage: Math.min(100, Math.max(0, parseFloat(entry.discountPercentage) || 0))
+                })).filter(e => e.productId)
+                : []
+            const globalDiscountPercentage = Math.min(100, Math.max(0, parseFloat(slideData.globalDiscountPercentage) || 0))
+            const title = sanitizeString(slideData.title || '', 300) || null
+
+            // Auto-generate link for offer sliders
+            const slideId = slideData.id || `slide-${Date.now()}`
+            let link = sanitizeString(slideData.link || '', MAX_CTA_LINK_LENGTH)
+            if (offerType !== 'none' && !link) {
+                link = `/products?slider=${slideId}`
+            }
             if (link && !isValidUrl(link)) {
                 return NextResponse.json({ error: 'Invalid link URL' }, { status: 400 })
             }
 
             const newSlide = {
-                id: slideData.id || `slide-${Date.now()}`,
+                id: slideId,
                 link: link || '',
                 isActive: slideData.isActive !== false,
                 image: null,
                 order: 0,
+                // Offer fields
+                title,
+                offerType,
+                customOfferScope,
+                targetBrands,
+                targetCategories,
+                targetProducts,
+                globalDiscountPercentage,
                 createdBy: user.dbUserId || user.userId,
                 createdAt: new Date(),
                 updatedAt: new Date(),
@@ -180,6 +288,11 @@ export async function POST(req) {
 
             const result = await db.collection('sliders').insertOne(newSlide)
             const created = await db.collection('sliders').findOne({ _id: result.insertedId })
+
+            // Apply discounts to products after creating the slide
+            if (offerType === 'custom') {
+                await applySliderDiscounts(db, { offerType, customOfferScope, targetBrands, targetCategories, targetProducts, globalDiscountPercentage })
+            }
 
             logAudit('SLIDER_CREATED', { userId: user.userId, slideId: newSlide.id }, req)
             return NextResponse.json({ success: true, message: 'Slide created successfully', slide: created }, { status: 201 })
@@ -202,10 +315,60 @@ export async function POST(req) {
                     updateData.link = link || ''
                 }
                 if (slideData.isActive !== undefined) updateData.isActive = Boolean(slideData.isActive)
+
+                // Offer fields
+                if (slideData.title !== undefined) {
+                    updateData.title = sanitizeString(slideData.title || '', 300) || null
+                }
+                
+                if (slideData.offerType !== undefined) {
+                    updateData.offerType = ['none', 'custom'].includes(slideData.offerType)
+                        ? slideData.offerType : 'none'
+                }
+                const offerType = updateData.offerType ?? (await db.collection('sliders').findOne({ id: slideId }))?.offerType ?? 'none'
+
+                if (slideData.customOfferScope !== undefined) {
+                    updateData.customOfferScope = ['brand', 'category', 'products'].includes(slideData.customOfferScope) ? slideData.customOfferScope : null
+                }
+                if (slideData.targetBrands !== undefined && Array.isArray(slideData.targetBrands)) {
+                    updateData.targetBrands = slideData.targetBrands.map(s => sanitizeString(s, 200)).filter(Boolean)
+                }
+                if (slideData.targetCategories !== undefined && Array.isArray(slideData.targetCategories)) {
+                    updateData.targetCategories = slideData.targetCategories.map(s => sanitizeString(s, 200)).filter(Boolean)
+                }
+
+                if (slideData.targetProducts !== undefined && Array.isArray(slideData.targetProducts)) {
+                    updateData.targetProducts = slideData.targetProducts.slice(0, 200).map(entry => ({
+                        productId: String(entry.productId || ''),
+                        productName: sanitizeString(entry.productName || '', 300) || '',
+                        discountPercentage: Math.min(100, Math.max(0, parseFloat(entry.discountPercentage) || 0))
+                    })).filter(e => e.productId)
+                }
+                if (slideData.globalDiscountPercentage !== undefined) {
+                    updateData.globalDiscountPercentage = Math.min(100, Math.max(0, parseFloat(slideData.globalDiscountPercentage) || 0))
+                }
+
+                // Auto-generate link if offer type set and no custom link given
+                if (offerType !== 'none' && !updateData.link) {
+                    updateData.link = `/products?slider=${slideId}`
+                }
             }
 
             await db.collection('sliders').updateOne({ id: slideId }, { $set: updateData })
             const updated = await db.collection('sliders').findOne({ id: slideId })
+
+            // Re-apply discounts after update
+            const effectiveOfferData = {
+                offerType: updated.offerType,
+                customOfferScope: updated.customOfferScope,
+                targetBrands: updated.targetBrands,
+                targetCategories: updated.targetCategories,
+                targetProducts: updated.targetProducts,
+                globalDiscountPercentage: updated.globalDiscountPercentage,
+            }
+            if (effectiveOfferData.offerType === 'custom') {
+                await applySliderDiscounts(db, effectiveOfferData)
+            }
 
             logAudit('SLIDER_UPDATED', { userId: user.userId, slideId }, req)
             return NextResponse.json({ success: true, message: 'Slide updated successfully', slide: updated })

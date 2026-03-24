@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 // Fallback slide
 const FALLBACK_SLIDES = [
@@ -86,10 +87,11 @@ export default function Hero() {
   };
 
   const slide = slides[current];
+  const router = useRouter();
 
   const handleSlideClick = () => {
     if (slide.link) {
-      window.open(slide.link, '_blank', 'noopener,noreferrer');
+      router.push(slide.link);
     }
   };
 

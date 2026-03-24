@@ -1,5 +1,5 @@
-// Section Banner API - Firebase Token Authentication
-// Controls homepage product section banner images (e.g., most-loved, new-arrivals)
+// subcategory Banner API - Firebase Token Authentication
+// Manages per-subcategory hero banner images displayed in ProductsView
 import { NextResponse } from 'next/server'
 import { verifyApiToken, requireRole, createAuthError, checkRateLimit } from '@/lib/auth'
 import { uploadImage, deleteImage } from '@/lib/cloudinary'
@@ -7,19 +7,15 @@ import clientPromise from '@/lib/mongodb'
 
 // 🔐 SECURITY CONSTANTS
 const MAX_IMAGE_SIZE = 100 * 1024 * 1024 // 100 MB
-// Accept any valid section key: alphanumeric, hyphens, underscores, max 200 chars
-function isValidSectionKey(key) {
-    return typeof key === 'string' && key.length > 0 && key.length <= 200 && /^[a-z0-9_-]+$/i.test(key)
-}
 
 // Upload rate limiting
 const uploadTracker = new Map()
-const UPLOAD_LIMIT_PER_HOUR = 20
+const UPLOAD_LIMIT_PER_HOUR = 30
 const UPLOAD_WINDOW_MS = 60 * 60 * 1000
 
 // Write rate limiting
 const writeRequestCounts = new Map()
-const WRITE_RATE_LIMIT = 20
+const WRITE_RATE_LIMIT = 30
 const WRITE_WINDOW_MS = 15 * 60 * 1000
 
 // ── Helpers ──
@@ -66,40 +62,40 @@ async function logAudit(action, data, req) {
     })
 }
 
-// ── GET: Fetch one or all section banners (Public) ──
-// ?section=most-loved  → returns { banner }
-// (no param)           → returns { banners: [...] }
+// ── GET: Fetch hero banner for a subcategory (Public) ──
+// ?subcategory=<subcategory-name>   → returns { banner }
+// (no param)                  → returns all banners
 export async function GET(req) {
     try {
         await checkRateLimit(req)
         const { searchParams } = new URL(req.url)
-        const section = sanitizeString(searchParams.get('section') || '', 100)
+        const subcategory = sanitizeString(searchParams.get('subcategory') || '', 200)
 
         const client = await clientPromise
         const db = client.db('ECOM2')
 
-        if (section) {
-            if (!isValidSectionKey(section)) {
-                return NextResponse.json({ error: 'Invalid section key.' }, { status: 400 })
-            }
-            const banner = await db.collection('section_banners').findOne({ section })
+        if (subcategory) {
+            const banner = await db.collection('subcategory_banners').findOne({
+                subcategory: { $regex: `^${subcategory}$`, $options: 'i' }
+            })
             return NextResponse.json({ success: true, banner: banner || null })
         }
 
-        const banners = await db.collection('section_banners').find({}).toArray()
+        // Return all banners (admin usage)
+        const banners = await db.collection('subcategory_banners').find({}).sort({ subcategory: 1 }).toArray()
         return NextResponse.json({ success: true, banners })
 
     } catch (err) {
-        console.error('❌ GET /api/section-banner error:', err)
+        console.error('❌ GET /api/subcategory-banner error:', err)
         return NextResponse.json({
-            error: 'Failed to fetch section banner',
+            error: 'Failed to fetch subcategory banner',
             details: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error',
         }, { status: 500 })
     }
 }
 
-// ── PUT: Upload/replace a section banner image (Admin only, FormData) ──
-// FormData: { section, image (file) }
+// ── PUT: Upload/replace a subcategory hero banner (Admin only, FormData) ──
+// FormData: { subcategory, image (file) }
 export async function PUT(req) {
     let user = null
     try {
@@ -114,40 +110,54 @@ export async function PUT(req) {
 
     try {
         const formData = await req.formData()
-        const section = sanitizeString(formData.get('section') || '', 100)
+        const subcategory = sanitizeString(formData.get('subcategory') || '', 200)
         const file = formData.get('image')
 
-        if (!section) return NextResponse.json({ error: 'section is required' }, { status: 400 })
-        if (!isValidSectionKey(section)) {
-            return NextResponse.json({ error: 'Invalid section key.' }, { status: 400 })
+        if (!subcategory || subcategory.length < 1) {
+            return NextResponse.json({ error: 'subcategory name is required' }, { status: 400 })
         }
-        if (!file || typeof file === 'string') return NextResponse.json({ error: 'image file is required' }, { status: 400 })
-        if (file.size > MAX_IMAGE_SIZE) return NextResponse.json({ error: 'Image too large (max 100MB)' }, { status: 400 })
+        if (!file || typeof file === 'string') {
+            return NextResponse.json({ error: 'image file is required' }, { status: 400 })
+        }
+        if (file.size > MAX_IMAGE_SIZE) {
+            return NextResponse.json({ error: 'Image too large (max 100MB)' }, { status: 400 })
+        }
 
         const client = await clientPromise
         const db = client.db('ECOM2')
 
-        // Delete old image if exists
-        const existing = await db.collection('section_banners').findOne({ section })
+        // Verify subcategory exists in the categories collection
+        const subcategoryDoc = await db.collection('categories').findOne({
+            name: { $regex: `^${subcategory}$`, $options: 'i' }
+        })
+        if (!subcategoryDoc) {
+            return NextResponse.json({ error: `subcategory "${subcategory}" not found in database` }, { status: 404 })
+        }
+
+        // Delete old banner image if exists
+        const existing = await db.collection('subcategory_banners').findOne({
+            subcategory: { $regex: `^${subcategory}$`, $options: 'i' }
+        })
         if (existing?.imagePublicId) {
             try { await deleteImage(existing.imagePublicId) } catch (e) { console.error('Cloudinary delete error:', e) }
         }
 
-        // Upload new image — wide banner format matching the gradient height
+        // Upload new banner — same dimensions as ProductsView hero banner
+        const safeName = subcategory.toLowerCase().replace(/[^a-z0-9]/g, '_')
         const buffer = Buffer.from(await file.arrayBuffer())
         const uploaded = await uploadImage(buffer, {
-            folder: 'ecom2/section-banners',
-            publicId: `section_banner_${section}_${Date.now()}`,
-            transformation: [{ width: 1440, height: 160, crop: 'fill', gravity: 'auto' }],
+            folder: 'ecom2/subcategory-banners',
+            publicId: `cat_banner_${safeName}_${Date.now()}`,
+            transformation: [{ width: 1440, height: 176, crop: 'fill', gravity: 'auto' }],
         })
         const imageUrl = uploaded.secure_url || uploaded.url
 
         // Upsert the banner document
-        await db.collection('section_banners').updateOne(
-            { section },
+        await db.collection('subcategory_banners').updateOne(
+            { subcategory: subcategoryDoc.name }, // use exact name from DB for consistency
             {
                 $set: {
-                    section,
+                    subcategory: subcategoryDoc.name,
                     image: imageUrl,
                     imagePublicId: uploaded.publicId,
                     updatedAt: new Date(),
@@ -158,22 +168,22 @@ export async function PUT(req) {
             { upsert: true }
         )
 
-        const updated = await db.collection('section_banners').findOne({ section })
+        const updated = await db.collection('subcategory_banners').findOne({ subcategory: subcategoryDoc.name })
 
-        logAudit('SECTION_BANNER_UPLOADED', { userId: user.userId, userEmail: user.email, section }, req)
-        return NextResponse.json({ success: true, message: `Banner for "${section}" uploaded successfully`, banner: updated })
+        logAudit('subcategory_BANNER_UPLOADED', { userId: user.userId, userEmail: user.email, subcategory }, req)
+        return NextResponse.json({ success: true, message: `Hero banner for "${subcategory}" uploaded successfully`, banner: updated })
 
     } catch (err) {
-        console.error('❌ PUT /api/section-banner error:', err)
+        console.error('❌ PUT /api/subcategory-banner error:', err)
         return NextResponse.json({
-            error: 'Failed to upload section banner',
+            error: 'Failed to upload subcategory banner',
             details: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error',
         }, { status: 500 })
     }
 }
 
-// ── DELETE: Remove a section banner image (Admin only) ──
-// ?section=most-loved
+// ── DELETE: Remove a subcategory hero banner (Admin only) ──
+// ?subcategory=<subcategory-name>
 export async function DELETE(req) {
     let user = null
     try {
@@ -187,33 +197,34 @@ export async function DELETE(req) {
 
     try {
         const { searchParams } = new URL(req.url)
-        const section = sanitizeString(searchParams.get('section') || '', 100)
+        const subcategory = sanitizeString(searchParams.get('subcategory') || '', 200)
 
-        if (!section) return NextResponse.json({ error: 'section is required' }, { status: 400 })
-        if (!isValidSectionKey(section)) {
-            return NextResponse.json({ error: 'Invalid section key.' }, { status: 400 })
-        }
+        if (!subcategory) return NextResponse.json({ error: 'subcategory is required' }, { status: 400 })
 
         const client = await clientPromise
         const db = client.db('ECOM2')
 
-        const existing = await db.collection('section_banners').findOne({ section })
-        if (!existing) return NextResponse.json({ error: 'Banner not found for this section' }, { status: 404 })
+        const existing = await db.collection('subcategory_banners').findOne({
+            subcategory: { $regex: `^${subcategory}$`, $options: 'i' }
+        })
+        if (!existing) {
+            return NextResponse.json({ error: 'Banner not found for this subcategory' }, { status: 404 })
+        }
 
-        // Delete image from Cloudinary
+        // Delete Cloudinary image
         if (existing.imagePublicId) {
             try { await deleteImage(existing.imagePublicId) } catch (e) { console.error('Cloudinary delete error:', e) }
         }
 
-        await db.collection('section_banners').deleteOne({ section })
+        await db.collection('subcategory_banners').deleteOne({ _id: existing._id })
 
-        logAudit('SECTION_BANNER_DELETED', { userId: user.userId, userEmail: user.email, section }, req)
-        return NextResponse.json({ success: true, message: `Banner for "${section}" deleted successfully` })
+        logAudit('subcategory_BANNER_DELETED', { userId: user.userId, userEmail: user.email, subcategory }, req)
+        return NextResponse.json({ success: true, message: `Hero banner for "${subcategory}" removed successfully` })
 
     } catch (err) {
-        console.error('❌ DELETE /api/section-banner error:', err)
+        console.error('❌ DELETE /api/subcategory-banner error:', err)
         return NextResponse.json({
-            error: 'Failed to delete section banner',
+            error: 'Failed to delete subcategory banner',
             details: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error',
         }, { status: 500 })
     }

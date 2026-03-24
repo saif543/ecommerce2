@@ -35,6 +35,16 @@ export default function Categories() {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
+        .marquee-track {
+          animation-name: marquee-scroll;
+          animation-duration: var(--marquee-duration, 30s);
+          animation-timing-function: linear;
+          animation-iteration-count: infinite;
+          animation-play-state: running;
+        }
+        .marquee-track.paused {
+          animation-play-state: paused;
+        }
       `}</style>
 
       {/* Header */}
@@ -63,11 +73,8 @@ export default function Categories() {
           onMouseLeave={() => setPaused(false)}
         >
           <div
-            className="flex gap-5 min-[480px]:gap-7 min-[768px]:gap-10 select-none w-max"
-            style={{
-              animation: `marquee-scroll ${duration}s linear infinite`,
-              animationPlayState: paused ? "paused" : "running",
-            }}
+            className={`flex gap-5 min-[480px]:gap-7 min-[768px]:gap-10 select-none w-max marquee-track${paused ? ' paused' : ''}`}
+            style={{ '--marquee-duration': `${duration}s` }}
           >
             {/* Render categories twice for seamless loop */}
             {[...categories, ...categories].map((cat, i) => (

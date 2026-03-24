@@ -96,13 +96,12 @@ export default function ProductsView() {
     const searchParams = useSearchParams();
     const categoryParam = searchParams.get("category");
     const subcategoryParam = searchParams.get("subcategory");
-
-    const pageTitle = subcategoryParam || categoryParam || "All Products";
-    const pageDescription = subcategoryParam
-        ? `Showing results for ${subcategoryParam}`
-        : categoryParam
-            ? `Browse all products in ${categoryParam}`
-            : "Browse our complete collection of premium products";
+    const sliderParam = searchParams.get("slider");
+    // Flag-based filters from homepage sections
+    const isLovedProduct = searchParams.get("isLovedProduct");
+    const isNewArrival = searchParams.get("isNewArrival");
+    const isTrending = searchParams.get("isTrending");
+    const flagParam = isLovedProduct ? 'isLovedProduct' : isNewArrival ? 'isNewArrival' : isTrending ? 'isTrending' : null;
 
     const [sortBy, setSortBy] = useState("default");
     const [gridView, setGridView] = useState("grid");
@@ -118,6 +117,24 @@ export default function ProductsView() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [heroBannerImage, setHeroBannerImage] = useState(null);
+    const [sliderInfo, setSliderInfo] = useState(null);
+
+    const pageTitleFromFlag = flagParam === 'isLovedProduct' ? 'Most Loved Products'
+        : flagParam === 'isNewArrival' ? 'New Arrivals'
+        : flagParam === 'isTrending' ? 'Trending Now'
+        : null;
+    const pageTitle = sliderParam ? (sliderInfo?.title || "Special Offer")
+        : pageTitleFromFlag
+        || subcategoryParam || categoryParam || "All Products";
+    const pageDescription = sliderParam
+        ? "Explore products currently on a special promotion."
+        : pageTitleFromFlag
+        ? `Browse our curated ${pageTitle} collection`
+        : subcategoryParam
+            ? `Showing results for ${subcategoryParam}`
+            : categoryParam
+                ? `Browse all products in ${categoryParam}`
+                : "Browse our complete collection of premium products";
 
     const { addToCart } = useCart();
 
@@ -127,11 +144,16 @@ export default function ProductsView() {
         let queryArgs = [];
         if (categoryParam) queryArgs.push(`category=${encodeURIComponent(categoryParam)}`);
         if (subcategoryParam) queryArgs.push(`subcategory=${encodeURIComponent(subcategoryParam)}`);
+        if (sliderParam) queryArgs.push(`slider=${encodeURIComponent(sliderParam)}`);
+        if (isLovedProduct) queryArgs.push(`isLovedProduct=${isLovedProduct}`);
+        if (isNewArrival) queryArgs.push(`isNewArrival=${isNewArrival}`);
+        if (isTrending) queryArgs.push(`isTrending=${isTrending}`);
         queryArgs.push("limit=100");
 
         fetch(`/api/product?${queryArgs.join("&")}`)
             .then((r) => r.ok ? r.json() : Promise.reject(r.status))
             .then((data) => {
+                if (data.sliderInfo) setSliderInfo(data.sliderInfo);
                 const prods = data.products || [];
                 if (prods.length > 0) {
                     setProducts(prods);
@@ -151,19 +173,47 @@ export default function ProductsView() {
                 if (fallback.length > 0) setPriceMax(Math.max(...fallback.map(p => p.price || 0)));
             })
             .finally(() => setLoading(false));
-    }, [categoryParam, subcategoryParam]);
+    }, [categoryParam, subcategoryParam, sliderParam, isLovedProduct, isNewArrival, isTrending]);
 
-    // Fetch hero banner for the current top-level category
+    // Fetch hero banner
     useEffect(() => {
-        const cat = categoryParam;
-        if (!cat) { setHeroBannerImage(null); return; }
-        fetch(`/api/category-banner?category=${encodeURIComponent(cat)}`)
-            .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-            .then((data) => {
-                setHeroBannerImage(data.banner?.image || null);
-            })
-            .catch(() => setHeroBannerImage(null));
-    }, [categoryParam]);
+        if (sliderParam) {
+            fetch(`/api/section-banner?section=special-offer-${sliderParam}`)
+                .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+                .then((data) => setHeroBannerImage(data.banner?.image || null))
+                .catch(() => setHeroBannerImage(null));
+        } else if (flagParam) {
+            // Fetch section-banner using flag name as key (e.g. 'isLovedProduct')
+            fetch(`/api/section-banner?section=${flagParam}`)
+                .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+                .then((data) => setHeroBannerImage(data.banner?.image || null))
+                .catch(() => setHeroBannerImage(null));
+        } else if (subcategoryParam) {
+            // Try subcategory-banner first, then fall back to section-banner (legacy key)
+            fetch(`/api/subcategory-banner?subcategory=${encodeURIComponent(subcategoryParam)}`)
+                .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+                .then((data) => {
+                    if (data.banner?.image) {
+                        setHeroBannerImage(data.banner.image);
+                    } else {
+                        // Fallback: check section-banner using legacy key
+                        const legacyKey = `subcategory-${subcategoryParam.toLowerCase().replace(/\s+/g, '-')}`;
+                        return fetch(`/api/section-banner?section=${encodeURIComponent(legacyKey)}`)
+                            .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+                            .then((d) => setHeroBannerImage(d.banner?.image || null))
+                            .catch(() => setHeroBannerImage(null));
+                    }
+                })
+                .catch(() => setHeroBannerImage(null));
+        } else if (categoryParam) {
+            fetch(`/api/category-banner?category=${encodeURIComponent(categoryParam)}`)
+                .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+                .then((data) => setHeroBannerImage(data.banner?.image || null))
+                .catch(() => setHeroBannerImage(null));
+        } else {
+            setHeroBannerImage(null);
+        }
+    }, [categoryParam, subcategoryParam, sliderParam, flagParam]);
 
     const toggleFilter = (key) => {
         setOpenFilter((prev) => (prev === key ? null : key));
