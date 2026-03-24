@@ -10,6 +10,10 @@ const MAX_ITEMS_PER_ORDER = 100
 const MAX_QUANTITY_PER_ITEM = 999
 const MAX_ADDRESS_LENGTH = 500
 
+// 🚚 SHIPPING COSTS (must match CartPage.jsx)
+const SHIPPING_INSIDE_DHAKA = 60
+const SHIPPING_OUTSIDE_DHAKA = 120
+
 const writeRequestCounts = new Map()
 const WRITE_RATE_LIMIT = 20
 const WRITE_WINDOW_MS = 15 * 60 * 1000
