@@ -54,7 +54,7 @@ export default function SliderManagement({ getToken }) {
             if (result.success) setSlides(result.slides || [])
         } catch (error) {
             console.error('Error fetching slides:', error)
-            MySwal.fire({ icon: 'error', title: 'Error', text: 'Failed to load slides', confirmButtonColor: '#3F72AF' })
+            MySwal.fire({ icon: 'error', title: 'Error', text: 'Failed to load slides', confirmButtonColor: '#f26e21' })
         } finally {
             setLoading(false)
         }
@@ -85,11 +85,11 @@ export default function SliderManagement({ getToken }) {
         if (!file) return
         const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif']
         if (!allowedTypes.includes(file.type)) {
-            MySwal.fire({ icon: 'error', title: 'Invalid File Type', text: 'Only JPEG, PNG, WebP are allowed', confirmButtonColor: '#3F72AF' })
+            MySwal.fire({ icon: 'error', title: 'Invalid File Type', text: 'Only JPEG, PNG, WebP are allowed', confirmButtonColor: '#f26e21' })
             return
         }
         if (file.size > 100 * 1024 * 1024) {
-            MySwal.fire({ icon: 'error', title: 'File Too Large', text: 'Maximum file size is 100MB', confirmButtonColor: '#3F72AF' })
+            MySwal.fire({ icon: 'error', title: 'File Too Large', text: 'Maximum file size is 100MB', confirmButtonColor: '#f26e21' })
             return
         }
         setImageFile(file)
@@ -101,7 +101,7 @@ export default function SliderManagement({ getToken }) {
     const handleSaveSlide = async (e) => {
         e.preventDefault()
         if (!editingSlide && !imageFile) {
-            MySwal.fire({ icon: 'warning', title: 'Image Required', text: 'Please select an image for the slide', confirmButtonColor: '#3F72AF' })
+            MySwal.fire({ icon: 'warning', title: 'Image Required', text: 'Please select an image for the slide', confirmButtonColor: '#f26e21' })
             return
         }
         setSaving(true)
@@ -142,13 +142,13 @@ export default function SliderManagement({ getToken }) {
             MySwal.fire({
                 icon: 'success', title: 'Success!',
                 text: `Slide ${editingSlide ? 'updated' : 'created'} successfully`,
-                timer: 1500, showConfirmButton: false, confirmButtonColor: '#3F72AF',
+                timer: 1500, showConfirmButton: false, confirmButtonColor: '#f26e21',
             })
             setShowModal(false)
             setTimeout(() => fetchSlides(), 500)
         } catch (error) {
             console.error('Error saving slide:', error)
-            MySwal.fire({ icon: 'error', title: 'Error', text: error.message || 'Failed to save slide', confirmButtonColor: '#3F72AF' })
+            MySwal.fire({ icon: 'error', title: 'Error', text: error.message || 'Failed to save slide', confirmButtonColor: '#f26e21' })
         } finally {
             setSaving(false)
             setUploading(false)
@@ -178,10 +178,10 @@ export default function SliderManagement({ getToken }) {
                 const data = await response.json().catch(() => ({}))
                 throw new Error(data.error || `Server error ${response.status}`)
             }
-            MySwal.fire({ icon: 'success', title: 'Deleted!', text: 'Slide permanently deleted', timer: 1500, showConfirmButton: false, confirmButtonColor: '#3F72AF' })
+            MySwal.fire({ icon: 'success', title: 'Deleted!', text: 'Slide permanently deleted', timer: 1500, showConfirmButton: false, confirmButtonColor: '#f26e21' })
             fetchSlides()
         } catch (error) {
-            MySwal.fire({ icon: 'error', title: 'Error', text: error.message || 'Failed to delete slide', confirmButtonColor: '#3F72AF' })
+            MySwal.fire({ icon: 'error', title: 'Error', text: error.message || 'Failed to delete slide', confirmButtonColor: '#f26e21' })
         }
     }
 
@@ -199,12 +199,12 @@ export default function SliderManagement({ getToken }) {
                     icon: 'success',
                     title: slide.isActive ? 'Deactivated!' : 'Activated!',
                     text: `Slide ${slide.isActive ? 'deactivated' : 'activated'}`,
-                    timer: 1500, showConfirmButton: false, confirmButtonColor: '#3F72AF',
+                    timer: 1500, showConfirmButton: false, confirmButtonColor: '#f26e21',
                 })
                 fetchSlides()
             }
         } catch (error) {
-            MySwal.fire({ icon: 'error', title: 'Error', text: 'Failed to update slide status', confirmButtonColor: '#3F72AF' })
+            MySwal.fire({ icon: 'error', title: 'Error', text: 'Failed to update slide status', confirmButtonColor: '#f26e21' })
         }
     }
 
@@ -238,7 +238,7 @@ export default function SliderManagement({ getToken }) {
         return (
             <div className="flex items-center justify-center py-20">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#3F72AF] mx-auto"></div>
+                    <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#f26e21] mx-auto"></div>
                     <p className="mt-4 text-gray-600 font-medium">Loading slides...</p>
                 </div>
             </div>
@@ -255,7 +255,7 @@ export default function SliderManagement({ getToken }) {
                 </div>
                 <button
                     onClick={openCreateModal}
-                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#3F72AF] to-[#2D5F8A] text-white rounded-lg hover:from-[#2D5F8A] hover:to-[#1E4D6D] transition-all shadow-md"
+                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#f26e21] to-[#C45A00] text-white rounded-lg hover:from-[#C45A00] hover:to-[#A34800] transition-all shadow-md"
                 >
                     <Plus size={18} />
                     Add Slide
@@ -269,7 +269,7 @@ export default function SliderManagement({ getToken }) {
                     <p className="text-xl text-gray-500 font-medium">No slides yet</p>
                     <button
                         onClick={openCreateModal}
-                        className="mt-4 px-6 py-2 bg-[#3F72AF] text-white rounded-lg hover:bg-[#2D5F8A] transition-colors"
+                        className="mt-4 px-6 py-2 bg-[#f26e21] text-white rounded-lg hover:bg-[#C45A00] transition-colors"
                     >
                         Create Your First Slide
                     </button>
@@ -310,7 +310,7 @@ export default function SliderManagement({ getToken }) {
                                                             href={slide.link}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="text-sm text-[#3F72AF] hover:underline truncate block"
+                                                            className="text-sm text-[#f26e21] hover:underline truncate block"
                                                         >
                                                             {slide.link}
                                                         </a>
@@ -328,7 +328,7 @@ export default function SliderManagement({ getToken }) {
                                         <div className="flex flex-col gap-2 flex-shrink-0">
                                             <button
                                                 onClick={() => openEditModal(slide)}
-                                                className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded hover:bg-blue-100 transition-colors text-sm flex items-center gap-1"
+                                                className="px-3 py-1.5 bg-orange-50 text-orange-700 rounded hover:bg-orange-100 transition-colors text-sm flex items-center gap-1"
                                             >
                                                 <Edit2 size={14} /> Edit
                                             </button>
@@ -386,7 +386,7 @@ export default function SliderManagement({ getToken }) {
                             className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden"
                         >
                             {/* Modal Header */}
-                            <div className="bg-gradient-to-r from-[#3F72AF] to-[#2D5F8A] text-white p-5 flex items-center justify-between">
+                            <div className="bg-gradient-to-r from-[#f26e21] to-[#C45A00] text-white p-5 flex items-center justify-between">
                                 <h2 className="text-xl font-bold">
                                     {editingSlide ? '✏️ Edit Slider' : '✨ Create New Slider'}
                                 </h2>
@@ -403,7 +403,7 @@ export default function SliderManagement({ getToken }) {
                                         🖼️ Slider Image {!editingSlide && <span className="text-red-500">*</span>}
                                     </label>
                                     <div
-                                        className="border-2 border-dashed border-gray-300 rounded-xl p-5 text-center cursor-pointer hover:border-[#3F72AF] hover:bg-blue-50 transition-all"
+                                        className="border-2 border-dashed border-gray-300 rounded-xl p-5 text-center cursor-pointer hover:border-[#f26e21] hover:bg-orange-50 transition-all"
                                         onClick={() => fileInputRef.current?.click()}
                                     >
                                         {imagePreview ? (
@@ -411,7 +411,7 @@ export default function SliderManagement({ getToken }) {
                                                 <img src={imagePreview} alt="Preview" className="w-full h-48 object-cover rounded-lg shadow" />
                                                 <div className="flex gap-2 justify-center">
                                                     <button type="button" onClick={e => { e.stopPropagation(); fileInputRef.current?.click() }}
-                                                        className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700">
+                                                        className="px-3 py-1.5 bg-orange-600 text-white rounded-lg text-xs font-medium hover:bg-orange-700">
                                                         Change Image
                                                     </button>
                                                     <button type="button" onClick={e => { e.stopPropagation(); setImageFile(null); setImagePreview(null) }}
@@ -441,18 +441,18 @@ export default function SliderManagement({ getToken }) {
                                         value={formData.link}
                                         onChange={e => set('link', e.target.value)}
                                         placeholder="https://example.com/products (optional)"
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3F72AF]"
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#f26e21]"
                                     />
                                 </div>
 
                                 {/* Active toggle */}
-                                <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                                <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg border border-orange-200">
                                     <input
                                         type="checkbox"
                                         id="isActive"
                                         checked={formData.isActive}
                                         onChange={e => set('isActive', e.target.checked)}
-                                        className="w-5 h-5 rounded cursor-pointer accent-[#3F72AF]"
+                                        className="w-5 h-5 rounded cursor-pointer accent-[#f26e21]"
                                     />
                                     <label htmlFor="isActive" className="text-sm font-medium text-gray-700 cursor-pointer">
                                         Publish immediately when saved
@@ -471,7 +471,7 @@ export default function SliderManagement({ getToken }) {
                                     <button
                                         type="submit"
                                         disabled={saving || uploading}
-                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[#3F72AF] to-[#2D5F8A] text-white rounded-lg font-semibold hover:from-[#2D5F8A] hover:to-[#1E4D6D] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[#f26e21] to-[#C45A00] text-white rounded-lg font-semibold hover:from-[#C45A00] hover:to-[#A34800] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
                                     >
                                         <Save size={18} />
                                         {saving ? 'Saving...' : uploading ? 'Uploading image...' : editingSlide ? 'Update Slider' : 'Create Slider'}

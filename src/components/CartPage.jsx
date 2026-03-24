@@ -64,7 +64,7 @@ function StepIndicator({ step }) {
               <div className={`w-8 sm:w-14 h-[2px] rounded-full transition-colors ${i <= step ? "bg-purple-mid" : "bg-gray-200"}`} />
             )}
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all ${current ? "bg-purple-dark text-white shadow-lg shadow-purple-dark/20" : active ? "bg-purple-mid text-white" : "bg-gray-100 text-text-muted"}`}>
+              <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all ${current ? "bg-[#f26e21] text-white shadow-lg shadow-[#f26e21]/20" : active ? "bg-purple-mid text-white" : "bg-gray-100 text-text-muted"}`}>
                 <Icon size={15} />
               </div>
               <span className={`text-xs sm:text-sm font-semibold hidden min-[480px]:inline ${current ? "text-purple-dark" : active ? "text-purple-mid" : "text-text-muted"}`}>
@@ -306,7 +306,7 @@ export default function CartPage() {
             </div>
             <Link
               href="/"
-              className="inline-flex items-center gap-2 bg-purple-dark hover:bg-purple-mid text-white text-sm font-semibold px-8 py-3.5 rounded-full transition-colors"
+              className="inline-flex items-center gap-2 bg-[#f26e21] hover:bg-[#e05e15] text-white text-sm font-semibold px-8 py-3.5 rounded-full transition-colors"
             >
               Continue Shopping
               <ChevronRight size={16} />
@@ -357,7 +357,7 @@ export default function CartPage() {
           </p>
           <Link
             href="/"
-            className="inline-flex items-center gap-2 bg-purple-dark hover:bg-purple-mid text-white text-sm font-semibold px-7 py-3.5 rounded-full transition-colors"
+            className="inline-flex items-center gap-2 bg-[#f26e21] hover:bg-[#e05e15] text-white text-sm font-semibold px-7 py-3.5 rounded-full transition-colors"
           >
             <ArrowLeft size={15} />
             Start Shopping
@@ -722,7 +722,7 @@ export default function CartPage() {
           <div className="lg:w-[380px]">
             <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden sticky top-20">
               {/* Summary Header */}
-              <div className="bg-gradient-to-r from-[#1a1a2e] to-[#0f3460] px-6 py-4">
+              <div className="bg-gradient-to-r from-[#111111] to-[#222222] px-6 py-4">
                 <h2 className="text-base font-bold text-white flex items-center gap-2">
                   <Package size={18} className="text-purple-light" />
                   Order Summary
@@ -777,7 +777,7 @@ export default function CartPage() {
                         <button
                           onClick={applyCoupon}
                           disabled={!couponInput.trim() || couponLoading}
-                          className="px-5 py-2.5 bg-purple-dark hover:bg-purple-mid disabled:bg-gray-200 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-colors flex-shrink-0"
+                          className="px-5 py-2.5 bg-[#f26e21] hover:bg-[#e05e15] disabled:bg-gray-200 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-colors flex-shrink-0"
                         >
                           {couponLoading ? <Loader2 size={16} className="animate-spin" /> : "Apply"}
                         </button>
@@ -817,7 +817,7 @@ export default function CartPage() {
                 {!showCheckout ? (
                   <>
                     {selectedItems.length === 0 && cartItems.length > 0 && (
-                      <p className="text-xs text-blue-600 font-medium text-center mb-3 flex items-center justify-center gap-1">
+                      <p className="text-xs text-orange-600 font-medium text-center mb-3 flex items-center justify-center gap-1">
                         <AlertCircle size={12} /> Select items to checkout
                       </p>
                     )}
@@ -828,7 +828,7 @@ export default function CartPage() {
                       disabled={selectedItems.length === 0}
                       className={`w-full text-sm font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 ${selectedItems.length === 0
                         ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                        : "bg-gradient-to-b from-[#16213e] via-[#1a1a2e] to-[#0f3460] text-white shadow-lg shadow-[#0f3460]/25 hover:shadow-xl hover:shadow-[#0f3460]/35 border border-[rgba(15,52,96,0.3)]"
+                        : "bg-[#f26e21] hover:bg-[#e05e15] text-white shadow-lg shadow-[#f26e21]/25 hover:shadow-xl hover:shadow-[#e05e15]/35 border border-[#e05e15]"
                         }`}
                     >
                       <span className={selectedItems.length > 0 ? "text-white" : ""}>
@@ -861,11 +861,11 @@ export default function CartPage() {
                       <span>Secure Checkout</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-text-muted">
-                      <Truck size={14} className="text-blue-500 flex-shrink-0" />
+                      <Truck size={14} className="text-orange-500 flex-shrink-0" />
                       <span>Fast Delivery</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-text-muted">
-                      <Package size={14} className="text-blue-500 flex-shrink-0" />
+                      <Package size={14} className="text-orange-500 flex-shrink-0" />
                       <span>Easy Returns</span>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-text-muted">

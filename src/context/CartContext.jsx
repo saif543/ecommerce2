@@ -17,9 +17,9 @@ function CartToast({ message, onClose }) {
       initial={{ opacity: 0, y: -20, x: 20 }}
       animate={{ opacity: 1, y: 0, x: 0 }}
       exit={{ opacity: 0, y: -20, x: 20 }}
-      className="fixed top-4 right-4 z-[9999] flex items-center gap-3 bg-[#1a1a2e] text-white pl-4 pr-5 py-3 rounded-xl shadow-lg shadow-black/30 border border-[#3F72AF]/30 max-w-xs"
+      className="fixed top-4 right-4 z-[9999] flex items-center gap-3 bg-[#111111] text-white pl-4 pr-5 py-3 rounded-xl shadow-lg shadow-black/30 border border-[#f26e21]/30 max-w-xs"
     >
-      <CheckCircle2 size={20} className="text-[#5C9AE5] flex-shrink-0" />
+      <CheckCircle2 size={20} className="text-[#ff8c42] flex-shrink-0" />
       <span className="text-sm font-medium">{message}</span>
     </motion.div>
   );

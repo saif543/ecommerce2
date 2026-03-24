@@ -58,7 +58,7 @@ export default function BrandProductsPage({ slug }) {
     <section className="max-w-[1440px] mx-auto px-2 min-[480px]:px-4 min-[640px]:px-5 min-[768px]:px-6 pt-4 min-[768px]:pt-6 pb-8">
       {/* Banner */}
       <div className="w-full h-20 min-[480px]:h-24 min-[640px]:h-28 min-[768px]:h-32 min-[1024px]:h-36 rounded-xl min-[480px]:rounded-2xl overflow-hidden mb-4 min-[768px]:mb-5"
-        style={{ background: "linear-gradient(135deg, #0a0a0a 0%, #16213e 50%, #1a1a2e 100%)" }}
+        style={{ background: "linear-gradient(135deg, #111111 0%, #1a1a1a 50%, #222222 100%)" }}
       />
 
       {/* Heading */}
@@ -87,7 +87,7 @@ export default function BrandProductsPage({ slug }) {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-2 min-[640px]:grid-cols-3 min-[1024px]:grid-cols-4 min-[1280px]:grid-cols-5 gap-2 min-[480px]:gap-3 min-[640px]:gap-4 min-[768px]:gap-5">
+        <div className="grid grid-cols-2 min-[480px]:grid-cols-3 min-[768px]:grid-cols-4 min-[1024px]:grid-cols-5 min-[1280px]:grid-cols-6 gap-2 min-[480px]:gap-3 min-[640px]:gap-4 min-[768px]:gap-5">
           {products.map((product, i) => (
             <ProductCard key={String(product._id || product.id)} product={product} index={i} />
           ))}

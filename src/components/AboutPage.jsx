@@ -59,7 +59,7 @@ const team = [
     name: "Tanvir Hossain",
     role: "Head of Operations",
     initials: "TH",
-    color: "bg-blue-50 text-blue-700",
+    color: "bg-orange-50 text-orange-700",
     bio: "Ensures every order is picked, packed, and delivered with care and speed.",
   },
   {
@@ -138,7 +138,7 @@ export default function AboutPage() {
           </p>
           <Link
             href="/brands"
-            className="inline-flex items-center gap-2 bg-purple-dark hover:bg-purple-mid text-white text-sm font-semibold px-6 py-3 rounded-xl transition-colors"
+            className="inline-flex items-center gap-2 bg-[#f26e21] hover:bg-[#e05e15] text-white text-sm font-semibold px-6 py-3 rounded-xl transition-colors"
           >
             Explore Our Brands <ArrowRight size={15} />
           </Link>
@@ -177,7 +177,7 @@ export default function AboutPage() {
                 transition={{ duration: 0.4, delay: i * 0.1 }}
                 className="flex items-start gap-6 pl-14 relative"
               >
-                <div className="absolute left-0 w-10 h-10 bg-purple-dark text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">
+                <div className="absolute left-0 w-10 h-10 bg-[#f26e21] text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">
                   {item.year.slice(2)}
                 </div>
                 <div className="bg-white rounded-xl px-5 py-3.5 border border-gray-100 shadow-sm flex-1">

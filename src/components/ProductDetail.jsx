@@ -163,7 +163,7 @@ export default function ProductDetail({ product, relatedProducts = [] }) {
                     {/* Badges */}
                     <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
                       {product.badge && (
-                        <span className="bg-purple-dark text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-sm">
+                        <span className="bg-[#f26e21] text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-sm">
                           {product.badge}
                         </span>
                       )}
@@ -326,7 +326,7 @@ export default function ProductDetail({ product, relatedProducts = [] }) {
                 {/* Add to Cart */}
                 <button
                   onClick={() => addToCart(productId, qty)}
-                  className="w-full relative overflow-hidden bg-gradient-to-b from-[#16213e] via-[#1a1a2e] to-[#0f3460] hover:from-[#1e2d4f] hover:via-[#1a1a2e] hover:to-[#0f3460] h-12 rounded-xl text-sm tracking-wider uppercase font-bold flex items-center justify-center gap-2.5 transition-all active:translate-y-[1px] shadow-[0_2px_8px_rgba(15,52,96,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] border border-[rgba(15,52,96,0.3)]"
+                  className="w-full relative overflow-hidden bg-[#f26e21] hover:bg-[#e05e15] h-12 rounded-xl text-sm tracking-wider uppercase font-bold flex items-center justify-center gap-2.5 transition-all active:translate-y-[1px] shadow-[0_2px_8px_rgba(242,110,33,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] border border-[#e05e15]"
                 >
                   <span className="absolute inset-x-0 top-0 h-[45%] bg-gradient-to-b from-white/10 to-transparent rounded-t pointer-events-none" />
                   <ShoppingCart size={16} className="relative text-white" />
@@ -386,7 +386,7 @@ export default function ProductDetail({ product, relatedProducts = [] }) {
                 const el = document.getElementById(`section-${tab}`);
                 if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
               }}
-              className="px-6 sm:px-8 py-2.5 text-[13px] font-bold tracking-wide rounded-full border transition-all capitalize bg-white text-gray-600 border-gray-200 hover:bg-purple-dark hover:text-white hover:border-purple-dark hover:shadow-md"
+              className="px-6 sm:px-8 py-2.5 text-[13px] font-bold tracking-wide rounded-full border transition-all capitalize bg-white text-gray-600 border-gray-200 hover:bg-[#f26e21] hover:text-white hover:border-[#f26e21] hover:shadow-md"
             >
               {tab}
             </button>
@@ -483,7 +483,7 @@ export default function ProductDetail({ product, relatedProducts = [] }) {
         {relatedProducts.length > 0 && (
           <div className="mt-14 mb-10">
             <h2 className="text-xl font-bold text-gray-900 mb-6">You May Also Like</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5">
+            <div className="grid grid-cols-2 min-[480px]:grid-cols-3 min-[768px]:grid-cols-4 min-[1024px]:grid-cols-5 min-[1280px]:grid-cols-6 gap-2 min-[480px]:gap-3 min-[640px]:gap-4 min-[768px]:gap-5">
               {relatedProducts.map((rp, i) => (
                 <ProductCard key={String(rp._id || rp.id)} product={rp} index={i} />
               ))}
@@ -500,7 +500,7 @@ export default function ProductDetail({ product, relatedProducts = [] }) {
         </div>
         <button
           onClick={() => addToCart(productId, qty)}
-          className="relative overflow-hidden bg-gradient-to-b from-[#16213e] via-[#1a1a2e] to-[#0f3460] text-sm font-bold px-5 py-3 rounded-xl transition-all flex items-center gap-2 flex-shrink-0 shadow-[0_2px_6px_rgba(15,52,96,0.3)] border border-[rgba(15,52,96,0.3)]"
+          className="relative overflow-hidden bg-[#f26e21] hover:bg-[#e05e15] text-sm font-bold px-5 py-3 rounded-xl transition-all flex items-center gap-2 flex-shrink-0 shadow-[0_2px_6px_rgba(242,110,33,0.3)] border border-[#e05e15]"
         >
           <span className="absolute inset-x-0 top-0 h-[45%] bg-gradient-to-b from-white/10 to-transparent rounded-t pointer-events-none" />
           <ShoppingCart size={15} className="relative text-white" />

@@ -25,7 +25,7 @@ const socialIcons = [Facebook, Instagram, Twitter, Youtube];
 
 export default function Footer() {
   return (
-    <footer className="bg-gradient-to-b from-[#1a1a2e] via-[#16213e] to-[#0f3460] text-white overflow-hidden">
+    <footer className="bg-gradient-to-b from-[#111111] via-[#1a1a1a] to-[#222222] text-white overflow-hidden">
       <div className="max-w-[1440px] mx-auto px-6 py-14">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
           {/* Brand */}
@@ -37,7 +37,7 @@ export default function Footer() {
             className="lg:col-span-2"
           >
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-8 h-8 bg-[#3F72AF] rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-[#f26e21] rounded-full flex items-center justify-center">
                 <span className="text-white font-bold text-xs">Z</span>
               </div>
               <span className="text-xl font-semibold tracking-tight">ZenTech</span>

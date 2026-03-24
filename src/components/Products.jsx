@@ -119,7 +119,7 @@ export default function Products({
           <div className="text-center py-16 text-text-muted text-sm">No products available yet.</div>
         ) : (
           <>
-            <div className="grid grid-cols-2 min-[640px]:grid-cols-3 min-[1024px]:grid-cols-4 min-[1280px]:grid-cols-5 gap-2 min-[480px]:gap-3 min-[640px]:gap-4 min-[768px]:gap-5">
+            <div className="grid grid-cols-2 min-[480px]:grid-cols-3 min-[768px]:grid-cols-4 min-[1024px]:grid-cols-5 min-[1280px]:grid-cols-6 gap-2 min-[480px]:gap-3 min-[640px]:gap-4 min-[768px]:gap-5">
               {products.map((product, i) => (
                 <ProductCard key={String(product._id || product.id)} product={product} index={i} />
               ))}
@@ -127,7 +127,7 @@ export default function Products({
             <div className="text-center mt-8 min-[768px]:mt-12">
               <Link
                 href={seeAllLink}
-                className="inline-flex items-center gap-2 px-6 py-2.5 min-[768px]:px-8 min-[768px]:py-3 bg-purple-dark text-white text-sm min-[768px]:text-base font-semibold rounded-full hover:bg-purple-mid transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-2.5 min-[768px]:px-8 min-[768px]:py-3 bg-[#f26e21] text-white text-sm min-[768px]:text-base font-semibold rounded-full hover:bg-[#e05e15] transition-colors shadow-[0_2px_8px_rgba(242,110,33,0.3)]"
               >
                 See All
                 <ArrowRight size={18} />

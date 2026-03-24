@@ -10,7 +10,7 @@ const toast = {
             text: message,
             timer: 2000,
             showConfirmButton: false,
-            confirmButtonColor: '#3F72AF',
+            confirmButtonColor: '#f26e21',
         })
     },
     error: (message, title = 'Error') => {
@@ -18,7 +18,7 @@ const toast = {
             icon: 'error',
             title,
             text: message,
-            confirmButtonColor: '#3F72AF',
+            confirmButtonColor: '#f26e21',
         })
     },
     warning: (message, title = 'Warning') => {
@@ -26,7 +26,7 @@ const toast = {
             icon: 'warning',
             title,
             text: message,
-            confirmButtonColor: '#3F72AF',
+            confirmButtonColor: '#f26e21',
         })
     },
     info: (message, title = 'Info') => {
@@ -34,7 +34,7 @@ const toast = {
             icon: 'info',
             title,
             text: message,
-            confirmButtonColor: '#3F72AF',
+            confirmButtonColor: '#f26e21',
         })
     },
 }

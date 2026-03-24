@@ -163,7 +163,7 @@ export default function Hero() {
           initial={{ width: "0%" }}
           animate={{ width: "100%" }}
           transition={{ duration: 5, ease: "linear" }}
-          className="h-full bg-gradient-to-r from-[#0f3460] to-[#5C9AE5]"
+          className="h-full bg-gradient-to-r from-[#111111] to-[#f26e21]"
         />
       </div>
     </section>

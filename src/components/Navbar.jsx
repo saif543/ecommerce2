@@ -126,7 +126,7 @@ export default function Navbar() {
         text: 'You have been successfully logged out',
         timer: 1500,
         showConfirmButton: false,
-        confirmButtonColor: '#0f3460',
+        confirmButtonColor: '#f26e21',
       });
       router.push('/');
     } catch (error) {
@@ -135,7 +135,7 @@ export default function Navbar() {
         icon: 'error',
         title: 'Logout Failed',
         text: 'Failed to log out. Please try again.',
-        confirmButtonColor: '#0f3460',
+        confirmButtonColor: '#f26e21',
       });
     } finally {
       setSigningOut(false);
@@ -159,16 +159,16 @@ export default function Navbar() {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="hidden md:block bg-card-white border-b border-gray-100 sticky top-0 z-50"
+        className="hidden md:block bg-[#111111] border-b border-[#222222] sticky top-0 z-50"
       >
         <div className="max-w-[1440px] mx-auto flex items-center justify-between px-6 py-4">
           {/* Logo */}
           <Link href="/">
             <motion.div whileHover={{ scale: 1.03 }} className="flex items-center gap-2.5 cursor-pointer">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#3F72AF] to-[#1a1a2e] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#f26e21] to-[#111111] flex items-center justify-center">
                 <span className="text-white font-bold text-xs">Z</span>
               </div>
-              <AnimatedLogo className="text-xl" color={pathname === "/" ? "text-purple-mid" : "text-purple-dark"} />
+              <AnimatedLogo className="text-xl" color="text-white" />
             </motion.div>
           </Link>
 
@@ -180,7 +180,7 @@ export default function Navbar() {
               onMouseEnter={() => setShowCategories(true)}
               onMouseLeave={() => { setShowCategories(false); setActiveCategory(null); }}
             >
-              <button className={`flex items-center gap-1.5 text-sm font-semibold transition-colors relative pb-0.5 ${pathname.startsWith("/products") ? "text-purple-mid" : "text-text-primary hover:text-purple-mid"
+              <button className={`flex items-center gap-1.5 text-sm font-semibold transition-colors relative pb-0.5 ${pathname.startsWith("/products") ? "text-[#f26e21]" : "text-white/90 hover:text-[#f26e21]"
                 }`}>
                 All Categories
                 <ChevronDown size={14} className={`transition-transform duration-200 ${showCategories ? "rotate-180" : ""}`} />
@@ -265,13 +265,13 @@ export default function Navbar() {
                 >
                   <Link
                     href={link.href}
-                    className={`text-sm font-semibold transition-colors pb-0.5 ${isActive ? "text-purple-mid" : "text-text-primary hover:text-purple-mid"
+                    className={`text-sm font-semibold transition-colors pb-0.5 ${isActive ? "text-[#f26e21]" : "text-white/90 hover:text-[#f26e21]"
                       }`}
                   >
                     {link.label}
                   </Link>
                   {isActive && (
-                    <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-purple-mid rounded-full" />
+                    <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[#f26e21] rounded-full" />
                   )}
                 </motion.li>
               );
@@ -285,16 +285,16 @@ export default function Navbar() {
               <div className="relative">
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors"
                 >
-                  <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                  <div className="w-8 h-8 bg-[#f26e21] rounded-full flex items-center justify-center text-white text-sm font-semibold">
                     {user.email?.[0]?.toUpperCase()}
                   </div>
-                  <span className="text-sm font-semibold text-text-primary">
+                  <span className="text-sm font-semibold text-white">
                     {user.displayName || user.email?.split('@')[0]}
                   </span>
                   {userRole === 'admin' && (
-                    <span className="px-2 py-0.5 bg-[#FF6B35] text-white text-[10px] font-bold rounded-full">
+                    <span className="px-2 py-0.5 bg-[#f26e21] text-white text-[10px] font-bold rounded-full">
                       ADMIN
                     </span>
                   )}
@@ -316,7 +316,7 @@ export default function Navbar() {
                         {userRole === 'admin' && (
                           <Link
                             href="/admin"
-                            className="inline-block mt-2 px-2 py-1 bg-[#FF6B35] text-white text-[10px] font-bold rounded-full"
+                            className="inline-block mt-2 px-2 py-1 bg-[#f26e21] text-white text-[10px] font-bold rounded-full"
                           >
                             Admin Panel
                           </Link>
@@ -354,7 +354,7 @@ export default function Navbar() {
               </div>
             ) : (
               /* Login Button */
-              <Link href="/login" className="relative text-sm font-semibold px-4 py-1.5 rounded-full bg-[#1a1a2e] hover:bg-[#16213e] transition-all group shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-[#0f3460]/40">
+              <Link href="/login" className="relative text-sm font-semibold px-4 py-1.5 rounded-full bg-[#f26e21] hover:bg-[#e05e15] transition-all group shadow-[0_2px_8px_rgba(242,110,33,0.35)] border border-[#f26e21]/40">
                 <span className="text-white">
                   Login / Register
                 </span>
@@ -372,20 +372,20 @@ export default function Navbar() {
                       transition={{ duration: 0.25 }}
                       className="overflow-hidden"
                     >
-                      <div className="flex items-center border border-gray-200 rounded-lg bg-gray-50 pl-3 pr-1 py-1.5">
-                        <Search size={14} className="text-text-muted flex-shrink-0" />
+                      <div className="flex items-center border border-white/20 rounded-lg bg-white/10 pl-3 pr-1 py-1.5">
+                        <Search size={14} className="text-white/60 flex-shrink-0" />
                         <input
                           ref={searchRef}
                           type="text"
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
                           placeholder="Search products..."
-                          className="w-full bg-transparent text-sm text-text-primary placeholder:text-text-muted outline-none ml-2"
+                          className="w-full bg-transparent text-sm text-white placeholder:text-white/50 outline-none ml-2"
                           onKeyDown={(e) => { if (e.key === "Escape") { setSearchOpen(false); setSearchQuery(""); } }}
                         />
                         <button
                           onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
-                          className="p-1 text-text-muted hover:text-text-primary transition-colors flex-shrink-0"
+                          className="p-1 text-white/60 hover:text-white transition-colors flex-shrink-0"
                         >
                           <X size={14} />
                         </button>
@@ -398,14 +398,14 @@ export default function Navbar() {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setSearchOpen(true)}
-                    className="text-text-primary hover:text-purple-mid transition-colors"
+                    className="text-white/90 hover:text-[#f26e21] transition-colors"
                   >
                     <Search size={22} />
                   </motion.button>
                 )}
               </div>
               <Link href="/cart">
-                <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} className="relative text-text-primary hover:text-purple-mid transition-colors">
+                <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} className="relative text-white/90 hover:text-[#f26e21] transition-colors">
                   <ShoppingCart size={22} />
                   {cartCount > 0 && (
                     <span className="absolute -top-2 -right-2.5 bg-purple-mid text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
@@ -422,12 +422,12 @@ export default function Navbar() {
       {/* ═══════════════════════════════════════════
           MOBILE TOP BAR (below md)
          ═══════════════════════════════════════════ */}
-      <div className="md:hidden bg-card-white border-b border-gray-100 sticky top-0 z-50">
+      <div className="md:hidden bg-[#111111] border-b border-[#222222] sticky top-0 z-50">
         <div className="flex items-center px-4 py-3 gap-3">
           {/* Hamburger — always visible */}
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="p-1.5 text-text-primary hover:text-purple-mid transition-colors flex-shrink-0"
+            className="p-1.5 text-white/90 hover:text-[#f26e21] transition-colors flex-shrink-0"
           >
             <Menu size={24} />
           </button>
@@ -444,20 +444,20 @@ export default function Navbar() {
                   transition={{ duration: 0.25, ease: "easeInOut" }}
                   className="overflow-hidden w-full"
                 >
-                  <div className="flex items-center border border-gray-200 rounded-lg bg-gray-50 pl-3 pr-1 py-2">
-                    <Search size={16} className="text-text-muted flex-shrink-0" />
+                  <div className="flex items-center border border-white/20 rounded-lg bg-white/10 pl-3 pr-1 py-2">
+                    <Search size={16} className="text-white/60 flex-shrink-0" />
                     <input
                       ref={searchRef}
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search products..."
-                      className="w-full bg-transparent text-sm text-text-primary placeholder:text-text-muted outline-none ml-2"
+                      className="w-full bg-transparent text-sm text-white placeholder:text-white/50 outline-none ml-2"
                       onKeyDown={(e) => { if (e.key === "Escape") { setSearchOpen(false); setSearchQuery(""); } }}
                     />
                     <button
                       onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
-                      className="p-1 text-text-muted hover:text-text-primary transition-colors flex-shrink-0"
+                      className="p-1 text-white/60 hover:text-white transition-colors flex-shrink-0"
                     >
                       <X size={16} />
                     </button>
@@ -472,10 +472,10 @@ export default function Navbar() {
                   transition={{ duration: 0.15 }}
                 >
                   <Link href="/" className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#3F72AF] to-[#1a1a2e] flex items-center justify-center">
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#f26e21] to-[#111111] flex items-center justify-center">
                       <span className="text-white font-bold text-[10px]">Z</span>
                     </div>
-                    <AnimatedLogo className="text-lg" color={pathname === "/" ? "text-purple-mid" : "text-purple-dark"} />
+                    <AnimatedLogo className="text-lg" color="text-white" />
                   </Link>
                 </motion.div>
               )}
@@ -486,7 +486,7 @@ export default function Navbar() {
           {!searchOpen && (
             <button
               onClick={() => setSearchOpen(true)}
-              className="p-1.5 text-text-primary hover:text-purple-mid transition-colors flex-shrink-0"
+              className="p-1.5 text-white/90 hover:text-[#f26e21] transition-colors flex-shrink-0"
             >
               <Search size={22} />
             </button>
@@ -521,7 +521,7 @@ export default function Navbar() {
               {/* Sidebar header */}
               <div className="flex items-center justify-between px-4 py-4 border-b border-gray-100">
                 <Link href="/" className="flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#3F72AF] to-[#1a1a2e] flex items-center justify-center">
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#f26e21] to-[#111111] flex items-center justify-center">
                     <span className="text-white font-bold text-[10px]">Z</span>
                   </div>
                   <AnimatedLogo className="text-lg" color="text-purple-dark" />
@@ -538,7 +538,7 @@ export default function Navbar() {
               {user && (
                 <div className="px-4 py-3 border-b border-gray-100 bg-gray-50/50">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 bg-black rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                    <div className="w-9 h-9 bg-[#f26e21] rounded-full flex items-center justify-center text-white text-sm font-semibold">
                       {user.email?.[0]?.toUpperCase()}
                     </div>
                     <div className="min-w-0">
@@ -552,7 +552,7 @@ export default function Navbar() {
                     <Link
                       href="/admin"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="inline-block mt-2 px-2 py-1 bg-[#FF6B35] text-white text-[10px] font-bold rounded-full"
+                      className="inline-block mt-2 px-2 py-1 bg-[#f26e21] text-white text-[10px] font-bold rounded-full"
                     >
                       Admin Panel
                     </Link>
@@ -676,7 +676,7 @@ export default function Navbar() {
       {/* ═══════════════════════════════════════════
           MOBILE BOTTOM BAR (fixed)
          ═══════════════════════════════════════════ */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#111111] border-t border-[#222222] z-50">
         <div className="flex items-center justify-around py-2">
           {bottomBarItems.map((item) => {
             const Icon = item.icon;
@@ -691,11 +691,11 @@ export default function Navbar() {
                   className="flex flex-col items-center gap-0.5 px-3 py-1 relative"
                 >
                   <div className="relative">
-                    <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center text-white text-[10px] font-semibold">
+                    <div className="w-6 h-6 bg-[#f26e21] rounded-full flex items-center justify-center text-white text-[10px] font-semibold">
                       {user.email?.[0]?.toUpperCase()}
                     </div>
                   </div>
-                  <span className="text-[10px] font-medium text-purple-mid">Account</span>
+                  <span className="text-[10px] font-medium text-[#f26e21]">Account</span>
                 </button>
               );
             }
@@ -704,18 +704,18 @@ export default function Navbar() {
               <Link
                 key={item.label}
                 href={item.href || "/login"}
-                className={`flex flex-col items-center gap-0.5 px-3 py-1 relative transition-colors ${isActive ? "text-purple-mid" : "text-text-muted"
+                className={`flex flex-col items-center gap-0.5 px-3 py-1 relative transition-colors ${isActive ? "text-[#f26e21]" : "text-white/50"
                   }`}
               >
                 <div className="relative">
                   <Icon size={22} />
                   {item.badge > 0 && (
-                    <span className="absolute -top-1.5 -right-2 bg-purple-mid text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                    <span className="absolute -top-1.5 -right-2 bg-[#f26e21] text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
                       {item.badge}
                     </span>
                   )}
                 </div>
-                <span className={`text-[10px] font-medium ${isActive ? "text-purple-mid" : "text-text-muted"}`}>
+                <span className={`text-[10px] font-medium ${isActive ? "text-[#f26e21]" : "text-white/50"}`}>
                   {item.label}
                 </span>
               </Link>

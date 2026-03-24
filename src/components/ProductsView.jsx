@@ -265,7 +265,7 @@ export default function ProductsView() {
                     ) : (
                         <div
                             className="w-full h-full"
-                            style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%)" }}
+                            style={{ background: "linear-gradient(135deg, #111111 0%, #1a1a1a 40%, #222222 100%)" }}
                         />
                     )}
                 </div>
@@ -314,7 +314,7 @@ export default function ProductsView() {
                                     <span className="text-sm min-[480px]:text-base font-bold text-text-primary">Filter By</span>
                                     <div className="flex items-center gap-3">
                                         {hasActiveFilters && (
-                                            <button onClick={resetAll} className="text-xs min-[480px]:text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+                                            <button onClick={resetAll} className="text-xs min-[480px]:text-sm font-semibold text-orange-600 hover:text-orange-700 transition-colors">
                                                 Reset
                                             </button>
                                         )}
@@ -329,7 +329,7 @@ export default function ProductsView() {
                                 <div className="sticky bottom-0 bg-white border-t border-gray-100 p-3 min-[480px]:p-4">
                                     <button
                                         onClick={() => setMobileFilterOpen(false)}
-                                        className="w-full bg-[#1a1a2e] text-sm font-semibold py-3 rounded-lg transition-colors"
+                                        className="w-full bg-[#f26e21] hover:bg-[#e05e15] text-sm font-semibold py-3 rounded-lg transition-colors"
                                     >
                                         <span className="text-white">
                                             Show {sortedProducts.length} Products
@@ -348,7 +348,7 @@ export default function ProductsView() {
                             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
                                 <span className="text-base font-bold text-text-primary">Filter By</span>
                                 {hasActiveFilters && (
-                                    <button onClick={resetAll} className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+                                    <button onClick={resetAll} className="text-sm font-semibold text-orange-600 hover:text-orange-700 transition-colors">
                                         Reset
                                     </button>
                                 )}
@@ -414,18 +414,18 @@ export default function ProductsView() {
                             <div className="text-center py-20 flex flex-col justify-center items-center">
                                 <p className="text-text-muted text-sm min-[480px]:text-base min-[768px]:text-lg mb-4">No products found for this query.</p>
                                 {hasActiveFilters && (
-                                    <button onClick={resetAll} className="text-xs min-[480px]:text-sm text-white bg-purple-mid hover:bg-purple-dark transition-colors px-4 min-[480px]:px-6 py-2 rounded-lg font-semibold">
+                                    <button onClick={resetAll} className="text-xs min-[480px]:text-sm text-white bg-purple-mid hover:bg-[#e05e15] transition-colors px-4 min-[480px]:px-6 py-2 rounded-lg font-semibold">
                                         Clear all filters
                                     </button>
                                 )}
                                 {(!hasActiveFilters && (categoryParam || subcategoryParam)) && (
-                                    <Link href="/products" className="text-xs min-[480px]:text-sm text-white bg-purple-mid hover:bg-purple-dark transition-colors px-4 min-[480px]:px-6 py-2 rounded-lg font-semibold mt-4">
+                                    <Link href="/products" className="text-xs min-[480px]:text-sm text-white bg-purple-mid hover:bg-[#e05e15] transition-colors px-4 min-[480px]:px-6 py-2 rounded-lg font-semibold mt-4">
                                         View All Products
                                     </Link>
                                 )}
                             </div>
                         ) : gridView === "grid" ? (
-                            <div className="grid grid-cols-2 min-[640px]:grid-cols-3 min-[768px]:grid-cols-2 min-[920px]:grid-cols-3 min-[1280px]:grid-cols-4 gap-2 min-[480px]:gap-3 min-[640px]:gap-4 min-[768px]:gap-4" style={{ overflow: "visible" }}>
+                            <div className="grid grid-cols-2 min-[480px]:grid-cols-3 min-[768px]:grid-cols-3 min-[920px]:grid-cols-4 min-[1280px]:grid-cols-5 gap-2 min-[480px]:gap-3 min-[640px]:gap-4 min-[768px]:gap-4" style={{ overflow: "visible" }}>
                                 {sortedProducts.map((product, i) => (
                                     <ProductCard key={String(product._id || product.id)} product={product} index={i} />
                                 ))}
