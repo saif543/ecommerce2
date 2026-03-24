@@ -183,7 +183,7 @@ export default function ProductManager({ getToken }) {
                 icon: 'error',
                 title: 'Error',
                 text: 'Failed to load products',
-                confirmButtonColor: '#F47B20',
+                confirmButtonColor: '#f26e21',
             })
         } finally {
             setLoading(false)
@@ -369,7 +369,7 @@ export default function ProductManager({ getToken }) {
                 icon: 'warning',
                 title: 'Missing Fields',
                 text: 'Please fill in product name and price',
-                confirmButtonColor: '#F47B20',
+                confirmButtonColor: '#f26e21',
             })
             return
         }
@@ -524,7 +524,7 @@ export default function ProductManager({ getToken }) {
                 text: `Product ${editingProduct ? 'updated' : 'created'} successfully`,
                 timer: 1500,
                 showConfirmButton: false,
-                confirmButtonColor: '#F47B20',
+                confirmButtonColor: '#f26e21',
             })
 
             setShowModal(false)
@@ -535,7 +535,7 @@ export default function ProductManager({ getToken }) {
                 icon: 'error',
                 title: 'Error',
                 text: error.message || 'Failed to save product',
-                confirmButtonColor: '#F47B20',
+                confirmButtonColor: '#f26e21',
             })
         } finally {
             setSaving(false)
@@ -577,7 +577,7 @@ export default function ProductManager({ getToken }) {
                 text: 'Product permanently deleted',
                 timer: 1500,
                 showConfirmButton: false,
-                confirmButtonColor: '#F47B20',
+                confirmButtonColor: '#f26e21',
             })
             fetchProducts()
         } catch (error) {
@@ -586,7 +586,7 @@ export default function ProductManager({ getToken }) {
                 icon: 'error',
                 title: 'Error',
                 text: error.message || 'Failed to delete product',
-                confirmButtonColor: '#F47B20',
+                confirmButtonColor: '#f26e21',
             })
         }
     }
@@ -618,7 +618,7 @@ export default function ProductManager({ getToken }) {
                     text: `${selectedProducts.length} products updated`,
                     timer: 1500,
                     showConfirmButton: false,
-                    confirmButtonColor: '#F47B20',
+                    confirmButtonColor: '#f26e21',
                 })
                 setSelectedProducts([])
                 fetchProducts()
@@ -629,7 +629,7 @@ export default function ProductManager({ getToken }) {
                 icon: 'error',
                 title: 'Error',
                 text: 'Failed to update products',
-                confirmButtonColor: '#F47B20',
+                confirmButtonColor: '#f26e21',
             })
         }
     }
@@ -647,7 +647,7 @@ export default function ProductManager({ getToken }) {
         return (
             <div className="flex items-center justify-center py-20">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#F47B20] mx-auto"></div>
+                    <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#f26e21] mx-auto"></div>
                     <p className="mt-4 text-gray-600 font-medium">Loading products...</p>
                 </div>
             </div>
@@ -665,7 +665,7 @@ export default function ProductManager({ getToken }) {
                 {subTab === 'products' && (
                     <button
                         onClick={openCreateModal}
-                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#F47B20] to-[#C45A00] text-white rounded-lg hover:from-[#C45A00] hover:to-[#A34800] transition-all shadow-md"
+                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#f26e21] to-[#C45A00] text-white rounded-lg hover:from-[#C45A00] hover:to-[#A34800] transition-all shadow-md"
                     >
                         <Plus size={18} />
                         Add Product
@@ -711,7 +711,7 @@ export default function ProductManager({ getToken }) {
                                 placeholder="Search products..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F47B20]"
+                                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f26e21]"
                             />
                         </div>
                     </div>
@@ -719,7 +719,7 @@ export default function ProductManager({ getToken }) {
                     <select
                         value={filterStatus}
                         onChange={(e) => setFilterStatus(e.target.value)}
-                        className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F47B20]"
+                        className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f26e21]"
                     >
                         <option value="all">All Status</option>
                         <option value="active">Active</option>
@@ -752,7 +752,7 @@ export default function ProductManager({ getToken }) {
                         <p className="text-xl text-gray-500 font-medium">No products found</p>
                         <button
                             onClick={openCreateModal}
-                            className="mt-4 px-6 py-2 bg-[#F47B20] text-white rounded-lg hover:bg-[#C45A00] transition-colors"
+                            className="mt-4 px-6 py-2 bg-[#f26e21] text-white rounded-lg hover:bg-[#C45A00] transition-colors"
                         >
                             Create Your First Product
                         </button>
@@ -904,7 +904,7 @@ export default function ProductManager({ getToken }) {
                                 className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto my-8"
                             >
                                 {/* Modal Header */}
-                                <div className="sticky top-0 bg-gradient-to-r from-[#F47B20] to-[#C45A00] text-white p-6 flex items-center justify-between z-10">
+                                <div className="sticky top-0 bg-gradient-to-r from-[#f26e21] to-[#C45A00] text-white p-6 flex items-center justify-between z-10">
                                     <h2 className="text-2xl font-bold">
                                         {editingProduct ? 'Edit Product' : 'Create New Product'}
                                     </h2>
@@ -944,7 +944,7 @@ export default function ProductManager({ getToken }) {
                                                 <button
                                                     type="button"
                                                     onClick={() => fileInputRef.current?.click()}
-                                                    className="w-full h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center hover:border-[#F47B20] hover:bg-orange-50 transition-all"
+                                                    className="w-full h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center hover:border-[#f26e21] hover:bg-orange-50 transition-all"
                                                 >
                                                     <Upload size={24} className="text-gray-400" />
                                                 </button>
@@ -971,7 +971,7 @@ export default function ProductManager({ getToken }) {
                                                 value={formData.name}
                                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                                 required
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F47B20]"
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f26e21]"
                                                 placeholder="Enter product name"
                                             />
                                         </div>
@@ -983,7 +983,7 @@ export default function ProductManager({ getToken }) {
                                                 type="text"
                                                 value={formData.sku}
                                                 onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F47B20]"
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f26e21]"
                                                 placeholder="Product SKU"
                                             />
                                         </div>
@@ -1006,7 +1006,7 @@ export default function ProductManager({ getToken }) {
                                                     const newId = crypto.randomUUID()
                                                     setDescSections(prev => [...prev, { id: newId, title: '', body: '', imageUrl: null, imagePublicId: null, _localFile: null, _localPreview: null }])
                                                 }}
-                                                className="flex items-center gap-1.5 px-3 py-2 bg-[#F47B20] text-white rounded-lg text-sm font-semibold hover:bg-[#C45A00] transition-colors flex-shrink-0"
+                                                className="flex items-center gap-1.5 px-3 py-2 bg-[#f26e21] text-white rounded-lg text-sm font-semibold hover:bg-[#C45A00] transition-colors flex-shrink-0"
                                             >
                                                 <Plus size={14} /> Add Section
                                             </button>
@@ -1076,7 +1076,7 @@ export default function ProductManager({ getToken }) {
                                                             setDescSections(s)
                                                         }}
                                                         placeholder="Section heading (optional) — e.g. Why Buy from Us?"
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#F47B20] bg-white"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#f26e21] bg-white"
                                                     />
 
                                                     {/* Body */}
@@ -1089,7 +1089,7 @@ export default function ProductManager({ getToken }) {
                                                         }}
                                                         rows={6}
                                                         placeholder={"Write the content for this section.\n\nEach new line will be shown as a separate paragraph.\n\nExample:\nGuaranteed Lowest Price: We promise you the best value...\n\nDazzle Care+ (1-Year Replacement Guarantee): Go beyond repair..."}
-                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F47B20] resize-y bg-white"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#f26e21] resize-y bg-white"
                                                     />
 
                                                     {/* Image upload area for this section */}
@@ -1147,7 +1147,7 @@ export default function ProductManager({ getToken }) {
                                                                     }
                                                                     inp.click()
                                                                 }}
-                                                                className="flex items-center gap-2 px-3 py-2 border-2 border-dashed border-gray-300 rounded-lg text-xs text-gray-500 hover:border-[#F47B20] hover:text-[#F47B20] hover:bg-orange-50 transition-all"
+                                                                className="flex items-center gap-2 px-3 py-2 border-2 border-dashed border-gray-300 rounded-lg text-xs text-gray-500 hover:border-[#f26e21] hover:text-[#f26e21] hover:bg-orange-50 transition-all"
                                                             >
                                                                 <Upload size={14} /> Click to upload an image for this section
                                                             </button>
@@ -1173,7 +1173,7 @@ export default function ProductManager({ getToken }) {
                                                 })}
                                                 required
                                                 step="0.01"
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F47B20]"
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f26e21]"
                                                 placeholder="0.00"
                                             />
                                         </div>
@@ -1189,7 +1189,7 @@ export default function ProductManager({ getToken }) {
                                                     pricing: { ...formData.pricing, salePrice: parseFloat(e.target.value) || 0 }
                                                 })}
                                                 step="0.01"
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F47B20]"
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f26e21]"
                                                 placeholder="0.00"
                                             />
                                         </div>
@@ -1205,7 +1205,7 @@ export default function ProductManager({ getToken }) {
                                                     pricing: { ...formData.pricing, costPerItem: parseFloat(e.target.value) || 0 }
                                                 })}
                                                 step="0.01"
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F47B20]"
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f26e21]"
                                                 placeholder="0.00"
                                             />
                                         </div>
@@ -1224,7 +1224,7 @@ export default function ProductManager({ getToken }) {
                                                     ...formData,
                                                     inventory: { ...formData.inventory, totalStock: parseInt(e.target.value) || 0 }
                                                 })}
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F47B20]"
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f26e21]"
                                                 placeholder="0"
                                             />
                                         </div>
@@ -1239,7 +1239,7 @@ export default function ProductManager({ getToken }) {
                                                     ...formData,
                                                     inventory: { ...formData.inventory, lowStockThreshold: parseInt(e.target.value) || 0 }
                                                 })}
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F47B20]"
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f26e21]"
                                                 placeholder="10"
                                             />
                                         </div>
@@ -1250,7 +1250,7 @@ export default function ProductManager({ getToken }) {
                                             <select
                                                 value={formData.condition}
                                                 onChange={(e) => setFormData({ ...formData, condition: e.target.value })}
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F47B20]"
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f26e21]"
                                             >
                                                 <option value="new">New</option>
                                                 <option value="refurbished">Refurbished</option>
@@ -1266,7 +1266,7 @@ export default function ProductManager({ getToken }) {
                                         <select
                                             value={formData.brand}
                                             onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F47B20]"
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f26e21]"
                                         >
                                             <option value="">— No brand —</option>
                                             {brands.map((b) => (
@@ -1293,7 +1293,7 @@ export default function ProductManager({ getToken }) {
                                                         setFormData({ ...formData, category: { ...formData.category, main: e.target.value, sub: '' } })
                                                     }
                                                 }}
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F47B20]"
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f26e21]"
                                             >
                                                 <option value="">Select a category</option>
                                                 {categories.map((cat) => (
@@ -1309,7 +1309,7 @@ export default function ProductManager({ getToken }) {
                                                         value={newCategoryName}
                                                         onChange={(e) => setNewCategoryName(e.target.value)}
                                                         onKeyDown={(e) => e.key === 'Escape' && setShowCustomCategory(false)}
-                                                        className="flex-1 px-3 py-2 border border-[#F47B20] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F47B20]"
+                                                        className="flex-1 px-3 py-2 border border-[#f26e21] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#f26e21]"
                                                         placeholder="New category name"
                                                     />
                                                     <button type="button" onClick={async () => {
@@ -1328,7 +1328,7 @@ export default function ProductManager({ getToken }) {
                                                         setShowCustomCategory(false)
                                                         setNewCategoryName('')
                                                         await fetchCategories() // refresh dropdown immediately
-                                                    }} className="px-3 py-2 bg-[#F47B20] text-white rounded-lg text-sm">Save</button>
+                                                    }} className="px-3 py-2 bg-[#f26e21] text-white rounded-lg text-sm">Save</button>
                                                     <button type="button" onClick={() => setShowCustomCategory(false)} className="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm">Cancel</button>
                                                 </div>
                                             )}
@@ -1348,7 +1348,7 @@ export default function ProductManager({ getToken }) {
                                                     }
                                                 }}
                                                 disabled={!formData.category.main}
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F47B20] disabled:opacity-50"
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f26e21] disabled:opacity-50"
                                             >
                                                 <option value="">Select subcategory</option>
                                                 {getAllSubcategories(formData.category.main).map((sub, index) => (
@@ -1364,7 +1364,7 @@ export default function ProductManager({ getToken }) {
                                                         value={newSubcategoryName}
                                                         onChange={(e) => setNewSubcategoryName(e.target.value)}
                                                         onKeyDown={(e) => e.key === 'Escape' && setShowCustomSubcategory(false)}
-                                                        className="flex-1 px-3 py-2 border border-[#F47B20] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F47B20]"
+                                                        className="flex-1 px-3 py-2 border border-[#f26e21] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#f26e21]"
                                                         placeholder="New subcategory name"
                                                     />
                                                     <button type="button" onClick={async () => {
@@ -1405,7 +1405,7 @@ export default function ProductManager({ getToken }) {
                                                         setShowCustomSubcategory(false)
                                                         setNewSubcategoryName('')
                                                         await fetchCategories() // refresh so subcategory appears next time
-                                                    }} className="px-3 py-2 bg-[#F47B20] text-white rounded-lg text-sm">Save</button>
+                                                    }} className="px-3 py-2 bg-[#f26e21] text-white rounded-lg text-sm">Save</button>
                                                     <button type="button" onClick={() => setShowCustomSubcategory(false)} className="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm">Cancel</button>
                                                 </div>
                                             )}
@@ -1422,7 +1422,7 @@ export default function ProductManager({ getToken }) {
                                             <select
                                                 value={formData.status}
                                                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F47B20]"
+                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f26e21]"
                                             >
                                                 <option value="draft">Draft</option>
                                                 <option value="active">Active</option>
@@ -1484,11 +1484,11 @@ export default function ProductManager({ getToken }) {
                                                 onKeyDown={(e) => {
                                                     if (e.key === 'Enter') { e.preventDefault(); if (newFeature.trim()) { setFormData({ ...formData, features: [...formData.features, newFeature.trim()] }); setNewFeature('') } }
                                                 }}
-                                                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F47B20] text-sm"
+                                                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f26e21] text-sm"
                                                 placeholder="Type a feature and press Add"
                                             />
                                             <button type="button" onClick={() => { if (newFeature.trim()) { setFormData({ ...formData, features: [...formData.features, newFeature.trim()] }); setNewFeature('') } }}
-                                                className="px-4 py-2 bg-[#F47B20] text-white rounded-lg hover:bg-[#C45A00] transition-colors text-sm font-medium">Add</button>
+                                                className="px-4 py-2 bg-[#f26e21] text-white rounded-lg hover:bg-[#C45A00] transition-colors text-sm font-medium">Add</button>
                                         </div>
                                     </div>
 
@@ -1513,7 +1513,7 @@ export default function ProductManager({ getToken }) {
                                                                     type="text"
                                                                     value={pair.key}
                                                                     onChange={(e) => { const p = [...specPairs]; p[idx] = { ...p[idx], key: e.target.value }; setSpecPairs(p) }}
-                                                                    className="w-full px-3 py-1.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#F47B20]"
+                                                                    className="w-full px-3 py-1.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#f26e21]"
                                                                     placeholder="e.g. Brand"
                                                                 />
                                                             </td>
@@ -1522,7 +1522,7 @@ export default function ProductManager({ getToken }) {
                                                                     type="text"
                                                                     value={pair.value}
                                                                     onChange={(e) => { const p = [...specPairs]; p[idx] = { ...p[idx], value: e.target.value }; setSpecPairs(p) }}
-                                                                    className="w-full px-3 py-1.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#F47B20]"
+                                                                    className="w-full px-3 py-1.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#f26e21]"
                                                                     placeholder="e.g. Samsung"
                                                                 />
                                                             </td>
@@ -1538,7 +1538,7 @@ export default function ProductManager({ getToken }) {
                                             </table>
                                         </div>
                                         <button type="button" onClick={() => setSpecPairs([...specPairs, { key: '', value: '' }])}
-                                            className="mt-2 text-sm text-[#F47B20] hover:underline flex items-center gap-1">
+                                            className="mt-2 text-sm text-[#f26e21] hover:underline flex items-center gap-1">
                                             + Add Row
                                         </button>
                                     </div>
@@ -1559,11 +1559,11 @@ export default function ProductManager({ getToken }) {
                                         </div>
                                         <div className="flex gap-2">
                                             <input type="text" value={customFieldKey} onChange={(e) => setCustomFieldKey(e.target.value)}
-                                                className="w-1/3 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F47B20] text-sm" placeholder="Field name" />
+                                                className="w-1/3 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f26e21] text-sm" placeholder="Field name" />
                                             <input type="text" value={customFieldValue} onChange={(e) => setCustomFieldValue(e.target.value)}
-                                                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F47B20] text-sm" placeholder="Field value" />
+                                                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f26e21] text-sm" placeholder="Field value" />
                                             <button type="button" onClick={() => { if (customFieldKey.trim()) { setFormData({ ...formData, customFields: { ...formData.customFields, [customFieldKey.trim()]: customFieldValue } }); setCustomFieldKey(''); setCustomFieldValue('') } }}
-                                                className="px-4 py-2 bg-[#F47B20] text-white rounded-lg hover:bg-[#C45A00] text-sm font-medium">Add</button>
+                                                className="px-4 py-2 bg-[#f26e21] text-white rounded-lg hover:bg-[#C45A00] text-sm font-medium">Add</button>
                                         </div>
                                     </div>
 
@@ -1583,7 +1583,7 @@ export default function ProductManager({ getToken }) {
                                         <button
                                             type="submit"
                                             disabled={saving}
-                                            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[#F47B20] to-[#C45A00] text-white rounded-lg font-semibold hover:from-[#C45A00] hover:to-[#A34800] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+                                            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[#f26e21] to-[#C45A00] text-white rounded-lg font-semibold hover:from-[#C45A00] hover:to-[#A34800] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
                                         >
                                             <Save size={18} />
                                             {saving ? 'Saving...' : editingProduct ? 'Update Product' : 'Create Product'}

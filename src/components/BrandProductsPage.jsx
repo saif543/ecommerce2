@@ -87,7 +87,7 @@ export default function BrandProductsPage({ slug }) {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-2 min-[640px]:grid-cols-3 min-[1024px]:grid-cols-4 min-[1280px]:grid-cols-5 gap-2 min-[480px]:gap-3 min-[640px]:gap-4 min-[768px]:gap-5">
+        <div className="grid grid-cols-2 min-[480px]:grid-cols-3 min-[768px]:grid-cols-4 min-[1024px]:grid-cols-5 min-[1280px]:grid-cols-6 gap-2 min-[480px]:gap-3 min-[640px]:gap-4 min-[768px]:gap-5">
           {products.map((product, i) => (
             <ProductCard key={String(product._id || product.id)} product={product} index={i} />
           ))}

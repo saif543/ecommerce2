@@ -185,9 +185,9 @@ function SectionBanner({ section, getToken }) {
 
                 {preview ? (
                     <div className="space-y-3">
-                        <div className="relative rounded-xl overflow-hidden border border-[#F47B20]/40">
+                        <div className="relative rounded-xl overflow-hidden border border-[#f26e21]/40">
                             <img src={preview} alt="Preview" className="w-full h-24 min-[480px]:h-28 min-[640px]:h-32 object-cover" />
-                            <div className="absolute top-2 left-2 bg-[#F47B20] text-white text-[10px] font-semibold px-2 py-0.5 rounded">
+                            <div className="absolute top-2 left-2 bg-[#f26e21] text-white text-[10px] font-semibold px-2 py-0.5 rounded">
                                 Preview
                             </div>
                         </div>
@@ -196,7 +196,7 @@ function SectionBanner({ section, getToken }) {
                             <button
                                 onClick={handleUpload}
                                 disabled={uploading}
-                                className="flex items-center gap-2 bg-[#F47B20] hover:bg-[#C45A00] text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors disabled:opacity-60 flex-1 justify-center"
+                                className="flex items-center gap-2 bg-[#f26e21] hover:bg-[#C45A00] text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors disabled:opacity-60 flex-1 justify-center"
                             >
                                 {uploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
                                 {uploading ? 'Uploading...' : 'Upload Banner'}
@@ -211,9 +211,9 @@ function SectionBanner({ section, getToken }) {
                         </div>
                     </div>
                 ) : (
-                    <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-[#F47B20] hover:bg-orange-50 transition-all group">
-                        <ImageIcon size={24} className="text-gray-300 group-hover:text-[#F47B20] transition-colors mb-2" />
-                        <span className="text-xs font-medium text-gray-400 group-hover:text-[#F47B20] transition-colors">
+                    <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-[#f26e21] hover:bg-orange-50 transition-all group">
+                        <ImageIcon size={24} className="text-gray-300 group-hover:text-[#f26e21] transition-colors mb-2" />
+                        <span className="text-xs font-medium text-gray-400 group-hover:text-[#f26e21] transition-colors">
                             Click to select image
                         </span>
                         <span className="text-[10px] text-gray-300 mt-0.5">Recommended: 1440×160px or wider. Max 100MB.</span>

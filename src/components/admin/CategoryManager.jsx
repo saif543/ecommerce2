@@ -73,7 +73,7 @@ export default function CategoryManager({ getToken }) {
         if (!file) return
         const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
         if (!allowed.includes(file.type)) {
-            MySwal.fire({ icon: 'error', title: 'Invalid File', text: 'Only JPEG, PNG, WebP allowed', confirmButtonColor: '#F47B20' })
+            MySwal.fire({ icon: 'error', title: 'Invalid File', text: 'Only JPEG, PNG, WebP allowed', confirmButtonColor: '#f26e21' })
             return
         }
         setNewCatImage(file)
@@ -85,7 +85,7 @@ export default function CategoryManager({ getToken }) {
         const name = newCatName.trim()
         if (!name) return
         if (!newCatImage) {
-            MySwal.fire({ icon: 'warning', title: 'Image Required', text: 'Please select an image for this category', confirmButtonColor: '#F47B20' })
+            MySwal.fire({ icon: 'warning', title: 'Image Required', text: 'Please select an image for this category', confirmButtonColor: '#f26e21' })
             return
         }
         setAddingCat(true)
@@ -112,7 +112,7 @@ export default function CategoryManager({ getToken }) {
             }
             fetchCategories()
         } catch (err) {
-            MySwal.fire({ icon: 'error', title: 'Error', text: err.message, confirmButtonColor: '#F47B20' })
+            MySwal.fire({ icon: 'error', title: 'Error', text: err.message, confirmButtonColor: '#f26e21' })
         } finally {
             setAddingCat(false)
         }
@@ -123,7 +123,7 @@ export default function CategoryManager({ getToken }) {
         if (!file) return
         const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
         if (!allowed.includes(file.type)) {
-            MySwal.fire({ icon: 'error', title: 'Invalid File', text: 'Only JPEG, PNG, WebP allowed', confirmButtonColor: '#F47B20' })
+            MySwal.fire({ icon: 'error', title: 'Invalid File', text: 'Only JPEG, PNG, WebP allowed', confirmButtonColor: '#f26e21' })
             return
         }
         setUpdatingImageFor(cat._id)
@@ -143,7 +143,7 @@ export default function CategoryManager({ getToken }) {
             MySwal.fire({ icon: 'success', title: 'Image updated!', timer: 1200, showConfirmButton: false })
             fetchCategories()
         } catch (err) {
-            MySwal.fire({ icon: 'error', title: 'Error', text: err.message, confirmButtonColor: '#F47B20' })
+            MySwal.fire({ icon: 'error', title: 'Error', text: err.message, confirmButtonColor: '#f26e21' })
         } finally {
             setUpdatingImageFor(null)
         }
@@ -166,7 +166,7 @@ export default function CategoryManager({ getToken }) {
             setAddingSubFor(null)
             fetchCategories()
         } catch (err) {
-            MySwal.fire({ icon: 'error', title: 'Error', text: err.message, confirmButtonColor: '#F47B20' })
+            MySwal.fire({ icon: 'error', title: 'Error', text: err.message, confirmButtonColor: '#f26e21' })
         }
     }
 
@@ -186,7 +186,7 @@ export default function CategoryManager({ getToken }) {
             setRenamingCatId(null)
             fetchCategories()
         } catch (err) {
-            MySwal.fire({ icon: 'error', title: 'Error', text: err.message, confirmButtonColor: '#F47B20' })
+            MySwal.fire({ icon: 'error', title: 'Error', text: err.message, confirmButtonColor: '#f26e21' })
         }
     }
 
@@ -206,7 +206,7 @@ export default function CategoryManager({ getToken }) {
             setRenamingSubId(null)
             fetchCategories()
         } catch (err) {
-            MySwal.fire({ icon: 'error', title: 'Error', text: err.message, confirmButtonColor: '#F47B20' })
+            MySwal.fire({ icon: 'error', title: 'Error', text: err.message, confirmButtonColor: '#f26e21' })
         }
     }
 
@@ -244,7 +244,7 @@ export default function CategoryManager({ getToken }) {
             MySwal.fire({ icon: 'success', title: 'Deleted!', text: `"${cat.name}" and all its subcategories have been deleted`, timer: 1800, showConfirmButton: false })
             fetchCategories()
         } catch (err) {
-            MySwal.fire({ icon: 'error', title: 'Error', text: err.message, confirmButtonColor: '#F47B20' })
+            MySwal.fire({ icon: 'error', title: 'Error', text: err.message, confirmButtonColor: '#f26e21' })
         }
     }
 
@@ -275,14 +275,14 @@ export default function CategoryManager({ getToken }) {
             MySwal.fire({ icon: 'success', title: 'Deleted!', text: `"${sub.name}" removed`, timer: 1200, showConfirmButton: false })
             fetchCategories()
         } catch (err) {
-            MySwal.fire({ icon: 'error', title: 'Error', text: err.message, confirmButtonColor: '#F47B20' })
+            MySwal.fire({ icon: 'error', title: 'Error', text: err.message, confirmButtonColor: '#f26e21' })
         }
     }
 
     if (loading) {
         return (
             <div className="flex items-center justify-center py-20">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-[#F47B20]" />
+                <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-[#f26e21]" />
             </div>
         )
     }
@@ -312,13 +312,13 @@ export default function CategoryManager({ getToken }) {
                     <div
                         onClick={() => newCatFileRef.current?.click()}
                         className={`flex items-center gap-3 p-3 rounded-lg border-2 border-dashed cursor-pointer transition-colors
-                            ${newCatPreview ? 'border-[#F47B20] bg-orange-50' : 'border-gray-300 hover:border-[#F47B20] hover:bg-orange-50'}`}
+                            ${newCatPreview ? 'border-[#f26e21] bg-orange-50' : 'border-gray-300 hover:border-[#f26e21] hover:bg-orange-50'}`}
                     >
                         {newCatPreview ? (
                             <>
                                 <img src={newCatPreview} alt="Preview" className="w-14 h-14 object-cover rounded-lg flex-shrink-0 shadow" />
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium text-[#F47B20] truncate">{newCatImage?.name}</p>
+                                    <p className="text-sm font-medium text-[#f26e21] truncate">{newCatImage?.name}</p>
                                     <p className="text-xs text-gray-400">Click to change image</p>
                                 </div>
                                 <button
@@ -359,12 +359,12 @@ export default function CategoryManager({ getToken }) {
                         onChange={(e) => setNewCatName(e.target.value)}
                         onKeyDown={(e) => { if (e.key === 'Enter') handleAddCategory() }}
                         placeholder="e.g. Smartphones, Laptops, Accessories"
-                        className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#F47B20] focus:border-transparent"
+                        className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#f26e21] focus:border-transparent"
                     />
                     <button
                         onClick={handleAddCategory}
                         disabled={addingCat || !newCatName.trim() || !newCatImage}
-                        className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#F47B20] to-[#C45A00] text-white rounded-lg text-sm font-medium hover:from-[#C45A00] hover:to-[#A34800] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#f26e21] to-[#C45A00] text-white rounded-lg text-sm font-medium hover:from-[#C45A00] hover:to-[#A34800] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <Plus size={16} />
                         {addingCat ? 'Adding...' : 'Add Category'}
@@ -415,7 +415,7 @@ export default function CategoryManager({ getToken }) {
                                             />
                                         ) : (
                                             isExpanded
-                                                ? <FolderOpen size={18} className="text-[#F47B20]" />
+                                                ? <FolderOpen size={18} className="text-[#f26e21]" />
                                                 : <Folder size={18} className="text-gray-400" />
                                         )}
                                         {/* Hidden file input for image update */}
@@ -443,7 +443,7 @@ export default function CategoryManager({ getToken }) {
                                                 if (e.key === 'Enter') handleRenameCategory(cat)
                                                 if (e.key === 'Escape') setRenamingCatId(null)
                                             }}
-                                            className="flex-1 px-2 py-1 border border-[#F47B20] rounded text-sm font-semibold focus:outline-none"
+                                            className="flex-1 px-2 py-1 border border-[#f26e21] rounded text-sm font-semibold focus:outline-none"
                                         />
                                     ) : (
                                         <span className="flex-1 font-semibold text-gray-900 text-sm">{cat.name}</span>
@@ -538,7 +538,7 @@ export default function CategoryManager({ getToken }) {
                                                                             if (e.key === 'Enter') handleRenameSubcategory(cat, sub)
                                                                             if (e.key === 'Escape') setRenamingSubId(null)
                                                                         }}
-                                                                        className="flex-1 px-2 py-0.5 border border-[#F47B20] rounded text-sm focus:outline-none"
+                                                                        className="flex-1 px-2 py-0.5 border border-[#f26e21] rounded text-sm focus:outline-none"
                                                                     />
                                                                 ) : (
                                                                     <span className="flex-1 text-sm text-gray-700">{sub.name}</span>
@@ -579,7 +579,7 @@ export default function CategoryManager({ getToken }) {
                                                 {/* Add Subcategory Row */}
                                                 {addingSubFor === cat._id ? (
                                                     <div className="flex items-center gap-2 pl-6 pt-1">
-                                                        <div className="w-1.5 h-1.5 rounded-full bg-[#F47B20] flex-shrink-0" />
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-[#f26e21] flex-shrink-0" />
                                                         <input
                                                             autoFocus
                                                             type="text"
@@ -590,7 +590,7 @@ export default function CategoryManager({ getToken }) {
                                                                 if (e.key === 'Escape') setAddingSubFor(null)
                                                             }}
                                                             placeholder="Subcategory name..."
-                                                            className="flex-1 px-2 py-1 border border-[#F47B20] rounded text-sm focus:outline-none"
+                                                            className="flex-1 px-2 py-1 border border-[#f26e21] rounded text-sm focus:outline-none"
                                                         />
                                                         <button onClick={() => handleAddSubcategory(cat)} className="p-1 text-green-600 hover:bg-green-50 rounded transition-colors">
                                                             <Check size={14} />
@@ -602,7 +602,7 @@ export default function CategoryManager({ getToken }) {
                                                 ) : (
                                                     <button
                                                         onClick={() => { setAddingSubFor(cat._id); setNewSubInputs(prev => ({ ...prev, [cat._id]: '' })) }}
-                                                        className="flex items-center gap-1.5 pl-6 text-sm text-[#F47B20] hover:underline mt-1"
+                                                        className="flex items-center gap-1.5 pl-6 text-sm text-[#f26e21] hover:underline mt-1"
                                                     >
                                                         <Plus size={13} />
                                                         Add subcategory

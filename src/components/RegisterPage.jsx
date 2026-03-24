@@ -98,8 +98,8 @@ export default function RegisterPage() {
       >
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 mb-8 justify-center">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#F47B20] to-[#111111] flex items-center justify-center">
-            <span className="text-[#FF9F43] font-bold text-sm">Z</span>
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#f26e21] to-[#111111] flex items-center justify-center">
+            <span className="text-[#ff8c42] font-bold text-sm">Z</span>
           </div>
           <span className="font-serif text-2xl tracking-tight text-purple-dark">ZenTech</span>
         </Link>

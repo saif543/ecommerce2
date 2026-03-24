@@ -37,7 +37,7 @@ export default function Footer() {
             className="lg:col-span-2"
           >
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-8 h-8 bg-[#F47B20] rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-[#f26e21] rounded-full flex items-center justify-center">
                 <span className="text-white font-bold text-xs">Z</span>
               </div>
               <span className="text-xl font-semibold tracking-tight">ZenTech</span>

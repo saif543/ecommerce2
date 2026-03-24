@@ -341,14 +341,14 @@ export default function CouponManager({ getToken }) {
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                        <Tag className="text-[#F47B20]" size={26} />
+                        <Tag className="text-[#f26e21]" size={26} />
                         Coupon Manager
                     </h2>
                     <p className="text-sm text-gray-500 mt-0.5">{pagination.total || 0} coupon{pagination.total !== 1 ? 's' : ''} total</p>
                 </div>
                 <button
                     onClick={openCreate}
-                    className="flex items-center gap-2 bg-[#F47B20] hover:bg-[#C45A00] text-white px-5 py-2.5 rounded-xl font-semibold shadow-md transition-colors"
+                    className="flex items-center gap-2 bg-[#f26e21] hover:bg-[#C45A00] text-white px-5 py-2.5 rounded-xl font-semibold shadow-md transition-colors"
                 >
                     <Plus size={18} /> New Coupon
                 </button>
@@ -361,7 +361,7 @@ export default function CouponManager({ getToken }) {
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
                     placeholder="Search by coupon code…"
-                    className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#F47B20]/30 bg-white"
+                    className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#f26e21]/30 bg-white"
                 />
             </div>
 
@@ -369,13 +369,13 @@ export default function CouponManager({ getToken }) {
             <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
                 {loading ? (
                     <div className="flex items-center justify-center h-48">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F47B20]" />
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#f26e21]" />
                     </div>
                 ) : coupons.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 text-gray-400 gap-3">
                         <Tag size={40} className="opacity-30" />
                         <p className="font-medium">No coupons yet</p>
-                        <button onClick={openCreate} className="text-sm text-[#F47B20] hover:underline font-medium">Create your first coupon</button>
+                        <button onClick={openCreate} className="text-sm text-[#f26e21] hover:underline font-medium">Create your first coupon</button>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
@@ -540,7 +540,7 @@ export default function CouponManager({ getToken }) {
                                             value={form.code}
                                             onChange={e => setForm(f => ({ ...f, code: e.target.value.toUpperCase() }))}
                                             placeholder="e.g. SUMMER20"
-                                            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-mono uppercase focus:outline-none focus:ring-2 focus:ring-[#F47B20]/30"
+                                            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-mono uppercase focus:outline-none focus:ring-2 focus:ring-[#f26e21]/30"
                                         />
                                     </div>
                                     <div className="flex items-end pb-1">
@@ -561,13 +561,13 @@ export default function CouponManager({ getToken }) {
                                         <div className="flex rounded-xl overflow-hidden border border-gray-200">
                                             <button
                                                 onClick={() => setForm(f => ({ ...f, discountType: 'percent' }))}
-                                                className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-sm font-semibold transition-all ${form.discountType === 'percent' ? 'bg-[#F47B20] text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                                                className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-sm font-semibold transition-all ${form.discountType === 'percent' ? 'bg-[#f26e21] text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
                                             >
                                                 <Percent size={14} /> Percent
                                             </button>
                                             <button
                                                 onClick={() => setForm(f => ({ ...f, discountType: 'flat' }))}
-                                                className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-sm font-semibold transition-all ${form.discountType === 'flat' ? 'bg-[#F47B20] text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                                                className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-sm font-semibold transition-all ${form.discountType === 'flat' ? 'bg-[#f26e21] text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
                                             >
                                                 <DollarSign size={14} /> Flat ৳
                                             </button>
@@ -584,7 +584,7 @@ export default function CouponManager({ getToken }) {
                                             value={form.discountValue}
                                             onChange={e => setForm(f => ({ ...f, discountValue: e.target.value }))}
                                             placeholder={form.discountType === 'percent' ? '0–100' : 'e.g. 100'}
-                                            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#F47B20]/30"
+                                            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#f26e21]/30"
                                         />
                                     </div>
                                 </div>
@@ -604,7 +604,7 @@ export default function CouponManager({ getToken }) {
                                                 onClick={() => setForm(f => ({ ...f, scope: value, categories: [], subcategories: [], productIds: [] }))}
                                                 className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 text-xs font-semibold transition-all ${
                                                     form.scope === value
-                                                        ? 'border-[#F47B20] bg-orange-50 text-[#F47B20]'
+                                                        ? 'border-[#f26e21] bg-orange-50 text-[#f26e21]'
                                                         : 'border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50'
                                                 }`}
                                             >
@@ -628,7 +628,7 @@ export default function CouponManager({ getToken }) {
                                                 <button
                                                     key={cat._id}
                                                     onClick={() => toggleCategory(cat.name)}
-                                                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${form.categories.includes(cat.name) ? 'bg-[#F47B20] border-[#F47B20] text-white' : 'bg-white border-gray-200 text-gray-700 hover:border-gray-400'}`}
+                                                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${form.categories.includes(cat.name) ? 'bg-[#f26e21] border-[#f26e21] text-white' : 'bg-white border-gray-200 text-gray-700 hover:border-gray-400'}`}
                                                 >
                                                     {cat.name}
                                                 </button>
@@ -685,13 +685,13 @@ export default function CouponManager({ getToken }) {
                                                 value={productSearch}
                                                 onChange={e => setProductSearch(e.target.value)}
                                                 placeholder="Search products…"
-                                                className="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#F47B20]/30"
+                                                className="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#f26e21]/30"
                                             />
                                         </div>
                                         <div className="max-h-52 overflow-y-auto border border-gray-200 rounded-xl divide-y divide-gray-100">
                                             {loadingProducts ? (
                                                 <div className="flex items-center justify-center h-20">
-                                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#F47B20]" />
+                                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#f26e21]" />
                                                 </div>
                                             ) : products.length === 0 ? (
                                                 <p className="text-gray-400 text-sm p-4 text-center">No products found</p>
@@ -704,7 +704,7 @@ export default function CouponManager({ getToken }) {
                                                         onClick={() => toggleProduct(pid)}
                                                         className={`w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-gray-50 transition-colors ${selected ? 'bg-orange-50' : ''}`}
                                                     >
-                                                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${selected ? 'bg-[#F47B20] border-[#F47B20]' : 'border-gray-300'}`}>
+                                                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${selected ? 'bg-[#f26e21] border-[#f26e21]' : 'border-gray-300'}`}>
                                                             {selected && <CheckCircle size={12} className="text-white" strokeWidth={3} />}
                                                         </div>
                                                         {product.images?.[0]?.url && (
@@ -737,7 +737,7 @@ export default function CouponManager({ getToken }) {
                                             value={form.minOrderAmount}
                                             onChange={e => setForm(f => ({ ...f, minOrderAmount: e.target.value }))}
                                             placeholder="0 = no minimum"
-                                            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#F47B20]/30"
+                                            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#f26e21]/30"
                                         />
                                     </div>
                                     <div>
@@ -748,7 +748,7 @@ export default function CouponManager({ getToken }) {
                                             value={form.maxDiscountAmount}
                                             onChange={e => setForm(f => ({ ...f, maxDiscountAmount: e.target.value }))}
                                             placeholder="0 = no cap"
-                                            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#F47B20]/30"
+                                            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#f26e21]/30"
                                         />
                                     </div>
                                     <div>
@@ -759,7 +759,7 @@ export default function CouponManager({ getToken }) {
                                             value={form.usageLimit}
                                             onChange={e => setForm(f => ({ ...f, usageLimit: e.target.value }))}
                                             placeholder="0 = unlimited"
-                                            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#F47B20]/30"
+                                            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#f26e21]/30"
                                         />
                                     </div>
                                     <div>
@@ -771,7 +771,7 @@ export default function CouponManager({ getToken }) {
                                             value={form.expiresAt}
                                             onChange={e => setForm(f => ({ ...f, expiresAt: e.target.value }))}
                                             min={new Date().toISOString().split('T')[0]}
-                                            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#F47B20]/30"
+                                            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#f26e21]/30"
                                         />
                                     </div>
                                 </div>
@@ -785,7 +785,7 @@ export default function CouponManager({ getToken }) {
                                 <button
                                     onClick={handleSave}
                                     disabled={saving}
-                                    className="flex items-center gap-2 px-6 py-2.5 bg-[#F47B20] hover:bg-[#C45A00] text-white rounded-xl text-sm font-semibold shadow-md transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                                    className="flex items-center gap-2 px-6 py-2.5 bg-[#f26e21] hover:bg-[#C45A00] text-white rounded-xl text-sm font-semibold shadow-md transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                                 >
                                     {saving ? (
                                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />

@@ -111,7 +111,7 @@ function AdminDashboard() {
     if (authLoading || loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#F47B20]"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#f26e21]"></div>
             </div>
         )
     }
@@ -140,7 +140,7 @@ function AdminDashboard() {
             <aside className="w-20 bg-gray-900 text-white flex flex-col">
                 {/* Logo */}
                 <div className="p-6 border-b border-gray-800 flex justify-center">
-                    <div className="w-10 h-10 bg-gradient-to-br from-[#F47B20] to-[#C45A00] rounded-lg flex items-center justify-center text-white font-bold text-xl">
+                    <div className="w-10 h-10 bg-gradient-to-br from-[#f26e21] to-[#C45A00] rounded-lg flex items-center justify-center text-white font-bold text-xl">
                         N
                     </div>
                 </div>
@@ -162,7 +162,7 @@ function AdminDashboard() {
                             onClick={() => setActiveTab(item.id)}
                             title={item.label}
                             className={`w-full flex items-center justify-center px-4 py-3 rounded-lg transition-all ${activeTab === item.id
-                                ? 'bg-[#F47B20] text-white shadow-lg'
+                                ? 'bg-[#f26e21] text-white shadow-lg'
                                 : 'text-gray-400 hover:bg-gray-800 hover:text-white'
                                 }`}
                         >
@@ -174,7 +174,7 @@ function AdminDashboard() {
                 {/* User Section */}
                 <div className="p-4 border-t border-gray-800">
                     <div className="flex items-center justify-center">
-                        <div className="w-10 h-10 bg-[#F47B20] rounded-full flex items-center justify-center text-white font-semibold">
+                        <div className="w-10 h-10 bg-[#f26e21] rounded-full flex items-center justify-center text-white font-semibold">
                             {user?.email?.[0]?.toUpperCase() || 'A'}
                         </div>
                     </div>
@@ -200,7 +200,7 @@ function AdminDashboard() {
                         <div className="flex items-center gap-3">
                             <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative">
                                 <Bell size={20} className="text-gray-600" />
-                                <span className="absolute top-1 right-1 w-2 h-2 bg-[#F47B20] rounded-full"></span>
+                                <span className="absolute top-1 right-1 w-2 h-2 bg-[#f26e21] rounded-full"></span>
                             </button>
                         </div>
                     </div>
@@ -252,7 +252,7 @@ function AdminDashboard() {
                                 >
                                     <div className="flex items-center justify-between mb-4">
                                         <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                                            <ShoppingCart className="text-[#F47B20]" size={24} />
+                                            <ShoppingCart className="text-[#f26e21]" size={24} />
                                         </div>
                                         <span className="text-sm text-gray-500">Total</span>
                                     </div>
@@ -283,25 +283,25 @@ function AdminDashboard() {
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                     <button
                                         onClick={() => setActiveTab('products')}
-                                        className="p-4 border-2 border-gray-200 rounded-lg hover:border-[#F47B20] hover:bg-orange-50 transition-all text-left"
+                                        className="p-4 border-2 border-gray-200 rounded-lg hover:border-[#f26e21] hover:bg-orange-50 transition-all text-left"
                                     >
-                                        <Package className="text-[#F47B20] mb-2" size={24} />
+                                        <Package className="text-[#f26e21] mb-2" size={24} />
                                         <p className="font-medium text-gray-900">Add Product</p>
                                         <p className="text-xs text-gray-500 mt-1">Create new listing</p>
                                     </button>
                                     <button
                                         onClick={() => setActiveTab('sliders')}
-                                        className="p-4 border-2 border-gray-200 rounded-lg hover:border-[#F47B20] hover:bg-orange-50 transition-all text-left"
+                                        className="p-4 border-2 border-gray-200 rounded-lg hover:border-[#f26e21] hover:bg-orange-50 transition-all text-left"
                                     >
-                                        <ImageIcon className="text-[#F47B20] mb-2" size={24} />
+                                        <ImageIcon className="text-[#f26e21] mb-2" size={24} />
                                         <p className="font-medium text-gray-900">Add Slider</p>
                                         <p className="text-xs text-gray-500 mt-1">Upload hero image</p>
                                     </button>
                                     <button
                                         onClick={() => setActiveTab('orders')}
-                                        className="p-4 border-2 border-gray-200 rounded-lg hover:border-[#F47B20] hover:bg-orange-50 transition-all text-left"
+                                        className="p-4 border-2 border-gray-200 rounded-lg hover:border-[#f26e21] hover:bg-orange-50 transition-all text-left"
                                     >
-                                        <ShoppingCart className="text-[#F47B20] mb-2" size={24} />
+                                        <ShoppingCart className="text-[#f26e21] mb-2" size={24} />
                                         <p className="font-medium text-gray-900">View Orders</p>
                                         <p className="text-xs text-gray-500 mt-1">Manage purchases</p>
                                     </button>

@@ -211,7 +211,7 @@ export default function TrendingPage() {
               </div>
               <div className="px-4 pb-8">{filterContent}</div>
               <div className="sticky bottom-0 bg-white border-t border-gray-100 p-4">
-                <button onClick={() => setMobileFilterOpen(false)} className="w-full bg-purple-dark text-white text-sm font-semibold py-3 rounded-lg hover:bg-purple-mid transition-colors">
+                <button onClick={() => setMobileFilterOpen(false)} className="w-full bg-[#f26e21] text-white text-sm font-semibold py-3 rounded-lg hover:bg-[#e05e15] transition-colors">
                   Show {sortedProducts.length} Products
                 </button>
               </div>
@@ -285,7 +285,7 @@ export default function TrendingPage() {
               {hasActiveFilters && <button onClick={resetAll} className="text-sm text-purple-mid font-semibold underline underline-offset-2">Clear all filters</button>}
             </div>
           ) : gridView === "grid" ? (
-            <div className="grid grid-cols-2 min-[640px]:grid-cols-3 min-[768px]:grid-cols-2 min-[920px]:grid-cols-3 min-[1280px]:grid-cols-4 gap-2 min-[480px]:gap-3 min-[640px]:gap-4 min-[768px]:gap-4">
+            <div className="grid grid-cols-2 min-[480px]:grid-cols-3 min-[768px]:grid-cols-3 min-[920px]:grid-cols-4 min-[1280px]:grid-cols-5 gap-2 min-[480px]:gap-3 min-[640px]:gap-4 min-[768px]:gap-4">
               {sortedProducts.map((product, i) => (
                 <ProductCard key={String(product._id || product.id)} product={product} index={i} />
               ))}

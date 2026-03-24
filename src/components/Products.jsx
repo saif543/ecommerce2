@@ -127,7 +127,7 @@ export default function Products({
             <div className="text-center mt-8 min-[768px]:mt-12">
               <Link
                 href={seeAllLink}
-                className="inline-flex items-center gap-2 px-6 py-2.5 min-[768px]:px-8 min-[768px]:py-3 bg-purple-dark text-white text-sm min-[768px]:text-base font-semibold rounded-full hover:bg-purple-mid transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-2.5 min-[768px]:px-8 min-[768px]:py-3 bg-[#f26e21] text-white text-sm min-[768px]:text-base font-semibold rounded-full hover:bg-[#e05e15] transition-colors shadow-[0_2px_8px_rgba(242,110,33,0.3)]"
               >
                 See All
                 <ArrowRight size={18} />

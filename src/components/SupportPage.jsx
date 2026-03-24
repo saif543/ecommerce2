@@ -214,7 +214,7 @@ export default function SupportPage() {
               onClick={() => setActiveCategory(i)}
               className={`flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-full border transition-colors ${
                 activeCategory === i
-                  ? "bg-purple-dark text-white border-purple-dark"
+                  ? "bg-[#f26e21] text-white border-[#f26e21]"
                   : "bg-white text-text-secondary border-gray-200 hover:border-purple-mid hover:text-purple-mid"
               }`}
             >

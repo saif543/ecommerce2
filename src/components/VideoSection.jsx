@@ -50,7 +50,7 @@ export default function VideoSection() {
               <motion.div
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-16 h-16 min-[480px]:w-20 min-[480px]:h-20 min-[768px]:w-24 min-[768px]:h-24 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/40 flex items-center justify-center group-hover:bg-white/30 transition-all"
+                className="w-16 h-16 min-[480px]:w-20 min-[480px]:h-20 min-[768px]:w-24 min-[768px]:h-24 rounded-full bg-[#f26e21]/80 backdrop-blur-sm border-2 border-[#f26e21] flex items-center justify-center group-hover:bg-[#f26e21] transition-all"
               >
                 <Play size={28} className="text-white ml-1 min-[480px]:w-8 min-[480px]:h-8 min-[768px]:w-10 min-[768px]:h-10" fill="white" />
               </motion.div>

@@ -29,7 +29,7 @@ export default function FeaturedCategories() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-card-white text-text-primary text-xs font-semibold px-5 py-2.5 rounded-md hover:bg-purple-dark hover:text-white transition-colors"
+              className="bg-card-white text-text-primary text-xs font-semibold px-5 py-2.5 rounded-md hover:bg-[#f26e21] hover:text-white transition-colors"
             >
               Shop Now
             </motion.button>
@@ -60,7 +60,7 @@ export default function FeaturedCategories() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="bg-card-white text-text-primary text-xs font-semibold px-5 py-2 rounded-md hover:bg-purple-dark hover:text-white transition-colors"
+                className="bg-card-white text-text-primary text-xs font-semibold px-5 py-2 rounded-md hover:bg-[#f26e21] hover:text-white transition-colors"
               >
                 Shop Now
               </motion.button>
@@ -89,7 +89,7 @@ export default function FeaturedCategories() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="bg-card-white text-text-primary text-xs font-semibold px-5 py-2 rounded-md hover:bg-purple-dark hover:text-white transition-colors"
+                className="bg-card-white text-text-primary text-xs font-semibold px-5 py-2 rounded-md hover:bg-[#f26e21] hover:text-white transition-colors"
               >
                 Shop Now
               </motion.button>

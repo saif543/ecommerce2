@@ -64,7 +64,7 @@ function StepIndicator({ step }) {
               <div className={`w-8 sm:w-14 h-[2px] rounded-full transition-colors ${i <= step ? "bg-purple-mid" : "bg-gray-200"}`} />
             )}
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all ${current ? "bg-purple-dark text-white shadow-lg shadow-purple-dark/20" : active ? "bg-purple-mid text-white" : "bg-gray-100 text-text-muted"}`}>
+              <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all ${current ? "bg-[#f26e21] text-white shadow-lg shadow-[#f26e21]/20" : active ? "bg-purple-mid text-white" : "bg-gray-100 text-text-muted"}`}>
                 <Icon size={15} />
               </div>
               <span className={`text-xs sm:text-sm font-semibold hidden min-[480px]:inline ${current ? "text-purple-dark" : active ? "text-purple-mid" : "text-text-muted"}`}>
@@ -306,7 +306,7 @@ export default function CartPage() {
             </div>
             <Link
               href="/"
-              className="inline-flex items-center gap-2 bg-purple-dark hover:bg-purple-mid text-white text-sm font-semibold px-8 py-3.5 rounded-full transition-colors"
+              className="inline-flex items-center gap-2 bg-[#f26e21] hover:bg-[#e05e15] text-white text-sm font-semibold px-8 py-3.5 rounded-full transition-colors"
             >
               Continue Shopping
               <ChevronRight size={16} />
@@ -357,7 +357,7 @@ export default function CartPage() {
           </p>
           <Link
             href="/"
-            className="inline-flex items-center gap-2 bg-purple-dark hover:bg-purple-mid text-white text-sm font-semibold px-7 py-3.5 rounded-full transition-colors"
+            className="inline-flex items-center gap-2 bg-[#f26e21] hover:bg-[#e05e15] text-white text-sm font-semibold px-7 py-3.5 rounded-full transition-colors"
           >
             <ArrowLeft size={15} />
             Start Shopping
@@ -777,7 +777,7 @@ export default function CartPage() {
                         <button
                           onClick={applyCoupon}
                           disabled={!couponInput.trim() || couponLoading}
-                          className="px-5 py-2.5 bg-purple-dark hover:bg-purple-mid disabled:bg-gray-200 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-colors flex-shrink-0"
+                          className="px-5 py-2.5 bg-[#f26e21] hover:bg-[#e05e15] disabled:bg-gray-200 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-colors flex-shrink-0"
                         >
                           {couponLoading ? <Loader2 size={16} className="animate-spin" /> : "Apply"}
                         </button>
@@ -828,7 +828,7 @@ export default function CartPage() {
                       disabled={selectedItems.length === 0}
                       className={`w-full text-sm font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 ${selectedItems.length === 0
                         ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                        : "bg-gradient-to-b from-[#1a1a1a] via-[#111111] to-[#222222] text-white shadow-lg shadow-[#222222]/25 hover:shadow-xl hover:shadow-[#222222]/35 border border-[rgba(15,52,96,0.3)]"
+                        : "bg-[#f26e21] hover:bg-[#e05e15] text-white shadow-lg shadow-[#f26e21]/25 hover:shadow-xl hover:shadow-[#e05e15]/35 border border-[#e05e15]"
                         }`}
                     >
                       <span className={selectedItems.length > 0 ? "text-white" : ""}>

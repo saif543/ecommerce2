@@ -20,7 +20,7 @@ export default function Home() {
         apiUrl="/api/product?isLovedProduct=true&limit=8"
         bg="bg-white"
         section="most-loved"
-        bannerGradient="linear-gradient(135deg, #111111 0%, #1a1a1a 40%, #222222 100%)"
+        bannerGradient="linear-gradient(135deg, #111111 0%, #f26e21 60%, #ff8c42 100%)"
         seeAllLink="/products"
       />
       <Products
@@ -29,7 +29,7 @@ export default function Home() {
         apiUrl="/api/product?isNewArrival=true&limit=8"
         bg="bg-offwhite"
         section="new-arrivals"
-        bannerGradient="linear-gradient(135deg, #111111 0%, #1a1a1a 40%, #222222 100%)"
+        bannerGradient="linear-gradient(135deg, #f26e21 0%, #111111 50%, #f26e21 100%)"
         seeAllLink="/products"
       />
       <Products
@@ -38,7 +38,7 @@ export default function Home() {
         apiUrl="/api/product?category=Headphones&limit=8"
         bg="bg-white"
         section="headphones"
-        bannerGradient="linear-gradient(135deg, #222222 0%, #1a1a1a 40%, #111111 100%)"
+        bannerGradient="linear-gradient(135deg, #ff8c42 0%, #f26e21 40%, #111111 100%)"
         seeAllLink="/products?category=Headphones"
       />
       <VideoSection />
