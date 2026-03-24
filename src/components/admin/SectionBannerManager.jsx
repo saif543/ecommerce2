@@ -3,26 +3,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { Upload, Trash2, Image as ImageIcon, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
 
-const SECTIONS = [
-    {
-        key: 'most-loved',
-        label: 'Most Loved Products Banner',
-        description: 'Displayed above the "Most Loved Products" section on the homepage.',
-        fallbackGradient: 'linear-gradient(135deg, #111111 0%, #1a1a1a 40%, #222222 100%)',
-    },
-    {
-        key: 'new-arrivals',
-        label: 'New Arrivals Banner',
-        description: 'Displayed above the "New Arrivals" section on the homepage.',
-        fallbackGradient: 'linear-gradient(135deg, #0f0f0f 0%, #1a2a1a 40%, #2d6a4f 100%)',
-    },
-    {
-        key: 'headphones',
-        label: 'Headphones Banner',
-        description: 'Displayed above the "Headphones" section on the homepage.',
-        fallbackGradient: 'linear-gradient(135deg, #222222 0%, #1a1a1a 40%, #111111 100%)',
-    },
-]
+
+
 
 function SectionBanner({ section, getToken }) {
     const [banner, setBanner] = useState(null)
@@ -232,17 +214,63 @@ function SectionBanner({ section, getToken }) {
 }
 
 export default function SectionBannerManager({ getToken }) {
+    const [sections, setSections] = useState([])
+    const [loadingSliders, setLoadingSliders] = useState(true)
+
+    useEffect(() => {
+        Promise.all([
+            fetch('/api/homepage-sections').then(r => r.json()),
+            fetch('/api/slider').then(r => r.json()),
+        ]).then(([homepageData, sliderData]) => {
+            const dynamicSections = []
+
+            // Homepage product sections
+            const hpSections = (homepageData.sections || []).filter(s => s.isActive)
+            for (const s of hpSections) {
+                const bannerKey = s.sectionBannerKey || s.id
+                dynamicSections.push({
+                    key: bannerKey,
+                    label: `${s.title} Banner`,
+                    description: `Banner displayed above the "${s.title}" section on the homepage.`,
+                    fallbackGradient: s.bannerGradient || 'linear-gradient(135deg, #111111 0%, #1a1a1a 40%, #222222 100%)',
+                })
+            }
+
+            // Custom Offer sliders
+            const activeOffers = (sliderData.slides || sliderData.sliders || []).filter(s => s.isActive && s.offerType === 'custom')
+            for (const offer of activeOffers) {
+                dynamicSections.push({
+                    key: `special-offer-${offer.id}`,
+                    label: `${offer.title || 'Custom Offer'} Banner`,
+                    description: `Banner for the "${offer.title || 'Custom Offer'}" offer page.`,
+                    fallbackGradient: 'linear-gradient(135deg, #111111 0%, #1a1a1a 40%, #222222 100%)',
+                })
+            }
+
+            setSections(dynamicSections)
+        }).catch(err => console.error('Error loading banners:', err))
+          .finally(() => setLoadingSliders(false))
+    }, [])
+
     return (
         <div className="max-w-3xl">
             <div className="mb-6">
                 <h2 className="text-xl font-bold text-gray-900">Section Banners</h2>
                 <p className="text-sm text-gray-500 mt-1">
-                    Upload banner images for homepage product sections. If no image is set, the gradient fallback is shown automatically.
+                    Upload banner images for your homepage sections and custom offer pages. These are dynamically generated from your active Homepage Sections and Custom Offer Sliders.
                 </p>
             </div>
-            {SECTIONS.map((section) => (
-                <SectionBanner key={section.key} section={section} getToken={getToken} />
-            ))}
+            {loadingSliders ? (
+                <div className="flex justify-center p-8"><Loader2 className="animate-spin text-[#f26e21]" /></div>
+            ) : sections.length > 0 ? (
+                sections.map((section) => (
+                    <SectionBanner key={section.key} section={section} getToken={getToken} />
+                ))
+            ) : (
+                <div className="bg-gray-50 border border-dashed border-gray-200 rounded-xl p-10 text-center text-sm text-gray-500">
+                    No active sections found. Add sections in <strong>Homepage Sections</strong> or create a Custom Offer Slider first.
+                </div>
+            )}
         </div>
     )
 }

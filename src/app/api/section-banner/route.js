@@ -7,7 +7,10 @@ import clientPromise from '@/lib/mongodb'
 
 // 🔐 SECURITY CONSTANTS
 const MAX_IMAGE_SIZE = 100 * 1024 * 1024 // 100 MB
-const VALID_SECTIONS = ['most-loved', 'new-arrivals', 'headphones'] // extensible list
+// Accept any valid section key: alphanumeric, hyphens, underscores, max 200 chars
+function isValidSectionKey(key) {
+    return typeof key === 'string' && key.length > 0 && key.length <= 200 && /^[a-z0-9_-]+$/i.test(key)
+}
 
 // Upload rate limiting
 const uploadTracker = new Map()
@@ -76,8 +79,8 @@ export async function GET(req) {
         const db = client.db('ECOM2')
 
         if (section) {
-            if (!VALID_SECTIONS.includes(section)) {
-                return NextResponse.json({ error: `Invalid section. Valid: ${VALID_SECTIONS.join(', ')}` }, { status: 400 })
+            if (!isValidSectionKey(section)) {
+                return NextResponse.json({ error: 'Invalid section key.' }, { status: 400 })
             }
             const banner = await db.collection('section_banners').findOne({ section })
             return NextResponse.json({ success: true, banner: banner || null })
@@ -115,8 +118,8 @@ export async function PUT(req) {
         const file = formData.get('image')
 
         if (!section) return NextResponse.json({ error: 'section is required' }, { status: 400 })
-        if (!VALID_SECTIONS.includes(section)) {
-            return NextResponse.json({ error: `Invalid section. Valid sections: ${VALID_SECTIONS.join(', ')}` }, { status: 400 })
+        if (!isValidSectionKey(section)) {
+            return NextResponse.json({ error: 'Invalid section key.' }, { status: 400 })
         }
         if (!file || typeof file === 'string') return NextResponse.json({ error: 'image file is required' }, { status: 400 })
         if (file.size > MAX_IMAGE_SIZE) return NextResponse.json({ error: 'Image too large (max 100MB)' }, { status: 400 })
@@ -187,8 +190,8 @@ export async function DELETE(req) {
         const section = sanitizeString(searchParams.get('section') || '', 100)
 
         if (!section) return NextResponse.json({ error: 'section is required' }, { status: 400 })
-        if (!VALID_SECTIONS.includes(section)) {
-            return NextResponse.json({ error: `Invalid section. Valid sections: ${VALID_SECTIONS.join(', ')}` }, { status: 400 })
+        if (!isValidSectionKey(section)) {
+            return NextResponse.json({ error: 'Invalid section key.' }, { status: 400 })
         }
 
         const client = await clientPromise

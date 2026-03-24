@@ -96,6 +96,7 @@ export async function GET(req) {
         let isLovedProduct = searchParams.get('isLovedProduct')
         let isTrending = searchParams.get('isTrending')
         let statusFilter = searchParams.get('status')
+        let sliderId = sanitizeString(searchParams.get('slider') || '', 100)
         let page = Math.max(1, parseInt(searchParams.get('page') || '1', 10))
         let limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '20', 10)))
 
@@ -163,6 +164,41 @@ export async function GET(req) {
             if (!isNaN(max) && max >= 0) query.price.$lte = max
         }
 
+        // ── Slider-based offer filtering ──
+        let sliderInfo = null
+        if (sliderId) {
+            const slider = await db.collection('sliders').findOne({ id: sliderId, isActive: true })
+            if (slider) {
+                sliderInfo = {
+                    id: slider.id,
+                    offerType: slider.offerType,
+                    customOfferScope: slider.customOfferScope,
+                    targetBrands: slider.targetBrands || [],
+                    targetCategories: slider.targetCategories || [],
+                    globalDiscountPercentage: slider.globalDiscountPercentage,
+                    title: slider.title || null,
+                }
+                if (slider.offerType === 'custom') {
+                    if (slider.customOfferScope === 'brand' && Array.isArray(slider.targetBrands) && slider.targetBrands.length > 0) {
+                        query.brand = { $in: slider.targetBrands.map(b => new RegExp(`^${b}$`, 'i')) }
+                    } else if (slider.customOfferScope === 'category' && Array.isArray(slider.targetCategories) && slider.targetCategories.length > 0) {
+                        query.category = { $in: slider.targetCategories.map(c => new RegExp(`^${c}$`, 'i')) }
+                    }
+                    if (Array.isArray(slider.targetProducts) && slider.targetProducts.length > 0) {
+                        const { ObjectId } = await import('mongodb')
+                        const oids = slider.targetProducts
+                            .map(e => { try { return new ObjectId(String(e.productId)) } catch { return null } })
+                            .filter(Boolean)
+                        if (oids.length > 0) {
+                            query._id = { $in: oids }
+                        }
+                        sliderInfo.targetProducts = slider.targetProducts
+                    }
+                    if (!isAdminRequest) query.isActive = true
+                }
+            }
+        }
+
         const skip = (page - 1) * limit
         const [products, total] = await Promise.all([
             db.collection('products').find(query).skip(skip).limit(limit).sort({ createdAt: -1 }).toArray(),
@@ -173,6 +209,7 @@ export async function GET(req) {
         return NextResponse.json({
             success: true,
             products,
+            sliderInfo,
             pagination: { total, page, limit, pages, totalPages: pages }
         })
 
