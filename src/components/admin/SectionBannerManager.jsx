@@ -8,7 +8,7 @@ const SECTIONS = [
         key: 'most-loved',
         label: 'Most Loved Products Banner',
         description: 'Displayed above the "Most Loved Products" section on the homepage.',
-        fallbackGradient: 'linear-gradient(135deg, #1a1a1a 0%, #2d1f3d 40%, #B8860B 100%)',
+        fallbackGradient: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%)',
     },
     {
         key: 'new-arrivals',
