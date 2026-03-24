@@ -187,8 +187,8 @@ export default function CategoryBannerManager({ getToken }) {
                                     {/* Preview of selected file */}
                                     {preview && (
                                         <div>
-                                            <p className="text-[11px] font-semibold text-blue-500 uppercase tracking-wide mb-2">Preview (not uploaded yet)</p>
-                                            <div className="relative rounded-lg overflow-hidden border border-[#3F72AF]/40">
+                                            <p className="text-[11px] font-semibold text-orange-500 uppercase tracking-wide mb-2">Preview (not uploaded yet)</p>
+                                            <div className="relative rounded-lg overflow-hidden border border-[#F47B20]/40">
                                                 <img src={preview} alt="preview" className="w-full h-[106px] min-[640px]:h-[141px] object-cover" />
                                             </div>
                                             <p className="text-[10px] text-gray-400 mt-1">{file?.name} ({(file?.size / 1024 / 1024).toFixed(2)} MB)</p>
@@ -196,7 +196,7 @@ export default function CategoryBannerManager({ getToken }) {
                                                 <button
                                                     onClick={() => handleUpload(catName)}
                                                     disabled={isUploading}
-                                                    className="flex items-center gap-1.5 bg-[#3F72AF] hover:bg-[#2D5F8A] text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors disabled:opacity-60"
+                                                    className="flex items-center gap-1.5 bg-[#F47B20] hover:bg-[#C45A00] text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors disabled:opacity-60"
                                                 >
                                                     {isUploading ? <Loader2 size={13} className="animate-spin" /> : <Upload size={13} />}
                                                     {isUploading ? 'Uploading...' : 'Upload Banner'}
@@ -214,10 +214,10 @@ export default function CategoryBannerManager({ getToken }) {
 
                                     {/* File selector */}
                                     {!preview && (
-                                        <label className="flex items-center gap-3 px-4 py-3 border border-dashed border-gray-200 rounded-lg cursor-pointer hover:border-[#3F72AF] hover:bg-blue-50 transition-all group">
-                                            <ImageIcon size={18} className="text-gray-300 group-hover:text-[#3F72AF] flex-shrink-0 transition-colors" />
+                                        <label className="flex items-center gap-3 px-4 py-3 border border-dashed border-gray-200 rounded-lg cursor-pointer hover:border-[#F47B20] hover:bg-orange-50 transition-all group">
+                                            <ImageIcon size={18} className="text-gray-300 group-hover:text-[#F47B20] flex-shrink-0 transition-colors" />
                                             <div>
-                                                <p className="text-xs font-medium text-gray-400 group-hover:text-[#3F72AF] transition-colors">
+                                                <p className="text-xs font-medium text-gray-400 group-hover:text-[#F47B20] transition-colors">
                                                     {banner ? 'Replace banner image' : 'Select banner image'}
                                                 </p>
                                                 <p className="text-[10px] text-gray-300">Recommended: 1440×160px or wider. Max 100MB.</p>

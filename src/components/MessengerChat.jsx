@@ -22,9 +22,9 @@ export default function MessengerChat() {
             {/* Header */}
             <div
               className="px-4 py-3 flex items-center gap-3"
-              style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%)" }}
+              style={{ background: "linear-gradient(135deg, #111111 0%, #222222 100%)" }}
             >
-              <div className="w-9 h-9 rounded-full bg-[#5C9AE5]/20 flex items-center justify-center flex-shrink-0">
+              <div className="w-9 h-9 rounded-full bg-[#FF9F43]/20 flex items-center justify-center flex-shrink-0">
                 <span className="text-white font-bold text-sm">Z</span>
               </div>
               <div className="flex-1 min-w-0">
@@ -50,7 +50,7 @@ export default function MessengerChat() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full text-center text-white text-sm font-semibold py-2.5 rounded-xl transition-all hover:opacity-90 border border-[rgba(15,52,96,0.3)]"
-                style={{ background: "linear-gradient(180deg, #16213e 0%, #1a1a2e 50%, #0f3460 100%)" }}
+                style={{ background: "linear-gradient(180deg, #1a1a1a 0%, #111111 50%, #222222 100%)" }}
               >
                 Chat on Messenger
               </a>
@@ -65,7 +65,7 @@ export default function MessengerChat() {
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
         className="relative w-14 h-14 rounded-full flex items-center justify-center shadow-[0_0_16px_rgba(15,52,96,0.45),0_0_40px_rgba(15,52,96,0.2)] hover:shadow-[0_0_22px_rgba(15,52,96,0.6),0_0_50px_rgba(15,52,96,0.3)] transition-all border border-[rgba(15,52,96,0.35)]"
-        style={{ background: "linear-gradient(180deg, #16213e 0%, #1a1a2e 50%, #0f3460 100%)" }}
+        style={{ background: "linear-gradient(180deg, #1a1a1a 0%, #111111 50%, #222222 100%)" }}
       >
         <span className="absolute inset-x-0 top-0 h-[45%] bg-gradient-to-b from-white/10 to-transparent rounded-t-full pointer-events-none"></span>
         {open ? (

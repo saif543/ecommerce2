@@ -265,7 +265,7 @@ export default function ProductsView() {
                     ) : (
                         <div
                             className="w-full h-full"
-                            style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%)" }}
+                            style={{ background: "linear-gradient(135deg, #111111 0%, #1a1a1a 40%, #222222 100%)" }}
                         />
                     )}
                 </div>
@@ -314,7 +314,7 @@ export default function ProductsView() {
                                     <span className="text-sm min-[480px]:text-base font-bold text-text-primary">Filter By</span>
                                     <div className="flex items-center gap-3">
                                         {hasActiveFilters && (
-                                            <button onClick={resetAll} className="text-xs min-[480px]:text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+                                            <button onClick={resetAll} className="text-xs min-[480px]:text-sm font-semibold text-orange-600 hover:text-orange-700 transition-colors">
                                                 Reset
                                             </button>
                                         )}
@@ -329,7 +329,7 @@ export default function ProductsView() {
                                 <div className="sticky bottom-0 bg-white border-t border-gray-100 p-3 min-[480px]:p-4">
                                     <button
                                         onClick={() => setMobileFilterOpen(false)}
-                                        className="w-full bg-[#1a1a2e] text-sm font-semibold py-3 rounded-lg transition-colors"
+                                        className="w-full bg-[#111111] text-sm font-semibold py-3 rounded-lg transition-colors"
                                     >
                                         <span className="text-white">
                                             Show {sortedProducts.length} Products
@@ -348,7 +348,7 @@ export default function ProductsView() {
                             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
                                 <span className="text-base font-bold text-text-primary">Filter By</span>
                                 {hasActiveFilters && (
-                                    <button onClick={resetAll} className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+                                    <button onClick={resetAll} className="text-sm font-semibold text-orange-600 hover:text-orange-700 transition-colors">
                                         Reset
                                     </button>
                                 )}

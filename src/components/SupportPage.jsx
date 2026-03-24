@@ -99,7 +99,7 @@ const contactChannels = [
     label: "Email Support",
     description: "Send us a message anytime",
     detail: "nisatkhan890@gmail.com",
-    color: "bg-blue-50 text-blue-600",
+    color: "bg-orange-50 text-orange-600",
     action: "Send Email",
     href: "mailto:nisatkhan890@gmail.com",
   },

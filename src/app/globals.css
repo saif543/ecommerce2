@@ -1,20 +1,20 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-purple-dark: #1a1a2e;
-  --color-purple-mid: #3F72AF;
-  --color-purple-light: #5C9AE5;
-  --color-purple-accent: #7BAAF7;
-  --color-purple-soft: #E8EAF6;
-  --color-purple-muted: #C5CAE9;
+  --color-purple-dark: #111111;
+  --color-purple-mid: #F47B20;
+  --color-purple-light: #FF9F43;
+  --color-purple-accent: #FFB84D;
+  --color-purple-soft: #FFF3E8;
+  --color-purple-muted: #FFE0C2;
   --color-offwhite: #F5F5F5;
   --color-cream: #EFEFEF;
   --color-card-white: #FFFFFF;
-  --color-text-primary: #1a1a2e;
-  --color-text-secondary: #3a3a5c;
-  --color-text-muted: #7a7a9a;
-  --color-gold-start: #3F72AF;
-  --color-gold-end: #5C9AE5;
+  --color-text-primary: #111111;
+  --color-text-secondary: #444444;
+  --color-text-muted: #888888;
+  --color-gold-start: #F47B20;
+  --color-gold-end: #FF9F43;
   --font-sans: var(--font-poppins), "Poppins", sans-serif;
   --font-serif: var(--font-poppins), "Poppins", sans-serif;
   --font-mono: var(--font-poppins), "Poppins", sans-serif;

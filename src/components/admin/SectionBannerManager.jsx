@@ -8,7 +8,7 @@ const SECTIONS = [
         key: 'most-loved',
         label: 'Most Loved Products Banner',
         description: 'Displayed above the "Most Loved Products" section on the homepage.',
-        fallbackGradient: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%)',
+        fallbackGradient: 'linear-gradient(135deg, #111111 0%, #1a1a1a 40%, #222222 100%)',
     },
     {
         key: 'new-arrivals',
@@ -20,7 +20,7 @@ const SECTIONS = [
         key: 'headphones',
         label: 'Headphones Banner',
         description: 'Displayed above the "Headphones" section on the homepage.',
-        fallbackGradient: 'linear-gradient(135deg, #0f3460 0%, #16213e 40%, #1a1a2e 100%)',
+        fallbackGradient: 'linear-gradient(135deg, #222222 0%, #1a1a1a 40%, #111111 100%)',
     },
 ]
 
@@ -185,9 +185,9 @@ function SectionBanner({ section, getToken }) {
 
                 {preview ? (
                     <div className="space-y-3">
-                        <div className="relative rounded-xl overflow-hidden border border-[#3F72AF]/40">
+                        <div className="relative rounded-xl overflow-hidden border border-[#F47B20]/40">
                             <img src={preview} alt="Preview" className="w-full h-24 min-[480px]:h-28 min-[640px]:h-32 object-cover" />
-                            <div className="absolute top-2 left-2 bg-[#3F72AF] text-white text-[10px] font-semibold px-2 py-0.5 rounded">
+                            <div className="absolute top-2 left-2 bg-[#F47B20] text-white text-[10px] font-semibold px-2 py-0.5 rounded">
                                 Preview
                             </div>
                         </div>
@@ -196,7 +196,7 @@ function SectionBanner({ section, getToken }) {
                             <button
                                 onClick={handleUpload}
                                 disabled={uploading}
-                                className="flex items-center gap-2 bg-[#3F72AF] hover:bg-[#2D5F8A] text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors disabled:opacity-60 flex-1 justify-center"
+                                className="flex items-center gap-2 bg-[#F47B20] hover:bg-[#C45A00] text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors disabled:opacity-60 flex-1 justify-center"
                             >
                                 {uploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
                                 {uploading ? 'Uploading...' : 'Upload Banner'}
@@ -211,9 +211,9 @@ function SectionBanner({ section, getToken }) {
                         </div>
                     </div>
                 ) : (
-                    <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-[#3F72AF] hover:bg-blue-50 transition-all group">
-                        <ImageIcon size={24} className="text-gray-300 group-hover:text-[#3F72AF] transition-colors mb-2" />
-                        <span className="text-xs font-medium text-gray-400 group-hover:text-[#3F72AF] transition-colors">
+                    <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-[#F47B20] hover:bg-orange-50 transition-all group">
+                        <ImageIcon size={24} className="text-gray-300 group-hover:text-[#F47B20] transition-colors mb-2" />
+                        <span className="text-xs font-medium text-gray-400 group-hover:text-[#F47B20] transition-colors">
                             Click to select image
                         </span>
                         <span className="text-[10px] text-gray-300 mt-0.5">Recommended: 1440×160px or wider. Max 100MB.</span>

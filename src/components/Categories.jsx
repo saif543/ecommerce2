@@ -87,8 +87,8 @@ export default function Categories() {
                       draggable={false}
                     />
                   ) : (
-                    <div className="w-full h-full rounded-full bg-gradient-to-br from-indigo-100 to-indigo-200 flex items-center justify-center">
-                      <span className="text-indigo-700 font-bold text-xl md:text-2xl select-none">
+                    <div className="w-full h-full rounded-full bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center">
+                      <span className="text-orange-700 font-bold text-xl md:text-2xl select-none">
                         {cat.name?.[0]?.toUpperCase()}
                       </span>
                     </div>

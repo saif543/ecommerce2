@@ -170,7 +170,7 @@ export default function TrendingPage() {
     <section className="max-w-[1440px] mx-auto px-2 min-[480px]:px-4 min-[640px]:px-5 min-[768px]:px-6 pt-4 min-[768px]:pt-6 pb-8">
       {/* Banner */}
       <div className="relative w-full h-20 min-[480px]:h-24 min-[640px]:h-28 min-[768px]:h-32 min-[1024px]:h-36 rounded-xl min-[480px]:rounded-2xl overflow-hidden mb-4 min-[768px]:mb-5"
-        style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%)" }}
+        style={{ background: "linear-gradient(135deg, #111111 0%, #1a1a1a 40%, #222222 100%)" }}
       />
 
       {/* Heading */}
@@ -202,7 +202,7 @@ export default function TrendingPage() {
                 <span className="text-base font-bold text-text-primary">Filter By</span>
                 <div className="flex items-center gap-3">
                   {hasActiveFilters && (
-                    <button onClick={resetAll} className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">Reset</button>
+                    <button onClick={resetAll} className="text-sm font-semibold text-orange-600 hover:text-orange-700 transition-colors">Reset</button>
                   )}
                   <button onClick={() => setMobileFilterOpen(false)} className="p-1 text-text-muted hover:text-text-primary transition-colors">
                     <X size={20} />
@@ -227,7 +227,7 @@ export default function TrendingPage() {
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
               <span className="text-base font-bold text-text-primary">Filter By</span>
               {hasActiveFilters && (
-                <button onClick={resetAll} className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">Reset</button>
+                <button onClick={resetAll} className="text-sm font-semibold text-orange-600 hover:text-orange-700 transition-colors">Reset</button>
               )}
             </div>
             <div className="px-4">{filterContent}</div>

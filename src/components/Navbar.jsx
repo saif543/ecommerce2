@@ -126,7 +126,7 @@ export default function Navbar() {
         text: 'You have been successfully logged out',
         timer: 1500,
         showConfirmButton: false,
-        confirmButtonColor: '#0f3460',
+        confirmButtonColor: '#222222',
       });
       router.push('/');
     } catch (error) {
@@ -135,7 +135,7 @@ export default function Navbar() {
         icon: 'error',
         title: 'Logout Failed',
         text: 'Failed to log out. Please try again.',
-        confirmButtonColor: '#0f3460',
+        confirmButtonColor: '#222222',
       });
     } finally {
       setSigningOut(false);
@@ -165,7 +165,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/">
             <motion.div whileHover={{ scale: 1.03 }} className="flex items-center gap-2.5 cursor-pointer">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#3F72AF] to-[#1a1a2e] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#F47B20] to-[#111111] flex items-center justify-center">
                 <span className="text-white font-bold text-xs">Z</span>
               </div>
               <AnimatedLogo className="text-xl" color={pathname === "/" ? "text-purple-mid" : "text-purple-dark"} />
@@ -294,7 +294,7 @@ export default function Navbar() {
                     {user.displayName || user.email?.split('@')[0]}
                   </span>
                   {userRole === 'admin' && (
-                    <span className="px-2 py-0.5 bg-[#FF6B35] text-white text-[10px] font-bold rounded-full">
+                    <span className="px-2 py-0.5 bg-[#F47B20] text-white text-[10px] font-bold rounded-full">
                       ADMIN
                     </span>
                   )}
@@ -316,7 +316,7 @@ export default function Navbar() {
                         {userRole === 'admin' && (
                           <Link
                             href="/admin"
-                            className="inline-block mt-2 px-2 py-1 bg-[#FF6B35] text-white text-[10px] font-bold rounded-full"
+                            className="inline-block mt-2 px-2 py-1 bg-[#F47B20] text-white text-[10px] font-bold rounded-full"
                           >
                             Admin Panel
                           </Link>
@@ -354,7 +354,7 @@ export default function Navbar() {
               </div>
             ) : (
               /* Login Button */
-              <Link href="/login" className="relative text-sm font-semibold px-4 py-1.5 rounded-full bg-[#1a1a2e] hover:bg-[#16213e] transition-all group shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-[#0f3460]/40">
+              <Link href="/login" className="relative text-sm font-semibold px-4 py-1.5 rounded-full bg-[#111111] hover:bg-[#1a1a1a] transition-all group shadow-[0_2px_8px_rgba(0,0,0,0.3)] border border-[#222222]/40">
                 <span className="text-white">
                   Login / Register
                 </span>
@@ -472,7 +472,7 @@ export default function Navbar() {
                   transition={{ duration: 0.15 }}
                 >
                   <Link href="/" className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#3F72AF] to-[#1a1a2e] flex items-center justify-center">
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#F47B20] to-[#111111] flex items-center justify-center">
                       <span className="text-white font-bold text-[10px]">Z</span>
                     </div>
                     <AnimatedLogo className="text-lg" color={pathname === "/" ? "text-purple-mid" : "text-purple-dark"} />
@@ -521,7 +521,7 @@ export default function Navbar() {
               {/* Sidebar header */}
               <div className="flex items-center justify-between px-4 py-4 border-b border-gray-100">
                 <Link href="/" className="flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#3F72AF] to-[#1a1a2e] flex items-center justify-center">
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#F47B20] to-[#111111] flex items-center justify-center">
                     <span className="text-white font-bold text-[10px]">Z</span>
                   </div>
                   <AnimatedLogo className="text-lg" color="text-purple-dark" />
@@ -552,7 +552,7 @@ export default function Navbar() {
                     <Link
                       href="/admin"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="inline-block mt-2 px-2 py-1 bg-[#FF6B35] text-white text-[10px] font-bold rounded-full"
+                      className="inline-block mt-2 px-2 py-1 bg-[#F47B20] text-white text-[10px] font-bold rounded-full"
                     >
                       Admin Panel
                     </Link>

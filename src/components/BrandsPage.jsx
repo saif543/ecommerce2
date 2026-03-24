@@ -84,9 +84,9 @@ export default function BrandsPage() {
   return (
     <section className="max-w-[1400px] mx-auto px-3 min-[480px]:px-4 min-[640px]:px-5 min-[768px]:px-6 py-6 min-[768px]:py-10">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl min-[480px]:rounded-3xl bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460] p-6 min-[480px]:p-8 min-[768px]:p-12 mb-8 min-[768px]:mb-12">
+      <div className="relative overflow-hidden rounded-2xl min-[480px]:rounded-3xl bg-gradient-to-br from-[#111111] via-[#1a1a1a] to-[#222222] p-6 min-[480px]:p-8 min-[768px]:p-12 mb-8 min-[768px]:mb-12">
         <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-orange-500/10 rounded-full blur-3xl" />
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-3">
             <Sparkles size={18} className="text-amber-400" />

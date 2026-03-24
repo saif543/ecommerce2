@@ -326,7 +326,7 @@ export default function ProductDetail({ product, relatedProducts = [] }) {
                 {/* Add to Cart */}
                 <button
                   onClick={() => addToCart(productId, qty)}
-                  className="w-full relative overflow-hidden bg-gradient-to-b from-[#16213e] via-[#1a1a2e] to-[#0f3460] hover:from-[#1e2d4f] hover:via-[#1a1a2e] hover:to-[#0f3460] h-12 rounded-xl text-sm tracking-wider uppercase font-bold flex items-center justify-center gap-2.5 transition-all active:translate-y-[1px] shadow-[0_2px_8px_rgba(15,52,96,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] border border-[rgba(15,52,96,0.3)]"
+                  className="w-full relative overflow-hidden bg-gradient-to-b from-[#1a1a1a] via-[#111111] to-[#222222] hover:from-[#1e2d4f] hover:via-[#111111] hover:to-[#222222] h-12 rounded-xl text-sm tracking-wider uppercase font-bold flex items-center justify-center gap-2.5 transition-all active:translate-y-[1px] shadow-[0_2px_8px_rgba(15,52,96,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] border border-[rgba(15,52,96,0.3)]"
                 >
                   <span className="absolute inset-x-0 top-0 h-[45%] bg-gradient-to-b from-white/10 to-transparent rounded-t pointer-events-none" />
                   <ShoppingCart size={16} className="relative text-white" />
@@ -500,7 +500,7 @@ export default function ProductDetail({ product, relatedProducts = [] }) {
         </div>
         <button
           onClick={() => addToCart(productId, qty)}
-          className="relative overflow-hidden bg-gradient-to-b from-[#16213e] via-[#1a1a2e] to-[#0f3460] text-sm font-bold px-5 py-3 rounded-xl transition-all flex items-center gap-2 flex-shrink-0 shadow-[0_2px_6px_rgba(15,52,96,0.3)] border border-[rgba(15,52,96,0.3)]"
+          className="relative overflow-hidden bg-gradient-to-b from-[#1a1a1a] via-[#111111] to-[#222222] text-sm font-bold px-5 py-3 rounded-xl transition-all flex items-center gap-2 flex-shrink-0 shadow-[0_2px_6px_rgba(15,52,96,0.3)] border border-[rgba(15,52,96,0.3)]"
         >
           <span className="absolute inset-x-0 top-0 h-[45%] bg-gradient-to-b from-white/10 to-transparent rounded-t pointer-events-none" />
           <ShoppingCart size={15} className="relative text-white" />

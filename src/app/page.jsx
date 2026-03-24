@@ -1,7 +1,9 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import TrustBadges from "@/components/TrustBadges";
+import VideoSection from "@/components/VideoSection";
 import Categories from "@/components/Categories";
+import BrandShowcase from "@/components/BrandShowcase";
 import Products from "@/components/Products";
 import Footer from "@/components/Footer";
 
@@ -11,13 +13,14 @@ export default function Home() {
       <Navbar />
       <Hero />
       <Categories />
+      <BrandShowcase />
       <Products
         title="Most Loved Products"
         subtitle="Discover our top picks for a premium lifestyle"
         apiUrl="/api/product?isLovedProduct=true&limit=8"
         bg="bg-white"
         section="most-loved"
-        bannerGradient="linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%)"
+        bannerGradient="linear-gradient(135deg, #111111 0%, #1a1a1a 40%, #222222 100%)"
         seeAllLink="/products"
       />
       <Products
@@ -26,7 +29,7 @@ export default function Home() {
         apiUrl="/api/product?isNewArrival=true&limit=8"
         bg="bg-offwhite"
         section="new-arrivals"
-        bannerGradient="linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%)"
+        bannerGradient="linear-gradient(135deg, #111111 0%, #1a1a1a 40%, #222222 100%)"
         seeAllLink="/products"
       />
       <Products
@@ -35,9 +38,10 @@ export default function Home() {
         apiUrl="/api/product?category=Headphones&limit=8"
         bg="bg-white"
         section="headphones"
-        bannerGradient="linear-gradient(135deg, #0f3460 0%, #16213e 40%, #1a1a2e 100%)"
+        bannerGradient="linear-gradient(135deg, #222222 0%, #1a1a1a 40%, #111111 100%)"
         seeAllLink="/products?category=Headphones"
       />
+      <VideoSection />
       <TrustBadges />
       <Footer />
     </div>

@@ -59,7 +59,7 @@ const team = [
     name: "Tanvir Hossain",
     role: "Head of Operations",
     initials: "TH",
-    color: "bg-blue-50 text-blue-700",
+    color: "bg-orange-50 text-orange-700",
     bio: "Ensures every order is picked, packed, and delivered with care and speed.",
   },
   {
