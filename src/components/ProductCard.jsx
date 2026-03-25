@@ -31,11 +31,11 @@ export default function ProductCard({ product, index = 0 }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.35, delay: index * 0.04 }}
-      className="bg-card-white rounded-xl overflow-hidden group shadow-[0_4px_16px_rgba(0,0,0,0.15),0_0px_20px_rgba(255,255,255,0.08)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.25),0_0_24px_rgba(242,110,33,0.2)] hover:-translate-y-1 transition-all duration-300 flex flex-col h-full"
+      className="bg-white rounded-xl overflow-hidden group shadow-[0_4px_16px_rgba(0,0,0,0.15),0_0px_20px_rgba(255,255,255,0.08)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.25),0_0_24px_rgba(242,110,33,0.2)] hover:-translate-y-1 transition-all duration-300 flex flex-col h-full"
     >
       <Link href={`/product/${productId}`} className="flex-1 flex flex-col">
         {/* Image */}
-        <div className="relative aspect-square bg-offwhite overflow-hidden">
+        <div className="relative aspect-square bg-gray-50 overflow-hidden">
           {savedAmount > 0 && (
             <span className="absolute top-2 left-2 bg-[#ff5500] text-white text-[9px] font-bold px-1.5 py-0.5 rounded z-10">
               -{Math.round((savedAmount / regularPrice) * 100)}%
@@ -53,7 +53,7 @@ export default function ProductCard({ product, index = 0 }) {
         {/* Info */}
         <div className="p-2.5 min-[480px]:p-3 flex-1 flex flex-col">
           {/* Name */}
-          <h3 className="text-xs min-[480px]:text-[13px] font-medium text-text-primary leading-snug line-clamp-2 mb-1.5">
+          <h3 className="text-xs min-[480px]:text-[13px] font-medium text-gray-900 leading-snug line-clamp-2 mb-1.5">
             {product.name}
           </h3>
 
@@ -64,7 +64,7 @@ export default function ProductCard({ product, index = 0 }) {
                 Tk {formatPrice(salePrice)}
               </span>
               {savedAmount > 0 && (
-                <span className="text-[8px] min-[360px]:text-[10px] min-[480px]:text-xs text-text-muted line-through whitespace-nowrap truncate">
+                <span className="text-[8px] min-[360px]:text-[10px] min-[480px]:text-xs text-gray-400 line-through whitespace-nowrap truncate">
                   Tk {formatPrice(regularPrice)}
                 </span>
               )}
