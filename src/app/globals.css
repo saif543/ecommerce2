@@ -30,6 +30,12 @@ body {
   background: var(--color-offwhite);
   color: var(--color-text-primary);
   font-family: var(--font-poppins), "Poppins", sans-serif;
+  overflow-x: hidden;
+}
+
+html {
+  overflow-x: hidden;
+  scroll-behavior: smooth;
 }
 
 input,
@@ -39,10 +45,7 @@ button {
   font-family: var(--font-poppins), "Poppins", sans-serif;
 }
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
+/* Smooth scrolling — merged into html block above */
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {

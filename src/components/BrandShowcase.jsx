@@ -190,10 +190,10 @@ export default function BrandShowcase() {
 
           {/* Centered brand list with arrows */}
           <div className="flex-1 flex items-center justify-center gap-2 min-[480px]:gap-3">
-            {/* Left Arrow */}
+            {/* Left Arrow — hidden on mobile */}
             <button
               onClick={() => scrollBrands(-1)}
-              className="flex-shrink-0 w-8 h-8 min-[768px]:w-9 min-[768px]:h-9 rounded-full border border-white/20 flex items-center justify-center text-white/70 hover:border-[#f26e21] hover:text-[#f26e21] transition-colors bg-white/5"
+              className="hidden min-[640px]:flex flex-shrink-0 w-8 h-8 min-[768px]:w-9 min-[768px]:h-9 rounded-full border border-white/20 items-center justify-center text-white/70 hover:border-[#f26e21] hover:text-[#f26e21] transition-colors bg-white/5"
             >
               <ChevronLeft size={18} />
             </button>
@@ -249,10 +249,10 @@ export default function BrandShowcase() {
               })}
             </div>
 
-            {/* Right Arrow */}
+            {/* Right Arrow — hidden on mobile */}
             <button
               onClick={() => scrollBrands(1)}
-              className="flex-shrink-0 w-8 h-8 min-[768px]:w-9 min-[768px]:h-9 rounded-full border border-white/20 flex items-center justify-center text-white/70 hover:border-[#f26e21] hover:text-[#f26e21] transition-colors bg-white/5"
+              className="hidden min-[640px]:flex flex-shrink-0 w-8 h-8 min-[768px]:w-9 min-[768px]:h-9 rounded-full border border-white/20 items-center justify-center text-white/70 hover:border-[#f26e21] hover:text-[#f26e21] transition-colors bg-white/5"
             >
               <ChevronRight size={18} />
             </button>
@@ -289,10 +289,10 @@ export default function BrandShowcase() {
               </div>
             ) : (
               <div className="relative group">
-                {/* Left Arrow */}
+                {/* Left Arrow — hidden on mobile */}
                 <button
                   onClick={() => scrollProducts(-1)}
-                  className="absolute left-0 top-[40%] -translate-y-1/2 z-10 w-9 h-9 min-[768px]:w-10 min-[768px]:h-10 bg-[#111111] border border-white/20 rounded-full flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity hover:shadow-lg hover:border-[#f26e21] text-white"
+                  className="hidden min-[640px]:flex absolute left-0 top-[40%] -translate-y-1/2 z-10 w-9 h-9 min-[768px]:w-10 min-[768px]:h-10 bg-[#111111] border border-white/20 rounded-full items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity hover:shadow-lg hover:border-[#f26e21] text-white"
                 >
                   <ChevronLeft size={18} className="text-text-primary" />
                 </button>
@@ -310,10 +310,10 @@ export default function BrandShowcase() {
                   ))}
                 </div>
 
-                {/* Right Arrow */}
+                {/* Right Arrow — hidden on mobile */}
                 <button
                   onClick={() => scrollProducts(1)}
-                  className="absolute right-0 top-[40%] -translate-y-1/2 z-10 w-9 h-9 min-[768px]:w-10 min-[768px]:h-10 bg-[#111111] border border-white/20 rounded-full flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity hover:shadow-lg hover:border-[#f26e21] text-white"
+                  className="hidden min-[640px]:flex absolute right-0 top-[40%] -translate-y-1/2 z-10 w-9 h-9 min-[768px]:w-10 min-[768px]:h-10 bg-[#111111] border border-white/20 rounded-full items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity hover:shadow-lg hover:border-[#f26e21] text-white"
                 >
                   <ChevronRight size={18} className="text-text-primary" />
                 </button>
