@@ -292,9 +292,9 @@ export default function BrandShowcase() {
                 {/* Left Arrow — hidden on mobile */}
                 <button
                   onClick={() => scrollProducts(-1)}
-                  className="hidden min-[640px]:flex absolute left-0 top-[40%] -translate-y-1/2 z-10 w-9 h-9 min-[768px]:w-10 min-[768px]:h-10 bg-[#111111] border border-white/20 rounded-full items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity hover:shadow-lg hover:border-[#f26e21] text-white"
+                  className="hidden min-[640px]:flex absolute left-0 top-[40%] -translate-y-1/2 z-10 w-9 h-9 min-[768px]:w-10 min-[768px]:h-10 bg-black/50 border border-white/20 rounded-full items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity hover:shadow-lg hover:border-[#f26e21] backdrop-blur-sm"
                 >
-                  <ChevronLeft size={18} className="text-text-primary" />
+                  <ChevronLeft size={18} className="text-[#f26e21]" />
                 </button>
 
                 <div
@@ -313,9 +313,9 @@ export default function BrandShowcase() {
                 {/* Right Arrow — hidden on mobile */}
                 <button
                   onClick={() => scrollProducts(1)}
-                  className="hidden min-[640px]:flex absolute right-0 top-[40%] -translate-y-1/2 z-10 w-9 h-9 min-[768px]:w-10 min-[768px]:h-10 bg-[#111111] border border-white/20 rounded-full items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity hover:shadow-lg hover:border-[#f26e21] text-white"
+                  className="hidden min-[640px]:flex absolute right-0 top-[40%] -translate-y-1/2 z-10 w-9 h-9 min-[768px]:w-10 min-[768px]:h-10 bg-black/50 border border-white/20 rounded-full items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity hover:shadow-lg hover:border-[#f26e21] backdrop-blur-sm"
                 >
-                  <ChevronRight size={18} className="text-text-primary" />
+                  <ChevronRight size={18} className="text-[#f26e21]" />
                 </button>
               </div>
             )}
