@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Package, Search, ArrowRight, Sparkles } from "lucide-react";
+import { Package, Search, ArrowRight } from "lucide-react";
 import { sampleProducts, sampleHeadphones, sampleBrandProducts } from "@/data/sampleProducts";
 
 const allSampleProducts = [...sampleProducts, ...sampleHeadphones, ...sampleBrandProducts];
@@ -83,22 +83,22 @@ export default function BrandsPage() {
 
   return (
     <section className="max-w-[1400px] mx-auto px-3 min-[480px]:px-4 min-[640px]:px-5 min-[768px]:px-6 py-6 min-[768px]:py-10">
-      {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl min-[480px]:rounded-3xl bg-gradient-to-br from-[#111111] via-[#1a1a1a] to-[#222222] p-6 min-[480px]:p-8 min-[768px]:p-12 mb-8 min-[768px]:mb-12">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-orange-500/10 rounded-full blur-3xl" />
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-3">
-            <Sparkles size={18} className="text-amber-400" />
-            <span className="text-amber-400 text-xs font-bold uppercase tracking-widest">Discover</span>
-          </div>
-          <h1 className="text-2xl min-[480px]:text-3xl min-[768px]:text-4xl lg:text-5xl font-bold text-white mb-2 min-[768px]:mb-3">
-            Our Brands
-          </h1>
-          <p className="text-gray-400 text-sm min-[768px]:text-base max-w-lg">
-            Shop from the world's most trusted brands, all in one place
-          </p>
-        </div>
+      {/* Hero Banner */}
+      <div className="relative overflow-hidden rounded-2xl min-[480px]:rounded-3xl h-24 min-[480px]:h-28 min-[768px]:h-36 min-[1024px]:h-40 mb-6 min-[768px]:mb-8"
+        style={{ background: "linear-gradient(135deg, #111111 0%, #1a1a1a 50%, #222222 100%)" }}
+      >
+        <div className="absolute top-0 right-0 w-64 h-64 bg-[#f26e21]/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#f26e21]/5 rounded-full blur-3xl" />
+      </div>
+
+      {/* Heading */}
+      <div className="mb-6 min-[768px]:mb-8">
+        <h1 className="text-xl min-[480px]:text-2xl min-[768px]:text-3xl font-bold text-gray-900 mb-1">
+          Our Brands
+        </h1>
+        <p className="text-gray-400 text-sm min-[768px]:text-base">
+          Shop from the world's most trusted brands, all in one place
+        </p>
       </div>
 
       {/* Search */}

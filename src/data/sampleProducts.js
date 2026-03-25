@@ -39,7 +39,45 @@ export const sampleProducts = [
     isLovedProduct: true,
     isTrending: true,
     createdAt: "2026-03-19T00:00:00Z",
-    specifications: { "Display": "AMOLED Always-On Retina", "Chip": "S9 SiP", "Storage": "64GB", "Water Resistance": "WR50", "Battery": "18 Hours" },
+    specifications: {
+      "Display": {
+        "Type": "Always-On Retina LTPO OLED",
+        "Size": "45mm / 41mm",
+        "Resolution": "484 × 396 pixels",
+        "Brightness": "2000 nits (peak outdoors)"
+      },
+      "Performance": {
+        "Chip": "Apple S9 SiP dual-core",
+        "Storage": "64 GB",
+        "RAM": "1 GB"
+      },
+      "Health & Sensors": {
+        "Heart Rate": "Optical heart rate sensor (continuous)",
+        "Blood Oxygen": "Blood Oxygen app (SpO2)",
+        "ECG": "ECG app (electrical heart sensor)",
+        "Temperature": "Wrist temperature sensor",
+        "Accelerometer": "High-g 3-axis accelerometer",
+        "Gyroscope": "Always-on altimeter"
+      },
+      "Connectivity": {
+        "GPS": "L1 + L5 dual-frequency GPS",
+        "Cellular": "LTE & UMTS (optional)",
+        "Bluetooth": "Bluetooth 5.3",
+        "Wi-Fi": "Wi-Fi 802.11b/g/n 2.4 & 5 GHz",
+        "NFC": "Yes (Apple Pay)"
+      },
+      "Battery": {
+        "Life": "Up to 18 hours",
+        "Low Power Mode": "Up to 60 hours",
+        "Charging": "Magnetic Fast Charging USB-C"
+      },
+      "Build": {
+        "Case Material": "Aluminium / Stainless Steel",
+        "Glass": "Ion-X front glass",
+        "Water Resistance": "WR50 (50 metres)",
+        "Weight": "51.5 g (45mm aluminium)"
+      }
+    },
     features: ["Blood Oxygen Monitoring", "ECG App", "Crash Detection", "Double Tap Gesture", "Precision Finding"],
     descriptions: [
       { id: "d1", title: "Your Health, Elevated", body: "Apple Watch Series 9 puts powerful health insights on your wrist. Monitor blood oxygen levels, take an ECG anytime, and track your sleep patterns — all from a device that never leaves your side.\n\nThe new temperature sensing helps with cycle tracking and provides deeper insights into your overall wellness." },

@@ -159,7 +159,8 @@ export default function Navbar() {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="hidden md:block bg-[#111111] border-b border-[#222222] sticky top-0 z-50"
+        className="hidden md:block border-b border-[#f26e21]/15 sticky top-0 z-50"
+        style={{ background: "linear-gradient(180deg, #1a1410 0%, #111111 40%, #0d0d0d 100%)", boxShadow: "0 2px 12px rgba(242,110,33,0.12), inset 0 1px 0 rgba(242,110,33,0.08)" }}
       >
         <div className="max-w-[1440px] mx-auto flex items-center justify-between px-6 py-4">
           {/* Logo */}
@@ -422,7 +423,7 @@ export default function Navbar() {
       {/* ═══════════════════════════════════════════
           MOBILE TOP BAR (below md)
          ═══════════════════════════════════════════ */}
-      <div className="md:hidden bg-[#111111] border-b border-[#222222] sticky top-0 z-50">
+      <div className="md:hidden border-b border-[#f26e21]/15 sticky top-0 z-50" style={{ background: "linear-gradient(180deg, #1a1410 0%, #111111 40%, #0d0d0d 100%)", boxShadow: "0 2px 12px rgba(242,110,33,0.12), inset 0 1px 0 rgba(242,110,33,0.08)" }}>
         <div className="flex items-center px-4 py-3 gap-3">
           {/* Hamburger — always visible */}
           <button
@@ -676,7 +677,7 @@ export default function Navbar() {
       {/* ═══════════════════════════════════════════
           MOBILE BOTTOM BAR (fixed)
          ═══════════════════════════════════════════ */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#111111] border-t border-[#222222] z-50">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 border-t border-[#f26e21]/15 z-50" style={{ background: "linear-gradient(0deg, #1a1410 0%, #111111 40%, #0d0d0d 100%)", boxShadow: "0 -2px 12px rgba(242,110,33,0.12), inset 0 -1px 0 rgba(242,110,33,0.08)" }}>
         <div className="flex items-center justify-around py-2">
           {bottomBarItems.map((item) => {
             const Icon = item.icon;

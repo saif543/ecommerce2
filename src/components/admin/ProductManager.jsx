@@ -81,33 +81,47 @@ export default function ProductManager({ getToken }) {
     // Features helpers
     const [newFeature, setNewFeature] = useState('')
 
-    // Specifications helpers — flat array of { key, value } pairs (no sections)
-    const [specPairs, setSpecPairs] = useState([{ key: '', value: '' }])
+    // Specifications helpers — array of sections, each with { section, pairs: [{ key, value }] }
+    const [specSections, setSpecSections] = useState([{ section: '', pairs: [{ key: '', value: '' }] }])
 
     // Custom fields helpers
     const [customFieldKey, setCustomFieldKey] = useState('')
     const [customFieldValue, setCustomFieldValue] = useState('')
 
-    // Build flat specifications object for API: { "Brand": "Samsung", "Model": "Galaxy" }
-    const buildSpecificationsObject = (pairs) => {
+    // Build nested specifications object for API: { "Display": { "Size": "6.3 inch" }, "Processor": { "Chipset": "A19" } }
+    const buildSpecificationsObject = (sections) => {
         const result = {}
-        for (const pair of pairs) {
-            if (pair.key && pair.key.trim()) result[pair.key.trim()] = pair.value
+        for (const sec of sections) {
+            const sectionName = (sec.section || '').trim()
+            if (!sectionName) continue
+            const obj = {}
+            for (const pair of sec.pairs) {
+                if (pair.key && pair.key.trim()) obj[pair.key.trim()] = pair.value
+            }
+            if (Object.keys(obj).length > 0) result[sectionName] = obj
         }
         return result
     }
 
-    // Parse DB spec object → flat pairs array for editing
-    const parseSpecPairs = (specs) => {
-        if (!specs || typeof specs !== 'object') return [{ key: '', value: '' }]
-        const entries = Object.entries(specs).flatMap(([k, v]) => {
+    // Parse DB spec object → sections array for editing
+    const parseSpecSections = (specs) => {
+        if (!specs || typeof specs !== 'object') return [{ section: '', pairs: [{ key: '', value: '' }] }]
+        const sections = []
+        Object.entries(specs).forEach(([k, v]) => {
             if (typeof v === 'object' && !Array.isArray(v)) {
-                // Flatten nested section objects into flat pairs
-                return Object.entries(v).map(([sk, sv]) => ({ key: sk, value: String(sv) }))
+                const pairs = Object.entries(v).map(([sk, sv]) => ({ key: sk, value: String(sv) }))
+                sections.push({ section: k, pairs: pairs.length > 0 ? pairs : [{ key: '', value: '' }] })
+            } else {
+                // Legacy flat spec — put under "General" section
+                const existing = sections.find(s => s.section === 'General')
+                if (existing) {
+                    existing.pairs.push({ key: k, value: String(v) })
+                } else {
+                    sections.push({ section: 'General', pairs: [{ key: k, value: String(v) }] })
+                }
             }
-            return [{ key: k, value: String(v) }]
         })
-        return entries.length > 0 ? entries : [{ key: '', value: '' }]
+        return sections.length > 0 ? sections : [{ section: '', pairs: [{ key: '', value: '' }] }]
     }
 
     const [imageFiles, setImageFiles] = useState([])
@@ -233,7 +247,7 @@ export default function ProductManager({ getToken }) {
         setDescSections([])
         setImageFiles([])
         setImagePreviews([])
-        setSpecPairs([{ key: '', value: '' }])
+        setSpecSections([{ section: '', pairs: [{ key: '', value: '' }] }])
         setNewFeature('')
         setNewCategoryName('')
         setNewSubcategoryName('')
@@ -248,7 +262,7 @@ export default function ProductManager({ getToken }) {
         // Always fetch fresh categories and brands from DB before opening
         await Promise.all([fetchCategories(), fetchBrands()])
         setEditingProduct(product)
-        const parsedSpecs = parseSpecPairs(product.specifications)
+        const parsedSpecs = parseSpecSections(product.specifications)
         setFormData({
             name: product.name || '',
             slug: product.slug || '',
@@ -281,7 +295,7 @@ export default function ProductManager({ getToken }) {
         // Populate description sections from saved product
         const savedDesc = Array.isArray(product.descriptions) ? product.descriptions : []
         setDescSections(savedDesc.map(s => ({ ...s, _localFile: null, _localPreview: null })))
-        setSpecPairs(parsedSpecs)
+        setSpecSections(parsedSpecs)
         setNewFeature('')
         setNewCategoryName('')
         setNewSubcategoryName('')
@@ -389,7 +403,7 @@ export default function ProductManager({ getToken }) {
             }
 
             // Build flat spec object from flat pairs (no sections)
-            const builtSpecs = buildSpecificationsObject(specPairs)
+            const builtSpecs = buildSpecificationsObject(specSections)
 
             const stockQty = parseInt(formData.inventory.totalStock, 10) || 0
             // Determine stock status from quantity
@@ -1497,49 +1511,70 @@ export default function ProductManager({ getToken }) {
                                         <label className="block text-sm font-semibold text-gray-700 mb-1">Specifications</label>
                                         <p className="text-xs text-gray-400 mb-3">Left column = Heading (e.g. Brand, Display), Right column = Value (e.g. Samsung, 6.9 inches)</p>
                                         <div className="border border-gray-200 rounded-lg overflow-hidden">
-                                            <table className="w-full text-sm">
-                                                <thead className="bg-gray-50">
-                                                    <tr>
-                                                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 w-2/5">Heading</th>
-                                                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500">Value</th>
-                                                        <th className="w-10"></th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {specPairs.map((pair, idx) => (
-                                                        <tr key={idx} className="border-t border-gray-100">
-                                                            <td className="px-2 py-1.5">
-                                                                <input
-                                                                    type="text"
-                                                                    value={pair.key}
-                                                                    onChange={(e) => { const p = [...specPairs]; p[idx] = { ...p[idx], key: e.target.value }; setSpecPairs(p) }}
-                                                                    className="w-full px-3 py-1.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#f26e21]"
-                                                                    placeholder="e.g. Brand"
-                                                                />
-                                                            </td>
-                                                            <td className="px-2 py-1.5">
-                                                                <input
-                                                                    type="text"
-                                                                    value={pair.value}
-                                                                    onChange={(e) => { const p = [...specPairs]; p[idx] = { ...p[idx], value: e.target.value }; setSpecPairs(p) }}
-                                                                    className="w-full px-3 py-1.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#f26e21]"
-                                                                    placeholder="e.g. Samsung"
-                                                                />
-                                                            </td>
-                                                            <td className="px-2 py-1.5 text-center">
-                                                                {specPairs.length > 1 && (
-                                                                    <button type="button" onClick={() => { const p = [...specPairs]; p.splice(idx, 1); setSpecPairs(p) }}
-                                                                        className="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors">✕</button>
-                                                                )}
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
+                                            {specSections.map((sec, sIdx) => (
+                                                <div key={sIdx} className="mb-4 border border-gray-200 rounded-lg overflow-hidden">
+                                                    {/* Section header */}
+                                                    <div className="flex items-center gap-2 bg-orange-50 px-3 py-2 border-b border-orange-100">
+                                                        <input
+                                                            type="text"
+                                                            value={sec.section}
+                                                            onChange={(e) => { const s = [...specSections]; s[sIdx] = { ...s[sIdx], section: e.target.value }; setSpecSections(s) }}
+                                                            className="flex-1 px-3 py-1.5 border border-orange-200 rounded-md text-sm font-semibold text-[#f26e21] bg-white focus:outline-none focus:ring-1 focus:ring-[#f26e21]"
+                                                            placeholder="Section name (e.g. Display, Processor)"
+                                                        />
+                                                        {specSections.length > 1 && (
+                                                            <button type="button" onClick={() => { const s = [...specSections]; s.splice(sIdx, 1); setSpecSections(s) }}
+                                                                className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors text-xs font-bold">✕</button>
+                                                        )}
+                                                    </div>
+                                                    {/* Key-value rows */}
+                                                    <table className="w-full text-sm">
+                                                        <thead className="bg-gray-50">
+                                                            <tr>
+                                                                <th className="px-4 py-1.5 text-left text-xs font-semibold text-gray-500 w-2/5">Key</th>
+                                                                <th className="px-4 py-1.5 text-left text-xs font-semibold text-gray-500">Value</th>
+                                                                <th className="w-10"></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {sec.pairs.map((pair, pIdx) => (
+                                                                <tr key={pIdx} className="border-t border-gray-100">
+                                                                    <td className="px-2 py-1.5">
+                                                                        <input
+                                                                            type="text"
+                                                                            value={pair.key}
+                                                                            onChange={(e) => { const s = [...specSections]; s[sIdx].pairs[pIdx] = { ...pair, key: e.target.value }; setSpecSections(s) }}
+                                                                            className="w-full px-3 py-1.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#f26e21]"
+                                                                            placeholder="e.g. Size"
+                                                                        />
+                                                                    </td>
+                                                                    <td className="px-2 py-1.5">
+                                                                        <input
+                                                                            type="text"
+                                                                            value={pair.value}
+                                                                            onChange={(e) => { const s = [...specSections]; s[sIdx].pairs[pIdx] = { ...pair, value: e.target.value }; setSpecSections(s) }}
+                                                                            className="w-full px-3 py-1.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#f26e21]"
+                                                                            placeholder="e.g. 6.3-inch"
+                                                                        />
+                                                                    </td>
+                                                                    <td className="px-2 py-1.5 text-center">
+                                                                        {sec.pairs.length > 1 && (
+                                                                            <button type="button" onClick={() => { const s = [...specSections]; s[sIdx].pairs.splice(pIdx, 1); setSpecSections(s) }}
+                                                                                className="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors">✕</button>
+                                                                        )}
+                                                                    </td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                    <button type="button" onClick={() => { const s = [...specSections]; s[sIdx].pairs.push({ key: '', value: '' }); setSpecSections(s) }}
+                                                        className="m-2 text-xs text-[#f26e21] hover:underline">+ Add Row</button>
+                                                </div>
+                                            ))}
                                         </div>
-                                        <button type="button" onClick={() => setSpecPairs([...specPairs, { key: '', value: '' }])}
+                                        <button type="button" onClick={() => setSpecSections([...specSections, { section: '', pairs: [{ key: '', value: '' }] }])}
                                             className="mt-2 text-sm text-[#f26e21] hover:underline flex items-center gap-1">
-                                            + Add Row
+                                            + Add Section
                                         </button>
                                     </div>
 

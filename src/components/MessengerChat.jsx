@@ -108,49 +108,12 @@ export default function MessengerChat() {
         onClick={() => setOpen((v) => !v)}
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
-        className="relative w-14 h-14 rounded-full flex items-center justify-center shadow-[0_4px_20px_rgba(242,110,33,0.4)] hover:shadow-[0_4px_28px_rgba(242,110,33,0.55)] transition-all overflow-hidden"
-        style={{ background: "linear-gradient(135deg, #f26e21 0%, #ff8c42 50%, #f26e21 100%)" }}
+        className="relative w-14 h-14 rounded-full flex items-center justify-center shadow-[0_4px_20px_rgba(0,0,0,0.25)] hover:shadow-[0_4px_28px_rgba(0,0,0,0.35)] transition-all overflow-hidden bg-white border-2 border-[#f26e21]/30"
       >
-        {/* Glossy highlight */}
-        <span className="absolute inset-x-0 top-0 h-[45%] bg-gradient-to-b from-white/25 to-transparent rounded-t-full pointer-events-none" />
-
         {open ? (
-          <X size={24} className="text-white relative" />
+          <X size={24} className="text-[#f26e21]" />
         ) : (
-          <svg viewBox="0 0 48 48" className="relative w-8 h-8" fill="none">
-            {/* Head — larger, more adult proportion */}
-            <circle cx="24" cy="15" r="8" fill="#F0C8A0" />
-            {/* Hair — styled, mature */}
-            <path d="M16 13c0-6 3.5-8.5 8-8.5s8 2.5 8 8.5c0 0-2-4-8-4s-8 4-8 4z" fill="#1a1a1a" />
-            {/* Eyebrows */}
-            <path d="M20 11.5h3" stroke="#333" strokeWidth="0.8" strokeLinecap="round" />
-            <path d="M25 11.5h3" stroke="#333" strokeWidth="0.8" strokeLinecap="round" />
-            {/* Eyes */}
-            <circle cx="21.5" cy="14" r="1" fill="#222" />
-            <circle cx="26.5" cy="14" r="1" fill="#222" />
-            {/* Nose */}
-            <path d="M24 15.5v1.5" stroke="#D4A574" strokeWidth="0.7" strokeLinecap="round" />
-            {/* Smile */}
-            <path d="M22 18.5c0 0 1 1.2 2 1.2s2-1.2 2-1.2" stroke="#C4886E" strokeWidth="0.8" strokeLinecap="round" />
-            {/* Neck */}
-            <rect x="22" y="22.5" width="4" height="3" rx="1" fill="#F0C8A0" />
-            {/* Body — suit with collar */}
-            <path d="M12 46c0-9 5.5-20 12-20s12 11 12 20" fill="#111111" />
-            {/* Collar / tie */}
-            <path d="M22 26l2 4 2-4" fill="#f26e21" />
-            <path d="M24 30v6" stroke="#f26e21" strokeWidth="1.2" />
-            {/* Suit lapels */}
-            <path d="M20 26c-2 2-4 6-4 10" stroke="#222" strokeWidth="0.6" />
-            <path d="M28 26c2 2 4 6 4 10" stroke="#222" strokeWidth="0.6" />
-            {/* Headset band */}
-            <path d="M15.5 13a8.5 8.5 0 0 1 17 0" stroke="white" strokeWidth="2" strokeLinecap="round" />
-            {/* Ear cups */}
-            <rect x="12.5" y="12" width="4" height="6" rx="2" fill="white" />
-            <rect x="31.5" y="12" width="4" height="6" rx="2" fill="white" />
-            {/* Mic arm */}
-            <path d="M14.5 18c-1.5 0.5-2 2-2 3" stroke="white" strokeWidth="1.3" strokeLinecap="round" />
-            <circle cx="12.5" cy="21.5" r="1.8" fill="white" />
-          </svg>
+          <img src="/customer-service.png" alt="Support" className="w-10 h-10 object-contain" />
         )}
       </motion.button>
 
