@@ -88,6 +88,8 @@ export default function BrandShowcase() {
         if (b.length > 0) {
           setBrands(b);
           setActiveBrand(b[0]);
+        } else {
+          throw new Error("empty");
         }
       })
       .catch(() => {
