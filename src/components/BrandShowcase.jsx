@@ -302,7 +302,7 @@ export default function BrandShowcase() {
                 >
                   <style jsx>{`div::-webkit-scrollbar { display: none; }`}</style>
                   {products.map((product, i) => (
-                    <div key={String(product._id || product.id)} className="flex-shrink-0 w-[160px] min-[480px]:w-[185px] min-[768px]:w-[220px] min-[1024px]:w-[240px]">
+                    <div key={String(product._id || product.id)} className="flex-shrink-0 w-[160px] min-[480px]:w-[185px] min-[768px]:w-[220px] min-[1024px]:w-[240px] self-stretch">
                       <ProductCard product={product} index={i} />
                     </div>
                   ))}

@@ -96,7 +96,7 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative w-full overflow-hidden select-none lg:max-h-[400px]" style={{ aspectRatio: '21/7', minHeight: '220px', maxHeight: '520px' }}>
+    <section className="relative w-full overflow-hidden select-none lg:max-h-[340px]" style={{ aspectRatio: '21/6', minHeight: '180px', maxHeight: '400px' }}>
       {/* Background Images */}
       <AnimatePresence initial={false} custom={direction} mode="popLayout">
         <motion.div
