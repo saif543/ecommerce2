@@ -1,73 +1,45 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import ProductCard from "./ProductCard";
 import { sampleBrandProducts } from "@/data/sampleProducts";
 
 function toSlug(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-/* Hook: click-drag scroll for desktop + native touch on mobile */
-function useDragScroll() {
-  const ref = useRef(null);
-  const dragState = useRef({ isDown: false, startX: 0, scrollLeft: 0, dragged: false });
+function formatPrice(n) {
+  return Math.round(n).toLocaleString("en-IN");
+}
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+// Brand logo via Google favicon
+const brandDomains = {
+  Samsung: "samsung.com",
+  Apple: "apple.com",
+  Nike: "nike.com",
+  Adidas: "adidas.com",
+  Puma: "puma.com",
+  Sony: "sony.com",
+  JBL: "jbl.com",
+  Bose: "bose.com",
+  Xiaomi: "mi.com",
+  OnePlus: "oneplus.com",
+  Realme: "realme.com",
+  Boat: "boat-lifestyle.com",
+  Oppo: "oppo.com",
+  Vivo: "vivo.com",
+  Tecno: "tecno-mobile.com",
+  Infinix: "infinixmobility.com",
+  Honor: "hihonor.com",
+};
 
-    const onMouseDown = (e) => {
-      dragState.current.isDown = true;
-      dragState.current.dragged = false;
-      dragState.current.startX = e.pageX;
-      dragState.current.scrollLeft = el.scrollLeft;
-      el.style.cursor = "grabbing";
-      el.style.userSelect = "none";
-    };
-
-    const onMouseUp = () => {
-      if (!dragState.current.isDown) return;
-      dragState.current.isDown = false;
-      el.style.cursor = "grab";
-      el.style.userSelect = "";
-    };
-
-    const onMouseMove = (e) => {
-      if (!dragState.current.isDown) return;
-      e.preventDefault();
-      const walk = e.pageX - dragState.current.startX;
-      if (Math.abs(walk) > 5) dragState.current.dragged = true;
-      el.scrollLeft = dragState.current.scrollLeft - walk;
-    };
-
-    const onClick = (e) => {
-      if (dragState.current.dragged) {
-        e.preventDefault();
-        e.stopPropagation();
-        dragState.current.dragged = false;
-      }
-    };
-
-    el.style.cursor = "grab";
-    el.addEventListener("mousedown", onMouseDown);
-    document.addEventListener("mouseup", onMouseUp);
-    document.addEventListener("mousemove", onMouseMove);
-    el.addEventListener("click", onClick, true);
-
-    return () => {
-      el.removeEventListener("mousedown", onMouseDown);
-      document.removeEventListener("mouseup", onMouseUp);
-      document.removeEventListener("mousemove", onMouseMove);
-      el.removeEventListener("click", onClick, true);
-    };
-  }, []);
-
-  return { ref, dragState };
+function getBrandLogo(name) {
+  const domain = brandDomains[name];
+  if (!domain) return null;
+  return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
 }
 
 export default function BrandShowcase() {
@@ -76,8 +48,12 @@ export default function BrandShowcase() {
   const [products, setProducts] = useState([]);
   const [loadingBrands, setLoadingBrands] = useState(true);
   const [loadingProducts, setLoadingProducts] = useState(false);
-  const { ref: brandScrollRef, dragState: brandDrag } = useDragScroll();
-  const { ref: productScrollRef, dragState: productDrag } = useDragScroll();
+  const brandScrollRef = useRef(null);
+
+  // Auto-slide
+  const [slideIndex, setSlideIndex] = useState(0);
+  const autoSlideRef = useRef(null);
+  const VISIBLE = 5; // products visible at a time on desktop
 
   // Fetch brands
   useEffect(() => {
@@ -112,6 +88,7 @@ export default function BrandShowcase() {
   useEffect(() => {
     if (!activeBrand) return;
     setLoadingProducts(true);
+    setSlideIndex(0);
     fetch("/api/product?limit=200")
       .then((r) => r.ok ? r.json() : Promise.reject())
       .then((data) => {
@@ -122,12 +99,12 @@ export default function BrandShowcase() {
           return pBrand === brandName;
         });
         if (filtered.length > 0) {
-          setProducts(filtered.slice(0, 12));
+          setProducts(filtered.slice(0, 15));
         } else {
           const fallback = sampleBrandProducts.filter(
             (p) => (p.brand || "").toLowerCase() === brandName
           );
-          setProducts(fallback.slice(0, 12));
+          setProducts(fallback.slice(0, 15));
         }
       })
       .catch(() => {
@@ -135,32 +112,52 @@ export default function BrandShowcase() {
         const fallback = sampleBrandProducts.filter(
           (p) => (p.brand || "").toLowerCase() === brandName
         );
-        setProducts(fallback.slice(0, 12));
+        setProducts(fallback.slice(0, 15));
       })
       .finally(() => setLoadingProducts(false));
   }, [activeBrand]);
+
+  // Auto-slide every 4 seconds
+  const maxIndex = Math.max(0, products.length - VISIBLE);
+
+  const nextSlide = useCallback(() => {
+    setSlideIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
+  }, [maxIndex]);
+
+  const prevSlide = useCallback(() => {
+    setSlideIndex((prev) => (prev <= 0 ? maxIndex : prev - 1));
+  }, [maxIndex]);
+
+  useEffect(() => {
+    if (products.length <= VISIBLE) return;
+    autoSlideRef.current = setInterval(nextSlide, 4000);
+    return () => clearInterval(autoSlideRef.current);
+  }, [products, nextSlide]);
+
+  const pauseAuto = () => clearInterval(autoSlideRef.current);
+  const resumeAuto = () => {
+    if (products.length <= VISIBLE) return;
+    clearInterval(autoSlideRef.current);
+    autoSlideRef.current = setInterval(nextSlide, 4000);
+  };
 
   const scrollBrands = (dir) => {
     brandScrollRef.current?.scrollBy({ left: dir * 200, behavior: "smooth" });
   };
 
-  const scrollProducts = (dir) => {
-    productScrollRef.current?.scrollBy({ left: dir * 300, behavior: "smooth" });
-  };
-
   if (loadingBrands) {
     return (
-      <section className="bg-[#111111] py-8 min-[768px]:py-14">
+      <section className="py-8 min-[768px]:py-12">
         <div className="max-w-[1440px] mx-auto px-3 min-[480px]:px-5 min-[768px]:px-6">
-          <div className="h-7 w-52 bg-white/10 rounded-lg mx-auto mb-8 animate-pulse" />
+          <div className="h-7 w-52 bg-gray-200 rounded-lg mx-auto mb-8 animate-pulse" />
           <div className="flex gap-8 justify-center overflow-hidden mb-8">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="flex-shrink-0 w-20 h-8 bg-white/10 rounded animate-pulse" />
+              <div key={i} className="flex-shrink-0 w-20 h-6 bg-gray-200 rounded animate-pulse" />
             ))}
           </div>
           <div className="flex gap-4 overflow-hidden">
             {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="flex-shrink-0 flex-1 h-64 bg-white/5 rounded-xl animate-pulse" />
+              <div key={i} className="flex-shrink-0 flex-1 h-72 bg-gray-100 rounded-xl animate-pulse" />
             ))}
           </div>
         </div>
@@ -171,106 +168,80 @@ export default function BrandShowcase() {
   if (brands.length === 0) return null;
 
   return (
-    <section className="bg-[#111111] py-8 min-[768px]:py-14">
+    <section className="py-8 min-[768px]:py-12 border-t border-gray-100">
       <div className="max-w-[1440px] mx-auto px-3 min-[480px]:px-5 min-[768px]:px-6">
         {/* Title */}
         <motion.h2
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-xl min-[480px]:text-2xl md:text-3xl font-semibold text-white text-center mb-6 min-[768px]:mb-8"
+          className="text-xl min-[480px]:text-2xl md:text-3xl font-bold text-gray-900 text-center mb-6 min-[768px]:mb-8"
         >
           Shop By Brands
         </motion.h2>
 
-        {/* Brand Row — centered brand list, See All on right */}
-        <div className="flex items-center mb-6 min-[768px]:mb-8">
-          {/* Invisible spacer to balance See All on right */}
-          <div className="flex-shrink-0 hidden min-[640px]:block w-[72px] min-[768px]:w-[84px]" />
-
-          {/* Centered brand list with arrows */}
-          <div className="flex-1 flex items-center justify-center gap-2 min-[480px]:gap-3">
-            {/* Left Arrow — hidden on mobile */}
-            <button
-              onClick={() => scrollBrands(-1)}
-              className="hidden min-[640px]:flex flex-shrink-0 w-8 h-8 min-[768px]:w-9 min-[768px]:h-9 rounded-full border border-white/20 items-center justify-center text-white/70 hover:border-[#f26e21] hover:text-[#f26e21] transition-colors bg-white/5"
-            >
-              <ChevronLeft size={18} />
-            </button>
-
-            {/* Scrollable brand logos — constrained width */}
-            <div
-              ref={brandScrollRef}
-              className="flex items-center gap-4 min-[480px]:gap-6 min-[768px]:gap-8 overflow-x-auto touch-pan-x max-w-[480px] min-[640px]:max-w-[560px] min-[768px]:max-w-[680px] min-[1024px]:max-w-[800px]"
-              style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}
-            >
-              <style jsx>{`div::-webkit-scrollbar { display: none; }`}</style>
-              {brands.map((brand) => {
-                const isActive = activeBrand?.name === brand.name;
-                return (
-                  <button
-                    key={brand.name}
-                    onClick={() => { if (!brandDrag.current.dragged) setActiveBrand(brand); }}
-                    className={`flex-shrink-0 relative pb-2 transition-all ${isActive ? "opacity-100" : "opacity-60 hover:opacity-90"}`}
-                  >
-                    <div className="flex flex-col items-center gap-1.5">
-                      {brand.logo ? (
-                        <div className="w-14 h-14 min-[480px]:w-16 min-[480px]:h-16 min-[768px]:w-[72px] min-[768px]:h-[72px] rounded-xl bg-white border border-gray-100 flex items-center justify-center overflow-hidden p-1.5">
-                          <Image
-                            src={brand.logo}
-                            alt={brand.name}
-                            width={72}
-                            height={72}
-                            className="object-contain w-full h-full"
-                            draggable={false}
-                          />
-                        </div>
-                      ) : (
-                        <div className={`w-14 h-14 min-[480px]:w-16 min-[480px]:h-16 min-[768px]:w-[72px] min-[768px]:h-[72px] rounded-xl border flex items-center justify-center ${isActive ? "bg-[#f26e21]/10 border-[#f26e21]/30" : "bg-white/10 border-white/20"}`}>
-                          <span className={`font-bold text-xl ${isActive ? "text-[#f26e21]" : "text-white/50"}`}>
-                            {brand.name?.[0]?.toUpperCase()}
-                          </span>
-                        </div>
-                      )}
-                      <span className={`text-[10px] min-[480px]:text-xs font-semibold whitespace-nowrap ${isActive ? "text-white" : "text-white/50"}`}>
-                        {brand.name}
-                      </span>
-                    </div>
-                    {/* Active underline */}
-                    {isActive && (
-                      <motion.div
-                        layoutId="brand-underline"
-                        className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#f26e21] rounded-full"
-                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                      />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Right Arrow — hidden on mobile */}
-            <button
-              onClick={() => scrollBrands(1)}
-              className="hidden min-[640px]:flex flex-shrink-0 w-8 h-8 min-[768px]:w-9 min-[768px]:h-9 rounded-full border border-white/20 items-center justify-center text-white/70 hover:border-[#f26e21] hover:text-[#f26e21] transition-colors bg-white/5"
-            >
-              <ChevronRight size={18} />
-            </button>
+        {/* Brand Row */}
+        <div className="flex items-center mb-6 min-[768px]:mb-8 border-b border-gray-200 pb-4">
+          {/* Scrollable brand names */}
+          <div
+            ref={brandScrollRef}
+            className="flex-1 flex items-center gap-5 min-[480px]:gap-7 min-[768px]:gap-10 overflow-x-auto touch-pan-x"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            <style jsx>{`div::-webkit-scrollbar { display: none; }`}</style>
+            {brands.map((brand) => {
+              const isActive = activeBrand?.name === brand.name;
+              const logoUrl = getBrandLogo(brand.name) || (brand.logo || null);
+              return (
+                <button
+                  key={brand.name}
+                  onClick={() => setActiveBrand(brand)}
+                  className={`flex-shrink-0 flex items-center gap-2 pb-1 relative transition-all ${isActive ? "opacity-100" : "opacity-50 hover:opacity-80"}`}
+                >
+                  {logoUrl && (
+                    <img
+                      src={logoUrl}
+                      alt={brand.name}
+                      className="w-5 h-5 min-[768px]:w-6 min-[768px]:h-6 object-contain"
+                      onError={(e) => { e.target.style.display = "none"; }}
+                    />
+                  )}
+                  <span className={`text-xs min-[768px]:text-sm font-bold whitespace-nowrap uppercase tracking-wide ${isActive ? "text-gray-900" : "text-gray-500"}`}>
+                    {brand.name}
+                  </span>
+                  {isActive && (
+                    <motion.div
+                      layoutId="brand-underline"
+                      className="absolute -bottom-[17px] left-0 right-0 h-[3px] bg-[#f26e21] rounded-full"
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    />
+                  )}
+                </button>
+              );
+            })}
           </div>
 
-          {/* See All link — right side */}
-          {activeBrand && (
-            <Link
-              href={`/brands/${toSlug(activeBrand.name)}`}
-              className="flex-shrink-0 hidden min-[640px]:flex items-center gap-1 text-sm font-semibold text-[#f26e21] hover:text-[#ff8c42] transition-colors ml-4 min-[768px]:ml-6"
+          {/* Right arrow for brands + Show All */}
+          <div className="flex items-center gap-3 flex-shrink-0 ml-4">
+            <button
+              onClick={() => scrollBrands(1)}
+              className="hidden min-[640px]:flex w-7 h-7 rounded-full border border-gray-300 items-center justify-center text-gray-400 hover:border-[#f26e21] hover:text-[#f26e21] transition-colors"
             >
-              See All
               <ChevronRight size={16} />
-            </Link>
-          )}
+            </button>
+            {activeBrand && (
+              <Link
+                href={`/brands/${toSlug(activeBrand.name)}`}
+                className="hidden min-[480px]:flex items-center gap-1 text-sm font-semibold text-[#f26e21] hover:text-[#e05e15] transition-colors whitespace-nowrap"
+              >
+                Show All
+                <ChevronRight size={16} />
+              </Link>
+            )}
+          </div>
         </div>
 
-        {/* Products Slider */}
+        {/* Products — auto-sliding carousel */}
         <AnimatePresence mode="wait">
           <motion.div
             key={activeBrand?.name || "none"}
@@ -281,41 +252,101 @@ export default function BrandShowcase() {
           >
             {loadingProducts ? (
               <div className="flex justify-center items-center h-52">
-                <Loader2 className="animate-spin text-purple-mid" size={28} />
+                <Loader2 className="animate-spin text-[#f26e21]" size={28} />
               </div>
             ) : products.length === 0 ? (
-              <div className="text-center py-16 text-white/40 text-sm">
+              <div className="text-center py-16 text-gray-400 text-sm">
                 No products found for {activeBrand?.name}
               </div>
             ) : (
-              <div className="relative group">
-                {/* Left Arrow — hidden on mobile */}
+              <div
+                className="relative"
+                onMouseEnter={pauseAuto}
+                onMouseLeave={resumeAuto}
+              >
+                {/* Left Arrow */}
                 <button
-                  onClick={() => scrollProducts(-1)}
-                  className="hidden min-[640px]:flex absolute left-0 top-[40%] -translate-y-1/2 z-10 w-9 h-9 min-[768px]:w-10 min-[768px]:h-10 bg-black/50 border border-white/20 rounded-full items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity hover:shadow-lg hover:border-[#f26e21] backdrop-blur-sm"
+                  onClick={() => { prevSlide(); pauseAuto(); resumeAuto(); }}
+                  className="hidden min-[768px]:flex absolute -left-3 min-[1024px]:-left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white border border-gray-200 rounded-full items-center justify-center shadow-md hover:shadow-lg hover:border-[#f26e21] transition-all"
                 >
-                  <ChevronLeft size={18} className="text-[#f26e21]" />
+                  <ChevronLeft size={20} className="text-gray-600" />
                 </button>
 
-                <div
-                  ref={productScrollRef}
-                  className="flex gap-2 min-[480px]:gap-3 min-[768px]:gap-4 overflow-x-auto py-4 touch-pan-x"
-                  style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}
-                >
-                  <style jsx>{`div::-webkit-scrollbar { display: none; }`}</style>
-                  {products.map((product, i) => (
-                    <div key={String(product._id || product.id)} className="flex-shrink-0 w-[160px] min-[480px]:w-[185px] min-[768px]:w-[220px] min-[1024px]:w-[240px] self-stretch">
-                      <ProductCard product={product} index={i} />
-                    </div>
-                  ))}
+                {/* Product strip */}
+                <div className="overflow-hidden">
+                  <motion.div
+                    className="flex"
+                    animate={{ x: `-${slideIndex * (100 / VISIBLE)}%` }}
+                    transition={{ type: "tween", duration: 0.5, ease: "easeInOut" }}
+                  >
+                    {products.map((product) => {
+                      const productId = String(product._id || product.id);
+                      const imageUrl = product.images?.length > 0 ? product.images[0].url : product.image || "/placeholder.png";
+                      const regularPrice = product.price || 0;
+                      const salePrice = product.discount && product.discount > 0 && product.discount < regularPrice ? product.discount : regularPrice;
+                      const savedAmount = regularPrice - salePrice;
+                      const brandName = product.brand || product.customFields?.brand || "";
+
+                      return (
+                        <div
+                          key={productId}
+                          className="flex-shrink-0 px-1.5 min-[480px]:px-2"
+                          style={{ width: `${100 / VISIBLE}%` }}
+                        >
+                          <Link href={`/product/${productId}`} className="block bg-white rounded-xl border border-gray-100 hover:shadow-lg hover:border-gray-200 transition-all duration-300 overflow-hidden group h-full">
+                            {/* Image */}
+                            <div className="relative aspect-square bg-gray-50 overflow-hidden p-4">
+                              {product.isNewArrival && (
+                                <span className="absolute top-2 left-0 bg-[#f26e21] text-white text-[8px] min-[768px]:text-[10px] font-bold px-2 py-1 rounded-r-md z-10 uppercase tracking-wider"
+                                  style={{ writingMode: "vertical-rl", textOrientation: "mixed", transform: "rotate(180deg)", lineHeight: 1.2, padding: "6px 4px" }}
+                                >
+                                  New Arrival
+                                </span>
+                              )}
+                              <Image
+                                src={imageUrl}
+                                alt={product.name}
+                                fill
+                                className="object-contain group-hover:scale-105 transition-transform duration-500 p-2"
+                                sizes="(max-width: 640px) 50vw, 20vw"
+                              />
+                            </div>
+
+                            {/* Info */}
+                            <div className="p-3 min-[768px]:p-4 text-center">
+                              {brandName && (
+                                <p className="text-[10px] min-[768px]:text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">{brandName}</p>
+                              )}
+                              <h3 className="text-xs min-[768px]:text-sm font-medium text-gray-800 leading-snug line-clamp-2 mb-2 min-h-[2.5em]">
+                                {product.name}
+                              </h3>
+                              <div className="flex items-center justify-center gap-2 mb-3">
+                                <span className="text-sm min-[768px]:text-base font-bold text-[#f26e21]">
+                                  Tk. {formatPrice(salePrice)}
+                                </span>
+                                {savedAmount > 0 && (
+                                  <span className="text-[10px] min-[768px]:text-xs text-gray-400 line-through">
+                                    Tk. {formatPrice(regularPrice)}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="border border-[#f26e21] text-[#f26e21] rounded-lg py-1.5 min-[768px]:py-2 text-[10px] min-[768px]:text-xs font-bold uppercase tracking-wider hover:bg-[#f26e21] hover:text-white transition-colors">
+                                Buy Now
+                              </div>
+                            </div>
+                          </Link>
+                        </div>
+                      );
+                    })}
+                  </motion.div>
                 </div>
 
-                {/* Right Arrow — hidden on mobile */}
+                {/* Right Arrow */}
                 <button
-                  onClick={() => scrollProducts(1)}
-                  className="hidden min-[640px]:flex absolute right-0 top-[40%] -translate-y-1/2 z-10 w-9 h-9 min-[768px]:w-10 min-[768px]:h-10 bg-black/50 border border-white/20 rounded-full items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity hover:shadow-lg hover:border-[#f26e21] backdrop-blur-sm"
+                  onClick={() => { nextSlide(); pauseAuto(); resumeAuto(); }}
+                  className="hidden min-[768px]:flex absolute -right-3 min-[1024px]:-right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white border border-gray-200 rounded-full items-center justify-center shadow-md hover:shadow-lg hover:border-[#f26e21] transition-all"
                 >
-                  <ChevronRight size={18} className="text-[#f26e21]" />
+                  <ChevronRight size={20} className="text-gray-600" />
                 </button>
               </div>
             )}
@@ -324,12 +355,12 @@ export default function BrandShowcase() {
 
         {/* Mobile Show All link */}
         {activeBrand && (
-          <div className="text-center mt-5 min-[640px]:hidden">
+          <div className="text-center mt-5 min-[480px]:hidden">
             <Link
               href={`/brands/${toSlug(activeBrand.name)}`}
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#f26e21] hover:text-[#ff8c42] transition-colors"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#f26e21] hover:text-[#e05e15] transition-colors"
             >
-              See All {activeBrand.name}
+              Show All {activeBrand.name}
               <ChevronRight size={16} />
             </Link>
           </div>
