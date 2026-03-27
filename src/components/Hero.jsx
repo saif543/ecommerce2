@@ -5,10 +5,22 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 
-// Fallback slide
+// Demo slides for testing — replaced by admin slider API data
 const FALLBACK_SLIDES = [
   {
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1400&h=700&fit=crop",
+    image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600&h=600&fit=crop",
+    link: "",
+  },
+  {
+    image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1600&h=600&fit=crop",
+    link: "",
+  },
+  {
+    image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1600&h=600&fit=crop",
+    link: "",
+  },
+  {
+    image: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=1600&h=600&fit=crop",
     link: "",
   },
 ];
@@ -129,20 +141,6 @@ export default function Hero() {
           )}
         </motion.div>
       </AnimatePresence>
-
-      {/* Left / Right Arrows */}
-      <button
-        onClick={(e) => { e.stopPropagation(); prev(); }}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/25 transition-colors"
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
-      </button>
-      <button
-        onClick={(e) => { e.stopPropagation(); next(); }}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/25 transition-colors"
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6" /></svg>
-      </button>
 
       {/* Bottom Dots */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3">

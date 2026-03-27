@@ -221,18 +221,9 @@ export default function BrandShowcase() {
   if (brands.length === 0) return null;
 
   return (
-    <section className="relative py-10 min-[768px]:py-16">
-      {/* Subtle background accent */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full opacity-[0.03]"
-          style={{ background: "radial-gradient(circle, #f26e21, transparent 70%)" }}
-        />
-        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full opacity-[0.02]"
-          style={{ background: "radial-gradient(circle, #f26e21, transparent 70%)" }}
-        />
-      </div>
+    <section className="relative py-10 min-[768px]:py-16 bg-white">
 
-      <div className="relative max-w-[1440px] mx-auto px-3 min-[480px]:px-5 min-[768px]:px-6">
+      <div className="max-w-[1440px] mx-auto px-3 min-[480px]:px-5 min-[768px]:px-6">
         {/* Title */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
@@ -280,39 +271,47 @@ export default function BrandShowcase() {
             onMouseLeave={onBrandMouseUp}
             onScroll={updateBrandArrows}
           >
-            <style jsx>{`div::-webkit-scrollbar { display: none; }`}</style>
+            <style jsx>{`
+              div::-webkit-scrollbar { display: none; }
+              @media (max-width: 479px) {
+                button[data-brand-box] { aspect-ratio: 5/2.5 !important; }
+              }
+            `}</style>
             {brands.map((brand) => {
               const isActive = activeBrand?.name === brand.name;
               return (
                 <button
                   key={brand.name}
                   onClick={() => setActiveBrand(brand)}
-                  className="flex-shrink-0 flex items-center justify-center relative transition-all w-[calc(100%/3)] min-[480px]:w-[calc(100%/4)] min-[768px]:w-[calc(100%/5)] min-[1024px]:w-[calc(100%/6)]"
-                  style={{ height: "70px" }}
+                  className="flex-shrink-0 flex items-center justify-center relative transition-all w-[calc(100%/2.5)] min-[480px]:w-[calc(100%/4)] min-[768px]:w-[calc(100%/5)] min-[1024px]:w-[calc(100%/6)] overflow-hidden"
+                  style={{ aspectRatio: "5/2" }}
+                  data-brand-box
                 >
-                  <div className="w-full h-10 min-[768px]:h-12 px-3 flex items-center justify-center">
+                  <div className="w-full h-full px-3 flex items-center justify-center overflow-hidden">
                     {brand.logo ? (
                       <img
                         src={brand.logo}
                         alt={brand.name}
-                        className={`max-w-full max-h-full object-contain transition-opacity duration-200 ${isActive ? "opacity-100" : "opacity-40 hover:opacity-70"}`}
-                        onError={(e) => {
-                          e.target.style.display = "none";
-                          e.target.parentElement.querySelector("span").style.display = "block";
-                        }}
+                        className={`max-w-full max-h-full object-contain transition-opacity duration-200 ${isActive ? "opacity-100" : "opacity-60 hover:opacity-80"}`}
+                        style={{ transform: `scale(${(brand.logoScale || 100) / 100}) translate(${brand.logoOffsetX || 0}px, ${brand.logoOffsetY || 0}px)` }}
                       />
-                    ) : null}
-                    <span
-                      className={`text-sm min-[768px]:text-base font-bold whitespace-nowrap uppercase tracking-wide transition-colors duration-200 ${isActive ? "text-gray-900" : "text-gray-400 hover:text-gray-600"}`}
-                      style={{ display: brand.logo ? "none" : "block" }}
-                    >
-                      {brand.name}
-                    </span>
+                    ) : (
+                      <span
+                        className={`text-sm min-[768px]:text-base font-bold whitespace-nowrap uppercase tracking-wide transition-colors duration-200 ${isActive ? "text-gray-900" : "text-gray-400 hover:text-gray-600"}`}
+                      >
+                        {brand.name}
+                      </span>
+                    )}
                   </div>
                   {/* Active indicator bar */}
-                  {isActive && (
-                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-10 min-[768px]:w-12 h-[3px] rounded-full bg-[#f26e21]" />
-                  )}
+                  <div
+                    className="absolute bottom-0 left-[15%] right-[15%] h-[3px] rounded-full transition-all duration-300 ease-out"
+                    style={{
+                      background: isActive ? "#f26e21" : "transparent",
+                      transform: isActive ? "scaleX(1)" : "scaleX(0)",
+                      opacity: isActive ? 1 : 0,
+                    }}
+                  />
                 </button>
               );
             })}

@@ -31,7 +31,7 @@ export default function TrustBadges() {
   return (
     <section className="max-w-[1440px] mx-auto px-3 md:px-6 py-6 md:py-12">
       {/* Mobile: 2x2 grid | Desktop: single row */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 py-5 md:py-10 px-3 md:px-6">
+      <div className="rounded-xl shadow-sm border border-orange-100 py-5 md:py-10 px-3 md:px-6" style={{ background: "linear-gradient(135deg, #fffaf6 0%, #fff5ed 50%, #fffaf6 100%)" }}>
         <div className="grid grid-cols-2 min-[640px]:grid-cols-4 gap-4 min-[640px]:gap-0">
           {badges.map((badge, i) => (
             <motion.div
