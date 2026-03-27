@@ -7,7 +7,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Grid3X3, LayoutList, Star, SlidersHorizontal, X, TrendingUp, Flame, Loader2 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import ProductCard from "./ProductCard";
-import { sampleProducts } from "@/data/sampleProducts";
 
 const sortOptions = [
   { label: "Most Popular", value: "default" },
@@ -71,10 +70,7 @@ export default function TrendingPage() {
     fetch("/api/product?isTrending=true&limit=100")
       .then((r) => r.ok ? r.json() : Promise.reject(r.status))
       .then((data) => {
-        let prods = data.products || [];
-        if (prods.length === 0) {
-          prods = sampleProducts.filter((p) => p.isTrending);
-        }
+        const prods = data.products || [];
         setProducts(prods);
         if (prods.length > 0) {
           const prices = prods.map((p) => p.price || 0);
@@ -83,10 +79,7 @@ export default function TrendingPage() {
       })
       .catch((err) => {
         console.error("Failed to fetch trending products:", err);
-        const fallback = sampleProducts.filter((p) => p.isTrending);
-        setProducts(fallback);
-        const prices = fallback.map((p) => p.price || 0);
-        if (prices.length > 0) setPriceMax(Math.max(...prices));
+        setProducts([]);
       })
       .finally(() => setLoading(false));
   }, []);

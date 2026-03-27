@@ -4,55 +4,13 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Package, Search, ArrowRight } from "lucide-react";
-import { sampleProducts, sampleHeadphones, sampleBrandProducts } from "@/data/sampleProducts";
-
-const allSampleProducts = [...sampleProducts, ...sampleHeadphones, ...sampleBrandProducts];
 
 function toSlug(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-function buildBrandsFromProducts(products) {
-  const map = {};
-  products.forEach((p) => {
-    const b = p.brand || p.customFields?.brand || "";
-    if (!b) return;
-    map[b] = (map[b] || 0) + 1;
-  });
-  return Object.entries(map)
-    .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => b.count - a.count);
-}
-
-const fallbackBrands = buildBrandsFromProducts(allSampleProducts);
-
-// ─── BRAND LOGOS ───────────────────────────────────────────
-// Change logo URLs here. Use any direct image link.
-// If a brand is not listed, it falls back to the first letter.
-// Uses Google favicon service (always works, no API key needed).
-function getBrandLogo(brandName) {
-  const domainMap = {
-    Samsung: "samsung.com",
-    Apple: "apple.com",
-    Nike: "nike.com",
-    Adidas: "adidas.com",
-    Puma: "puma.com",
-    Sony: "sony.com",
-    JBL: "jbl.com",
-    Bose: "bose.com",
-    Xiaomi: "mi.com",
-    OnePlus: "oneplus.com",
-    Realme: "realme.com",
-    Boat: "boat-lifestyle.com",
-  };
-  const domain = domainMap[brandName];
-  if (!domain) return null;
-  return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
-}
-// ───────────────────────────────────────────────────────────
-
 export default function BrandsPage() {
-  const [brands, setBrands] = useState(fallbackBrands);
+  const [brands, setBrands] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
@@ -60,15 +18,24 @@ export default function BrandsPage() {
     let cancelled = false;
     async function load() {
       try {
-        const res = await fetch("/api/product?limit=1000");
+        const res = await fetch("/api/brand");
         if (!res.ok) throw new Error("API error");
         const data = await res.json();
-        const dbProducts = data.products || [];
-        if (!cancelled && dbProducts.length > 0) {
-          setBrands(buildBrandsFromProducts(dbProducts));
+        const brandList = data.brands || [];
+        if (!cancelled && brandList.length > 0) {
+          // Fetch products to get counts per brand
+          const prodRes = await fetch("/api/product?limit=1000");
+          const prodData = prodRes.ok ? await prodRes.json() : { products: [] };
+          const products = prodData.products || [];
+          const countMap = {};
+          products.forEach((p) => {
+            const b = p.brand || p.customFields?.brand || "";
+            if (b) countMap[b] = (countMap[b] || 0) + 1;
+          });
+          setBrands(brandList.map((b) => ({ name: b.name, logo: b.logo || null, count: countMap[b.name] || 0 })));
         }
       } catch {
-        // Keep fallback brands
+        // API failed — brands stays as empty array
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -123,7 +90,7 @@ export default function BrandsPage() {
       {/* Grid — 5 cols on PC */}
       <div className="grid grid-cols-2 min-[480px]:grid-cols-2 min-[640px]:grid-cols-3 min-[768px]:grid-cols-4 min-[1024px]:grid-cols-5 gap-3 min-[480px]:gap-4 min-[768px]:gap-5">
         {filtered.map((brand, i) => {
-          const logoUrl = getBrandLogo(brand.name);
+          const logoUrl = brand.logo || null;
           return (
             <motion.div
               key={brand.name}

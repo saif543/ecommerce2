@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { Loader2, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import ProductCard from "./ProductCard";
-import { sampleProducts, sampleHeadphones } from "@/data/sampleProducts";
 
 /*
   Responsive breakpoints:
@@ -41,23 +40,11 @@ export default function Products({
         const prods = data.products || [];
         const params = new URL(apiUrl, window.location.origin).searchParams;
         const limit = parseInt(params.get("limit")) || 12;
-        if (prods.length > 0) {
-          setProducts(prods.slice(0, limit));
-        } else {
-          // Fallback to sample data when DB is empty
-          let fallback = sampleProducts;
-          const cat = params.get("category");
-          if (cat && cat.toLowerCase() === "headphones") fallback = sampleHeadphones;
-          else if (params.get("isLovedProduct") === "true") fallback = sampleProducts.filter((p) => p.isLovedProduct);
-          else if (params.get("isNewArrival") === "true") fallback = sampleProducts.filter((p) => p.isNewArrival);
-          setProducts(fallback.slice(0, limit));
-        }
+        setProducts(prods.slice(0, limit));
       })
       .catch((err) => {
         console.error("Failed to fetch products:", err);
-        const params = new URL(apiUrl, window.location.origin).searchParams;
-        const limit = parseInt(params.get("limit")) || 12;
-        setProducts(sampleProducts.slice(0, limit));
+        setProducts([]);
       })
       .finally(() => setLoading(false));
   }, [apiUrl]);

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { sampleCategories } from "@/data/sampleProducts";
+
 
 export default function Categories() {
   const router = useRouter();
@@ -16,11 +16,11 @@ export default function Categories() {
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
       .then((data) => {
         const cats = data.categories || [];
-        setCategories(cats.length > 0 ? cats : sampleCategories);
+        setCategories(cats);
       })
       .catch((err) => {
         console.error("Failed to load categories:", err);
-        setCategories(sampleCategories);
+        setCategories([]);
       })
       .finally(() => setLoading(false));
   }, []);

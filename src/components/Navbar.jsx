@@ -7,11 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Search, ShoppingCart, ChevronDown, ChevronRight, X, User, LogOut, Menu, Home, TrendingUp, HeadphonesIcon, Info, Tag } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/hooks/useAuth";
-import { sampleCategories } from "@/data/sampleProducts";
 import Swal from "sweetalert2";
-
-// Fallback categories for when DB is unavailable
-const fallbackCategories = sampleCategories;
 
 // Convert a category name to a URL-friendly slug
 function toSlug(name) {
@@ -76,7 +72,7 @@ export default function Navbar() {
   const [signingOut, setSigningOut] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [expandedMobileCategory, setExpandedMobileCategory] = useState(null);
-  const [categories, setCategories] = useState(fallbackCategories);
+  const [categories, setCategories] = useState([]);
   const searchRef = useRef(null);
   const { cartCount } = useCart();
 
@@ -159,8 +155,7 @@ export default function Navbar() {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="hidden md:block border-b border-[#f26e21]/15 sticky top-0 z-50"
-        style={{ background: "linear-gradient(180deg, #1a1410 0%, #111111 40%, #0d0d0d 100%)", boxShadow: "0 2px 12px rgba(242,110,33,0.12), inset 0 1px 0 rgba(242,110,33,0.08)" }}
+        className="hidden md:block bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm"
       >
         <div className="max-w-[1440px] mx-auto flex items-center justify-between px-6 py-4">
           {/* Logo */}
@@ -169,7 +164,7 @@ export default function Navbar() {
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#f26e21] to-[#111111] flex items-center justify-center">
                 <span className="text-white font-bold text-xs">Z</span>
               </div>
-              <AnimatedLogo className="text-xl" color="text-white" />
+              <AnimatedLogo className="text-xl" color="text-gray-900" />
             </motion.div>
           </Link>
 
@@ -181,7 +176,7 @@ export default function Navbar() {
               onMouseEnter={() => setShowCategories(true)}
               onMouseLeave={() => { setShowCategories(false); setActiveCategory(null); }}
             >
-              <button className={`flex items-center gap-1.5 text-sm font-semibold transition-colors relative pb-0.5 ${pathname.startsWith("/products") ? "text-[#f26e21]" : "text-white/90 hover:text-[#f26e21]"
+              <button className={`flex items-center gap-1.5 text-sm font-semibold transition-colors relative pb-0.5 ${pathname.startsWith("/products") ? "text-[#f26e21]" : "text-gray-700 hover:text-[#f26e21]"
                 }`}>
                 All Categories
                 <ChevronDown size={14} className={`transition-transform duration-200 ${showCategories ? "rotate-180" : ""}`} />
@@ -266,7 +261,7 @@ export default function Navbar() {
                 >
                   <Link
                     href={link.href}
-                    className={`text-sm font-semibold transition-colors pb-0.5 ${isActive ? "text-[#f26e21]" : "text-white/90 hover:text-[#f26e21]"
+                    className={`text-sm font-semibold transition-colors pb-0.5 ${isActive ? "text-[#f26e21]" : "text-gray-700 hover:text-[#f26e21]"
                       }`}
                   >
                     {link.label}
@@ -286,12 +281,12 @@ export default function Navbar() {
               <div className="relative">
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
                 >
                   <div className="w-8 h-8 bg-[#f26e21] rounded-full flex items-center justify-center text-white text-sm font-semibold">
                     {user.email?.[0]?.toUpperCase()}
                   </div>
-                  <span className="text-sm font-semibold text-white">
+                  <span className="text-sm font-semibold text-gray-800">
                     {user.displayName || user.email?.split('@')[0]}
                   </span>
                   {userRole === 'admin' && (
@@ -373,20 +368,20 @@ export default function Navbar() {
                       transition={{ duration: 0.25 }}
                       className="overflow-hidden"
                     >
-                      <div className="flex items-center border border-white/20 rounded-lg bg-white/10 pl-3 pr-1 py-1.5">
-                        <Search size={14} className="text-white/60 flex-shrink-0" />
+                      <div className="flex items-center border border-gray-300 rounded-lg bg-gray-50 pl-3 pr-1 py-1.5">
+                        <Search size={14} className="text-gray-400 flex-shrink-0" />
                         <input
                           ref={searchRef}
                           type="text"
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
                           placeholder="Search products..."
-                          className="w-full bg-transparent text-sm text-white placeholder:text-white/50 outline-none ml-2"
+                          className="w-full bg-transparent text-sm text-gray-800 placeholder:text-gray-400 outline-none ml-2"
                           onKeyDown={(e) => { if (e.key === "Escape") { setSearchOpen(false); setSearchQuery(""); } }}
                         />
                         <button
                           onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
-                          className="p-1 text-white/60 hover:text-white transition-colors flex-shrink-0"
+                          className="p-1 text-gray-400 hover:text-gray-700 transition-colors flex-shrink-0"
                         >
                           <X size={14} />
                         </button>
@@ -399,14 +394,14 @@ export default function Navbar() {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setSearchOpen(true)}
-                    className="text-white/90 hover:text-[#f26e21] transition-colors"
+                    className="text-gray-700 hover:text-[#f26e21] transition-colors"
                   >
                     <Search size={22} />
                   </motion.button>
                 )}
               </div>
               <Link href="/cart">
-                <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} className="relative text-white/90 hover:text-[#f26e21] transition-colors">
+                <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} className="relative text-gray-700 hover:text-[#f26e21] transition-colors">
                   <ShoppingCart size={22} />
                   {cartCount > 0 && (
                     <span className="absolute -top-2 -right-2.5 bg-purple-mid text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
@@ -423,12 +418,12 @@ export default function Navbar() {
       {/* ═══════════════════════════════════════════
           MOBILE TOP BAR (below md)
          ═══════════════════════════════════════════ */}
-      <div className="md:hidden border-b border-[#f26e21]/15 sticky top-0 z-50" style={{ background: "linear-gradient(180deg, #1a1410 0%, #111111 40%, #0d0d0d 100%)", boxShadow: "0 2px 12px rgba(242,110,33,0.12), inset 0 1px 0 rgba(242,110,33,0.08)" }}>
+      <div className="md:hidden bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
         <div className="flex items-center px-4 py-3 gap-3">
           {/* Hamburger — always visible */}
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="p-1.5 text-white/90 hover:text-[#f26e21] transition-colors flex-shrink-0"
+            className="p-1.5 text-gray-700 hover:text-[#f26e21] transition-colors flex-shrink-0"
           >
             <Menu size={24} />
           </button>
@@ -445,20 +440,20 @@ export default function Navbar() {
                   transition={{ duration: 0.25, ease: "easeInOut" }}
                   className="overflow-hidden w-full"
                 >
-                  <div className="flex items-center border border-white/20 rounded-lg bg-white/10 pl-3 pr-1 py-2">
-                    <Search size={16} className="text-white/60 flex-shrink-0" />
+                  <div className="flex items-center border border-gray-300 rounded-lg bg-gray-50 pl-3 pr-1 py-2">
+                    <Search size={16} className="text-gray-400 flex-shrink-0" />
                     <input
                       ref={searchRef}
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search products..."
-                      className="w-full bg-transparent text-sm text-white placeholder:text-white/50 outline-none ml-2"
+                      className="w-full bg-transparent text-sm text-gray-800 placeholder:text-gray-400 outline-none ml-2"
                       onKeyDown={(e) => { if (e.key === "Escape") { setSearchOpen(false); setSearchQuery(""); } }}
                     />
                     <button
                       onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
-                      className="p-1 text-white/60 hover:text-white transition-colors flex-shrink-0"
+                      className="p-1 text-gray-400 hover:text-gray-700 transition-colors flex-shrink-0"
                     >
                       <X size={16} />
                     </button>
@@ -476,7 +471,7 @@ export default function Navbar() {
                     <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#f26e21] to-[#111111] flex items-center justify-center">
                       <span className="text-white font-bold text-[10px]">Z</span>
                     </div>
-                    <AnimatedLogo className="text-lg" color="text-white" />
+                    <AnimatedLogo className="text-lg" color="text-gray-900" />
                   </Link>
                 </motion.div>
               )}
@@ -487,7 +482,7 @@ export default function Navbar() {
           {!searchOpen && (
             <button
               onClick={() => setSearchOpen(true)}
-              className="p-1.5 text-white/90 hover:text-[#f26e21] transition-colors flex-shrink-0"
+              className="p-1.5 text-gray-700 hover:text-[#f26e21] transition-colors flex-shrink-0"
             >
               <Search size={22} />
             </button>
@@ -677,7 +672,7 @@ export default function Navbar() {
       {/* ═══════════════════════════════════════════
           MOBILE BOTTOM BAR (fixed)
          ═══════════════════════════════════════════ */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 border-t border-[#f26e21]/15 z-50" style={{ background: "linear-gradient(0deg, #1a1410 0%, #111111 40%, #0d0d0d 100%)", boxShadow: "0 -2px 12px rgba(242,110,33,0.12), inset 0 -1px 0 rgba(242,110,33,0.08)" }}>
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.06)]">
         <div className="flex items-center justify-around py-2">
           {bottomBarItems.map((item) => {
             const Icon = item.icon;
@@ -705,7 +700,7 @@ export default function Navbar() {
               <Link
                 key={item.label}
                 href={item.href || "/login"}
-                className={`flex flex-col items-center gap-0.5 px-3 py-1 relative transition-colors ${isActive ? "text-[#f26e21]" : "text-white/50"
+                className={`flex flex-col items-center gap-0.5 px-3 py-1 relative transition-colors ${isActive ? "text-[#f26e21]" : "text-gray-400"
                   }`}
               >
                 <div className="relative">
@@ -716,7 +711,7 @@ export default function Navbar() {
                     </span>
                   )}
                 </div>
-                <span className={`text-[10px] font-medium ${isActive ? "text-[#f26e21]" : "text-white/50"}`}>
+                <span className={`text-[10px] font-medium ${isActive ? "text-[#f26e21]" : "text-gray-400"}`}>
                   {item.label}
                 </span>
               </Link>

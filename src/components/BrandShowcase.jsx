@@ -1,74 +1,14 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import ProductCard from "./ProductCard";
-import { sampleBrandProducts } from "@/data/sampleProducts";
-
 function toSlug(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-/* Hook: click-drag scroll for desktop + native touch on mobile */
-function useDragScroll() {
-  const ref = useRef(null);
-  const dragState = useRef({ isDown: false, startX: 0, scrollLeft: 0, dragged: false });
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const onMouseDown = (e) => {
-      dragState.current.isDown = true;
-      dragState.current.dragged = false;
-      dragState.current.startX = e.pageX;
-      dragState.current.scrollLeft = el.scrollLeft;
-      el.style.cursor = "grabbing";
-      el.style.userSelect = "none";
-    };
-
-    const onMouseUp = () => {
-      if (!dragState.current.isDown) return;
-      dragState.current.isDown = false;
-      el.style.cursor = "grab";
-      el.style.userSelect = "";
-    };
-
-    const onMouseMove = (e) => {
-      if (!dragState.current.isDown) return;
-      e.preventDefault();
-      const walk = e.pageX - dragState.current.startX;
-      if (Math.abs(walk) > 5) dragState.current.dragged = true;
-      el.scrollLeft = dragState.current.scrollLeft - walk;
-    };
-
-    const onClick = (e) => {
-      if (dragState.current.dragged) {
-        e.preventDefault();
-        e.stopPropagation();
-        dragState.current.dragged = false;
-      }
-    };
-
-    el.style.cursor = "grab";
-    el.addEventListener("mousedown", onMouseDown);
-    document.addEventListener("mouseup", onMouseUp);
-    document.addEventListener("mousemove", onMouseMove);
-    el.addEventListener("click", onClick, true);
-
-    return () => {
-      el.removeEventListener("mousedown", onMouseDown);
-      document.removeEventListener("mouseup", onMouseUp);
-      document.removeEventListener("mousemove", onMouseMove);
-      el.removeEventListener("click", onClick, true);
-    };
-  }, []);
-
-  return { ref, dragState };
-}
 
 export default function BrandShowcase() {
   const [brands, setBrands] = useState([]);
@@ -76,8 +16,24 @@ export default function BrandShowcase() {
   const [products, setProducts] = useState([]);
   const [loadingBrands, setLoadingBrands] = useState(true);
   const [loadingProducts, setLoadingProducts] = useState(false);
-  const { ref: brandScrollRef, dragState: brandDrag } = useDragScroll();
-  const { ref: productScrollRef, dragState: productDrag } = useDragScroll();
+  const brandScrollRef = useRef(null);
+  const [brandCanScrollLeft, setBrandCanScrollLeft] = useState(false);
+  const [brandCanScrollRight, setBrandCanScrollRight] = useState(false);
+
+  const updateBrandArrows = useCallback(() => {
+    const el = brandScrollRef.current;
+    if (!el) return;
+    setBrandCanScrollLeft(el.scrollLeft > 5);
+    setBrandCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 5);
+  }, []);
+
+  useEffect(() => {
+    updateBrandArrows();
+  }, [brands, updateBrandArrows]);
+
+  // Auto-slide
+  const autoSlideRef = useRef(null);
+  const VISIBLE = 6;
 
   // Fetch brands
   useEffect(() => {
@@ -93,17 +49,7 @@ export default function BrandShowcase() {
         }
       })
       .catch(() => {
-        const seen = new Set();
-        const fallback = sampleBrandProducts
-          .filter((p) => {
-            const b = p.brand || p.customFields?.brand;
-            if (!b || seen.has(b)) return false;
-            seen.add(b);
-            return true;
-          })
-          .map((p) => ({ name: p.brand || p.customFields?.brand, logo: null }));
-        setBrands(fallback);
-        if (fallback.length > 0) setActiveBrand(fallback[0]);
+        setBrands([]);
       })
       .finally(() => setLoadingBrands(false));
   }, []);
@@ -112,6 +58,7 @@ export default function BrandShowcase() {
   useEffect(() => {
     if (!activeBrand) return;
     setLoadingProducts(true);
+    setTranslateX(0);
     fetch("/api/product?limit=200")
       .then((r) => r.ok ? r.json() : Promise.reject())
       .then((data) => {
@@ -121,46 +68,149 @@ export default function BrandShowcase() {
           const pBrand = (p.brand || p.customFields?.brand || "").toLowerCase();
           return pBrand === brandName;
         });
-        if (filtered.length > 0) {
-          setProducts(filtered.slice(0, 12));
-        } else {
-          const fallback = sampleBrandProducts.filter(
-            (p) => (p.brand || "").toLowerCase() === brandName
-          );
-          setProducts(fallback.slice(0, 12));
-        }
+        setProducts(filtered.slice(0, 15));
       })
       .catch(() => {
-        const brandName = activeBrand.name.toLowerCase();
-        const fallback = sampleBrandProducts.filter(
-          (p) => (p.brand || "").toLowerCase() === brandName
-        );
-        setProducts(fallback.slice(0, 12));
+        setProducts([]);
       })
       .finally(() => setLoadingProducts(false));
   }, [activeBrand]);
 
-  const scrollBrands = (dir) => {
-    brandScrollRef.current?.scrollBy({ left: dir * 200, behavior: "smooth" });
+  // Product translateX carousel
+  const productStripRef = useRef(null);
+  const [translateX, setTranslateX] = useState(0);
+  const productDragRef = useRef({ startX: 0, startY: 0, startTranslate: 0, dragging: false, moved: false, decided: false, isHorizontal: false });
+
+  const getMaxTranslate = useCallback(() => {
+    const el = productStripRef.current;
+    if (!el || !el.parentElement) return 0;
+    return Math.max(0, el.scrollWidth - el.parentElement.clientWidth);
+  }, []);
+
+  // Auto-slide every 4 seconds
+  const autoScroll = useCallback(() => {
+    setTranslateX((prev) => {
+      const max = getMaxTranslate();
+      if (max <= 0) return 0;
+      const step = max / (products.length - VISIBLE || 1);
+      const next = prev - step;
+      return next < -max ? 0 : next;
+    });
+  }, [getMaxTranslate, products.length]);
+
+  useEffect(() => {
+    if (products.length <= VISIBLE) return;
+    autoSlideRef.current = setInterval(autoScroll, 4000);
+    return () => clearInterval(autoSlideRef.current);
+  }, [products, autoScroll]);
+
+  const pauseAuto = () => clearInterval(autoSlideRef.current);
+  const resumeAuto = () => {
+    if (products.length <= VISIBLE) return;
+    clearInterval(autoSlideRef.current);
+    autoSlideRef.current = setInterval(autoScroll, 4000);
   };
 
-  const scrollProducts = (dir) => {
-    productScrollRef.current?.scrollBy({ left: dir * 300, behavior: "smooth" });
+  // Mouse drag for products (desktop only — preventDefault is safe)
+  const onProductMouseDown = (e) => {
+    e.preventDefault();
+    productDragRef.current = { startX: e.pageX, startY: 0, startTranslate: translateX, dragging: true, moved: false, decided: true, isHorizontal: true };
+    pauseAuto();
+  };
+  const onProductMouseMove = (e) => {
+    if (!productDragRef.current.dragging) return;
+    const diff = e.pageX - productDragRef.current.startX;
+    if (Math.abs(diff) > 10) productDragRef.current.moved = true;
+    setTranslateX(Math.min(0, Math.max(-getMaxTranslate(), productDragRef.current.startTranslate + diff)));
+  };
+  const onProductMouseUp = () => {
+    productDragRef.current.dragging = false;
+    resumeAuto();
+  };
+
+  // Touch drag for products — detect direction first, allow vertical scroll
+  const onProductTouchStart = (e) => {
+    const t = e.touches[0];
+    productDragRef.current = { startX: t.pageX, startY: t.pageY, startTranslate: translateX, dragging: true, moved: false, decided: false, isHorizontal: false };
+    pauseAuto();
+  };
+  const onProductTouchMove = (e) => {
+    const ref = productDragRef.current;
+    if (!ref.dragging) return;
+    const t = e.touches[0];
+    const dx = t.pageX - ref.startX;
+    const dy = t.pageY - ref.startY;
+
+    // Decide direction on first significant movement
+    if (!ref.decided) {
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return; // too small, wait
+      ref.decided = true;
+      ref.isHorizontal = Math.abs(dx) > Math.abs(dy);
+      if (!ref.isHorizontal) {
+        // Vertical scroll — cancel drag, let browser handle
+        ref.dragging = false;
+        resumeAuto();
+        return;
+      }
+    }
+
+    if (!ref.isHorizontal) return;
+
+    // Horizontal drag — prevent page scroll, move carousel
+    e.preventDefault();
+    if (Math.abs(dx) > 10) ref.moved = true;
+    setTranslateX(Math.min(0, Math.max(-getMaxTranslate(), ref.startTranslate + dx)));
+  };
+  const onProductTouchEnd = () => {
+    productDragRef.current.dragging = false;
+    resumeAuto();
+  };
+
+  // Mouse drag for brand row (desktop only)
+  const brandDragRef = useRef({ startX: 0, scrollLeft: 0, dragging: false });
+
+  const onBrandMouseDown = (e) => {
+    const el = brandScrollRef.current;
+    if (!el) return;
+    brandDragRef.current = { startX: e.pageX, scrollLeft: el.scrollLeft, dragging: true };
+  };
+  const onBrandMouseMove = (e) => {
+    if (!brandDragRef.current.dragging) return;
+    e.preventDefault();
+    const el = brandScrollRef.current;
+    if (!el) return;
+    el.scrollLeft = brandDragRef.current.scrollLeft - (e.pageX - brandDragRef.current.startX);
+    updateBrandArrows();
+  };
+  const onBrandMouseUp = () => {
+    brandDragRef.current.dragging = false;
+    updateBrandArrows();
+  };
+
+  // Brand row: NO custom touch handlers — native overflow-x-auto handles touch scroll
+  // and doesn't block vertical page scrolling
+
+  const scrollBrands = (dir) => {
+    brandScrollRef.current?.scrollBy({ left: dir * 200, behavior: "smooth" });
+    setTimeout(updateBrandArrows, 300);
   };
 
   if (loadingBrands) {
     return (
-      <section className="bg-[#111111] py-8 min-[768px]:py-14">
+      <section className="py-10 min-[768px]:py-16">
         <div className="max-w-[1440px] mx-auto px-3 min-[480px]:px-5 min-[768px]:px-6">
-          <div className="h-7 w-52 bg-white/10 rounded-lg mx-auto mb-8 animate-pulse" />
-          <div className="flex gap-8 justify-center overflow-hidden mb-8">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="flex-shrink-0 w-20 h-8 bg-white/10 rounded animate-pulse" />
+          <div className="text-center mb-8">
+            <div className="h-7 w-52 bg-gray-200 rounded-lg mx-auto mb-2 animate-pulse" />
+            <div className="h-4 w-64 bg-gray-100 rounded mx-auto animate-pulse" />
+          </div>
+          <div className="flex gap-3 mb-8 overflow-hidden justify-center">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="flex-shrink-0 w-24 h-10 bg-gray-100 rounded animate-pulse" />
             ))}
           </div>
           <div className="flex gap-4 overflow-hidden">
             {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="flex-shrink-0 flex-1 h-64 bg-white/5 rounded-xl animate-pulse" />
+              <div key={i} className="flex-shrink-0 flex-1 h-72 bg-gray-100 rounded-2xl animate-pulse" />
             ))}
           </div>
         </div>
@@ -171,165 +221,189 @@ export default function BrandShowcase() {
   if (brands.length === 0) return null;
 
   return (
-    <section className="bg-[#111111] py-8 min-[768px]:py-14">
-      <div className="max-w-[1440px] mx-auto px-3 min-[480px]:px-5 min-[768px]:px-6">
+    <section className="relative py-10 min-[768px]:py-16">
+      {/* Subtle background accent */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full opacity-[0.03]"
+          style={{ background: "radial-gradient(circle, #f26e21, transparent 70%)" }}
+        />
+        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full opacity-[0.02]"
+          style={{ background: "radial-gradient(circle, #f26e21, transparent 70%)" }}
+        />
+      </div>
+
+      <div className="relative max-w-[1440px] mx-auto px-3 min-[480px]:px-5 min-[768px]:px-6">
         {/* Title */}
-        <motion.h2
-          initial={{ opacity: 0, y: 15 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-xl min-[480px]:text-2xl md:text-3xl font-semibold text-white text-center mb-6 min-[768px]:mb-8"
-        >
-          Shop By Brands
-        </motion.h2>
-
-        {/* Brand Row — centered brand list, See All on right */}
-        <div className="flex items-center mb-6 min-[768px]:mb-8">
-          {/* Invisible spacer to balance See All on right */}
-          <div className="flex-shrink-0 hidden min-[640px]:block w-[72px] min-[768px]:w-[84px]" />
-
-          {/* Centered brand list with arrows */}
-          <div className="flex-1 flex items-center justify-center gap-2 min-[480px]:gap-3">
-            {/* Left Arrow — hidden on mobile */}
-            <button
-              onClick={() => scrollBrands(-1)}
-              className="hidden min-[640px]:flex flex-shrink-0 w-8 h-8 min-[768px]:w-9 min-[768px]:h-9 rounded-full border border-white/20 items-center justify-center text-white/70 hover:border-[#f26e21] hover:text-[#f26e21] transition-colors bg-white/5"
-            >
-              <ChevronLeft size={18} />
-            </button>
-
-            {/* Scrollable brand logos — constrained width */}
-            <div
-              ref={brandScrollRef}
-              className="flex items-center gap-4 min-[480px]:gap-6 min-[768px]:gap-8 overflow-x-auto touch-pan-x max-w-[480px] min-[640px]:max-w-[560px] min-[768px]:max-w-[680px] min-[1024px]:max-w-[800px]"
-              style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}
-            >
-              <style jsx>{`div::-webkit-scrollbar { display: none; }`}</style>
-              {brands.map((brand) => {
-                const isActive = activeBrand?.name === brand.name;
-                return (
-                  <button
-                    key={brand.name}
-                    onClick={() => { if (!brandDrag.current.dragged) setActiveBrand(brand); }}
-                    className={`flex-shrink-0 relative pb-2 transition-all ${isActive ? "opacity-100" : "opacity-60 hover:opacity-90"}`}
-                  >
-                    <div className="flex flex-col items-center gap-1.5">
-                      {brand.logo ? (
-                        <div className="w-14 h-14 min-[480px]:w-16 min-[480px]:h-16 min-[768px]:w-[72px] min-[768px]:h-[72px] rounded-xl bg-white border border-gray-100 flex items-center justify-center overflow-hidden p-1.5">
-                          <Image
-                            src={brand.logo}
-                            alt={brand.name}
-                            width={72}
-                            height={72}
-                            className="object-contain w-full h-full"
-                            draggable={false}
-                          />
-                        </div>
-                      ) : (
-                        <div className={`w-14 h-14 min-[480px]:w-16 min-[480px]:h-16 min-[768px]:w-[72px] min-[768px]:h-[72px] rounded-xl border flex items-center justify-center ${isActive ? "bg-[#f26e21]/10 border-[#f26e21]/30" : "bg-white/10 border-white/20"}`}>
-                          <span className={`font-bold text-xl ${isActive ? "text-[#f26e21]" : "text-white/50"}`}>
-                            {brand.name?.[0]?.toUpperCase()}
-                          </span>
-                        </div>
-                      )}
-                      <span className={`text-[10px] min-[480px]:text-xs font-semibold whitespace-nowrap ${isActive ? "text-white" : "text-white/50"}`}>
-                        {brand.name}
-                      </span>
-                    </div>
-                    {/* Active underline */}
-                    {isActive && (
-                      <motion.div
-                        layoutId="brand-underline"
-                        className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#f26e21] rounded-full"
-                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                      />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Right Arrow — hidden on mobile */}
-            <button
-              onClick={() => scrollBrands(1)}
-              className="hidden min-[640px]:flex flex-shrink-0 w-8 h-8 min-[768px]:w-9 min-[768px]:h-9 rounded-full border border-white/20 items-center justify-center text-white/70 hover:border-[#f26e21] hover:text-[#f26e21] transition-colors bg-white/5"
-            >
-              <ChevronRight size={18} />
-            </button>
-          </div>
-
-          {/* See All link — right side */}
+        <div className="flex items-center justify-between mb-6 min-[768px]:mb-8">
+          <motion.h2
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-xl min-[480px]:text-2xl md:text-3xl font-semibold text-text-primary"
+          >
+            Shop By Brands
+          </motion.h2>
           {activeBrand && (
             <Link
-              href={`/brands/${toSlug(activeBrand.name)}`}
-              className="flex-shrink-0 hidden min-[640px]:flex items-center gap-1 text-sm font-semibold text-[#f26e21] hover:text-[#ff8c42] transition-colors ml-4 min-[768px]:ml-6"
+              href="/brands"
+              className="flex items-center gap-1 text-sm font-semibold text-[#f26e21] hover:text-[#e05e15] transition-colors whitespace-nowrap"
             >
-              See All
+              Show All
               <ChevronRight size={16} />
             </Link>
           )}
         </div>
 
-        {/* Products Slider */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeBrand?.name || "none"}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+        {/* Brand Row */}
+        <div className="relative mb-6 min-[768px]:mb-8 border-b border-gray-200 max-w-[75%] mx-auto">
+          {/* Left arrow — plain on mobile, circle on desktop */}
+          {brandCanScrollLeft && (
+            <button
+              onClick={() => scrollBrands(-1)}
+              className="absolute -left-7 min-[768px]:-left-10 top-1/2 -translate-y-1/2 z-10 w-6 h-6 min-[768px]:w-8 min-[768px]:h-8 flex items-center justify-center transition-all min-[768px]:rounded-full"
+              style={{
+                background: "transparent",
+              }}
+            >
+              <ChevronLeft size={18} className="text-gray-400 min-[768px]:text-gray-600" />
+            </button>
+          )}
+
+          {/* Scrollable brand logos */}
+          <div
+            ref={brandScrollRef}
+            className="flex items-center gap-0 overflow-x-auto select-none px-2"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}
+            onMouseDown={onBrandMouseDown}
+            onMouseMove={onBrandMouseMove}
+            onMouseUp={onBrandMouseUp}
+            onMouseLeave={onBrandMouseUp}
+            onScroll={updateBrandArrows}
           >
-            {loadingProducts ? (
-              <div className="flex justify-center items-center h-52">
-                <Loader2 className="animate-spin text-purple-mid" size={28} />
-              </div>
-            ) : products.length === 0 ? (
-              <div className="text-center py-16 text-white/40 text-sm">
-                No products found for {activeBrand?.name}
-              </div>
-            ) : (
-              <div className="relative group">
-                {/* Left Arrow — hidden on mobile */}
+            <style jsx>{`div::-webkit-scrollbar { display: none; }`}</style>
+            {brands.map((brand) => {
+              const isActive = activeBrand?.name === brand.name;
+              return (
                 <button
-                  onClick={() => scrollProducts(-1)}
-                  className="hidden min-[640px]:flex absolute left-0 top-[40%] -translate-y-1/2 z-10 w-9 h-9 min-[768px]:w-10 min-[768px]:h-10 bg-black/50 border border-white/20 rounded-full items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity hover:shadow-lg hover:border-[#f26e21] backdrop-blur-sm"
+                  key={brand.name}
+                  onClick={() => setActiveBrand(brand)}
+                  className="flex-shrink-0 flex items-center justify-center relative transition-all w-[calc(100%/3)] min-[480px]:w-[calc(100%/4)] min-[768px]:w-[calc(100%/5)] min-[1024px]:w-[calc(100%/6)]"
+                  style={{ height: "56px" }}
                 >
-                  <ChevronLeft size={18} className="text-[#f26e21]" />
+                  <div className="w-[100px] min-[768px]:w-[120px] h-8 min-[768px]:h-9 flex items-center justify-center">
+                    {brand.logo ? (
+                      <img
+                        src={brand.logo}
+                        alt={brand.name}
+                        className={`max-w-full max-h-full object-contain transition-opacity duration-200 ${isActive ? "opacity-100" : "opacity-40 hover:opacity-70"}`}
+                        onError={(e) => {
+                          e.target.style.display = "none";
+                          e.target.parentElement.querySelector("span").style.display = "block";
+                        }}
+                      />
+                    ) : null}
+                    <span
+                      className={`text-sm min-[768px]:text-base font-bold whitespace-nowrap uppercase tracking-wide transition-colors duration-200 ${isActive ? "text-gray-900" : "text-gray-400 hover:text-gray-600"}`}
+                      style={{ display: brand.logo ? "none" : "block" }}
+                    >
+                      {brand.name}
+                    </span>
+                  </div>
+                  {/* Active indicator bar */}
+                  {isActive && (
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-10 min-[768px]:w-12 h-[3px] rounded-full bg-[#f26e21]" />
+                  )}
                 </button>
+              );
+            })}
+          </div>
 
-                <div
-                  ref={productScrollRef}
-                  className="flex gap-2 min-[480px]:gap-3 min-[768px]:gap-4 overflow-x-auto py-4 touch-pan-x"
-                  style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}
-                >
-                  <style jsx>{`div::-webkit-scrollbar { display: none; }`}</style>
-                  {products.map((product, i) => (
-                    <div key={String(product._id || product.id)} className="flex-shrink-0 w-[160px] min-[480px]:w-[185px] min-[768px]:w-[220px] min-[1024px]:w-[240px] self-stretch">
-                      <ProductCard product={product} index={i} />
-                    </div>
-                  ))}
-                </div>
+          {/* Right arrow — plain on mobile, circle on desktop */}
+          {brandCanScrollRight && (
+            <button
+              onClick={() => scrollBrands(1)}
+              className="absolute -right-7 min-[768px]:-right-10 top-1/2 -translate-y-1/2 z-10 w-6 h-6 min-[768px]:w-8 min-[768px]:h-8 flex items-center justify-center transition-all min-[768px]:rounded-full"
+              style={{
+                background: "transparent",
+              }}
+            >
+              <ChevronRight size={18} className="text-gray-400 min-[768px]:text-gray-600" />
+            </button>
+          )}
+        </div>
 
-                {/* Right Arrow — hidden on mobile */}
-                <button
-                  onClick={() => scrollProducts(1)}
-                  className="hidden min-[640px]:flex absolute right-0 top-[40%] -translate-y-1/2 z-10 w-9 h-9 min-[768px]:w-10 min-[768px]:h-10 bg-black/50 border border-white/20 rounded-full items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-opacity hover:shadow-lg hover:border-[#f26e21] backdrop-blur-sm"
-                >
-                  <ChevronRight size={18} className="text-[#f26e21]" />
-                </button>
+        {/* Products */}
+        {loadingProducts ? (
+          <div className="flex justify-center items-center h-52">
+            <Loader2 className="animate-spin text-[#f26e21]" size={28} />
+          </div>
+        ) : products.length === 0 ? (
+          <div className="text-center py-16 text-gray-400 text-sm">
+            No products found for {activeBrand?.name}
+          </div>
+        ) : (
+          <div
+            className="relative"
+            onMouseEnter={pauseAuto}
+            onMouseLeave={() => { resumeAuto(); onProductMouseUp(); }}
+            onMouseDown={onProductMouseDown}
+            onMouseMove={onProductMouseMove}
+            onMouseUp={onProductMouseUp}
+            onTouchStart={onProductTouchStart}
+            onTouchMove={onProductTouchMove}
+            onTouchEnd={onProductTouchEnd}
+            onClickCapture={(e) => { if (productDragRef.current.moved) { e.preventDefault(); e.stopPropagation(); } }}
+          >
+            {/* Clip only left & right, not top & bottom */}
+            <div style={{ clipPath: "inset(-100px 0px -100px 0px)" }}>
+              <div
+                ref={productStripRef}
+                className="flex gap-2 min-[480px]:gap-3 min-[640px]:gap-4 min-[768px]:gap-5 select-none cursor-pointer transition-transform duration-300 ease-out"
+                style={{ transform: `translateX(${translateX}px)`, ...(productDragRef.current.dragging && productDragRef.current.isHorizontal ? { transition: "none" } : {}) }}
+              >
+                {products.map((product, i) => (
+                  <div
+                    key={String(product._id || product.id)}
+                    className="flex-shrink-0 w-[calc((100%-8px)/2)] min-[480px]:w-[calc((100%-24px)/3)] min-[768px]:w-[calc((100%-48px)/4)] min-[1024px]:w-[calc((100%-80px)/5)] min-[1280px]:w-[calc((100%-100px)/6)]"
+                  >
+                    <ProductCard product={product} index={i} />
+                  </div>
+                ))}
               </div>
-            )}
-          </motion.div>
-        </AnimatePresence>
+            </div>
+
+            {/* Left Arrow — plain on mobile, glass circle on desktop */}
+            <button
+              onClick={() => { setTranslateX((prev) => Math.min(0, prev + productStripRef.current.parentElement.clientWidth * 0.6)); }}
+              className="absolute left-1 min-[768px]:-left-1 top-1/2 -translate-y-1/2 z-10 w-7 h-7 min-[768px]:w-10 min-[768px]:h-10 min-[768px]:rounded-full flex items-center justify-center transition-all duration-200 min-[768px]:hover:scale-105"
+              style={{
+                background: "transparent",
+              }}
+            >
+              <ChevronLeft size={20} className="text-gray-500 min-[768px]:text-gray-700 drop-shadow-sm" />
+            </button>
+
+            {/* Right Arrow — plain on mobile, glass circle on desktop */}
+            <button
+              onClick={() => { setTranslateX((prev) => Math.max(-getMaxTranslate(), prev - productStripRef.current.parentElement.clientWidth * 0.6)); }}
+              className="absolute right-1 min-[768px]:-right-1 top-1/2 -translate-y-1/2 z-10 w-7 h-7 min-[768px]:w-10 min-[768px]:h-10 min-[768px]:rounded-full flex items-center justify-center transition-all duration-200 min-[768px]:hover:scale-105"
+              style={{
+                background: "transparent",
+              }}
+            >
+              <ChevronRight size={20} className="text-gray-500 min-[768px]:text-gray-700 drop-shadow-sm" />
+            </button>
+          </div>
+        )}
 
         {/* Mobile Show All link */}
         {activeBrand && (
-          <div className="text-center mt-5 min-[640px]:hidden">
+          <div className="text-center mt-5 min-[480px]:hidden">
             <Link
               href={`/brands/${toSlug(activeBrand.name)}`}
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#f26e21] hover:text-[#ff8c42] transition-colors"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#f26e21] hover:text-[#e05e15] transition-colors"
             >
-              See All {activeBrand.name}
+              Show All {activeBrand.name}
               <ChevronRight size={16} />
             </Link>
           </div>
