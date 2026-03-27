@@ -821,7 +821,7 @@ export default function CartPage() {
                     <motion.button
                       whileHover={{ scale: selectedItems.length > 0 ? 1.01 : 1 }}
                       whileTap={{ scale: selectedItems.length > 0 ? 0.98 : 1 }}
-                      onClick={() => setShowCheckout(true)}
+                      onClick={() => { setShowCheckout(true); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                       disabled={selectedItems.length === 0}
                       className={`w-full text-sm font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 ${selectedItems.length === 0
                         ? "bg-gray-100 text-gray-400 cursor-not-allowed"
