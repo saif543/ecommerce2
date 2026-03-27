@@ -47,15 +47,14 @@ button {
 
 /* Smooth scrolling — merged into html block above */
 
-/* Custom scrollbar */
+/* Hide scrollbar */
 ::-webkit-scrollbar {
-  height: 4px;
-  width: 6px;
+  width: 0;
+  height: 0;
 }
 
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--color-purple-mid), var(--color-purple-light));
-  border-radius: 4px;
+html {
+  scrollbar-width: none;
 }
 
 /* Gold gradient utility */
@@ -68,6 +67,12 @@ button {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* Selection highlight */
+::selection {
+  background: rgba(242, 110, 33, 0.15);
+  color: #111111;
 }
 
 /* Smooth transitions for interactive elements */
@@ -89,4 +94,9 @@ a, button {
 
 .animate-fade-in-up {
   animation: fadeInUp 0.5s ease-out both;
+}
+
+/* Smooth image loading */
+img {
+  transition: opacity 0.3s ease;
 }

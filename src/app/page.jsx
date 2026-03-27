@@ -3,11 +3,13 @@
 import React, { useState, useEffect } from 'react'
 import Navbar from '@/components/Navbar'
 import Hero from '@/components/Hero'
+import PromoStrip from '@/components/PromoStrip'
 import TrustBadges from '@/components/TrustBadges'
 import VideoSection from '@/components/VideoSection'
 import Categories from '@/components/Categories'
 import BrandShowcase from '@/components/BrandShowcase'
 import Products from '@/components/Products'
+import PromoBanner from '@/components/PromoBanner'
 import Footer from '@/components/Footer'
 
 // Default fallback sections shown if no admin config exists
@@ -109,10 +111,13 @@ export default function Home() {
       .catch(() => { /* silently fall back to defaults */ })
   }, [])
 
+  const sectionBgs = ['bg-white', 'bg-[#f5f5f5]', 'bg-white']
+
   return (
-    <div className="min-h-screen" style={{ background: "linear-gradient(180deg, #ffffff 0%, #f8f8f8 15%, #f5f3f0 50%, #f8f8f8 85%, #f0ece6 100%)" }}>
+    <div className="min-h-screen bg-[#f5f5f5]">
       <Navbar />
       <Hero />
+      <PromoStrip />
       <Categories />
       <BrandShowcase />
       {sections.map((section, i) => (
@@ -121,12 +126,13 @@ export default function Home() {
             title={section.title}
             subtitle={section.subtitle}
             apiUrl={buildApiUrl(section)}
-            bg={section.bg}
+            bg={sectionBgs[i % sectionBgs.length]}
             section={buildBannerKey(section)}
             bannerGradient={section.bannerGradient}
             seeAllLink={buildSeeAllLink(section)}
           />
           {i === 0 && videoConfig.isActive && <VideoSection config={videoConfig} />}
+          {i === 0 && <PromoBanner />}
         </React.Fragment>
       ))}
       <TrustBadges />

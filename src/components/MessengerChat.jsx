@@ -7,10 +7,24 @@ import { X } from "lucide-react";
 export default function MessengerChat() {
   const [open, setOpen] = useState(false);
   const [showBubble, setShowBubble] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+
+  // Check localStorage on mount
+  useEffect(() => {
+    try {
+      if (localStorage.getItem("zentech-chat-dismissed") === "1") setDismissed(true);
+    } catch {}
+  }, []);
+
+  const dismissBubble = () => {
+    setDismissed(true);
+    setShowBubble(false);
+    try { localStorage.setItem("zentech-chat-dismissed", "1"); } catch {}
+  };
 
   // Pulsing message bubble — shows for 4s, hides for 6s, repeats
   useEffect(() => {
-    if (open) {
+    if (open || dismissed) {
       setShowBubble(false);
       return;
     }
@@ -27,7 +41,7 @@ export default function MessengerChat() {
     // First show after 2s
     const initial = setTimeout(loop, 2000);
     return () => { mounted = false; clearTimeout(initial); };
-  }, [open]);
+  }, [open, dismissed]);
 
   return (
     <div className="fixed bottom-20 md:bottom-6 right-4 min-[480px]:right-6 z-[999]">
@@ -94,8 +108,14 @@ export default function MessengerChat() {
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
             className="absolute bottom-[72px] right-0 whitespace-nowrap"
           >
-            <div className="bg-white rounded-xl rounded-br-sm px-4 py-2.5 shadow-[0_4px_20px_rgba(0,0,0,0.12)] border border-gray-100">
+            <div className="bg-white rounded-xl rounded-br-sm pl-4 pr-2 py-2 shadow-[0_4px_20px_rgba(0,0,0,0.12)] border border-gray-100 flex items-center gap-2">
               <p className="text-text-primary text-sm font-medium">How can I help you? 👋</p>
+              <button
+                onClick={(e) => { e.stopPropagation(); dismissBubble(); }}
+                className="flex-shrink-0 w-5 h-5 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+              >
+                <X size={11} className="text-gray-400" />
+              </button>
             </div>
             {/* Triangle pointer */}
             <div className="absolute -bottom-1.5 right-5 w-3 h-3 bg-white border-r border-b border-gray-100 rotate-45" />

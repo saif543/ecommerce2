@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 // Demo slides for testing — replaced by admin slider API data
 const FALLBACK_SLIDES = [
@@ -142,15 +143,39 @@ export default function Hero() {
         </motion.div>
       </AnimatePresence>
 
+      {/* Side vignette overlays */}
+      <div className="absolute inset-y-0 left-0 w-16 min-[768px]:w-24 bg-gradient-to-r from-black/25 to-transparent z-10 pointer-events-none" />
+      <div className="absolute inset-y-0 right-0 w-16 min-[768px]:w-24 bg-gradient-to-l from-black/25 to-transparent z-10 pointer-events-none" />
+      {/* Bottom gradient fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/40 to-transparent z-10 pointer-events-none" />
+
+      {/* Navigation Arrows */}
+      {slides.length > 1 && (
+        <>
+          <button
+            onClick={(e) => { e.stopPropagation(); prev(); }}
+            className="absolute left-2 min-[480px]:left-3 min-[768px]:left-5 top-1/2 -translate-y-1/2 z-20 w-8 h-8 min-[480px]:w-9 min-[480px]:h-9 min-[768px]:w-11 min-[768px]:h-11 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/50 flex items-center justify-center transition-all"
+          >
+            <ChevronLeft size={18} className="text-white" />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); next(); }}
+            className="absolute right-2 min-[480px]:right-3 min-[768px]:right-5 top-1/2 -translate-y-1/2 z-20 w-8 h-8 min-[480px]:w-9 min-[480px]:h-9 min-[768px]:w-11 min-[768px]:h-11 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/50 flex items-center justify-center transition-all"
+          >
+            <ChevronRight size={18} className="text-white" />
+          </button>
+        </>
+      )}
+
       {/* Bottom Dots */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3">
+      <div className="absolute bottom-6 min-[480px]:bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 min-[480px]:gap-3 bg-black/20 backdrop-blur-sm rounded-full px-3 py-1.5">
         {slides.map((_, i) => (
           <button
             key={i}
             onClick={(e) => { e.stopPropagation(); goTo(i); }}
             className={`rounded-full transition-all duration-300 ${i === current
-              ? "w-10 h-2.5 bg-white"
-              : "w-2.5 h-2.5 bg-white/40 hover:bg-white/60"
+              ? "w-8 min-[480px]:w-10 h-2 min-[480px]:h-2.5 bg-white"
+              : "w-2 min-[480px]:w-2.5 h-2 min-[480px]:h-2.5 bg-white/40 hover:bg-white/60"
               }`}
           />
         ))}
@@ -163,7 +188,7 @@ export default function Hero() {
           initial={{ width: "0%" }}
           animate={{ width: "100%" }}
           transition={{ duration: 5, ease: "linear" }}
-          className="h-full bg-gradient-to-r from-[#111111] to-[#f26e21]"
+          className="h-full bg-gradient-to-r from-[#f26e21] to-[#ff8c42]"
         />
       </div>
     </section>
