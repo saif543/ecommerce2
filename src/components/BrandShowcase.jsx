@@ -234,25 +234,25 @@ export default function BrandShowcase() {
 
       <div className="relative max-w-[1440px] mx-auto px-3 min-[480px]:px-5 min-[768px]:px-6">
         {/* Title */}
-        <div className="flex items-center justify-between mb-6 min-[768px]:mb-8">
-          <motion.h2
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-xl min-[480px]:text-2xl md:text-3xl font-semibold text-text-primary"
-          >
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-5 min-[480px]:mb-7 min-[768px]:mb-10"
+        >
+          <h2 className="text-xl min-[480px]:text-2xl md:text-3xl font-semibold text-text-primary mb-1 min-[480px]:mb-2">
             Shop By Brands
-          </motion.h2>
+          </h2>
           {activeBrand && (
             <Link
               href="/brands"
-              className="flex items-center gap-1 text-sm font-semibold text-[#f26e21] hover:text-[#e05e15] transition-colors whitespace-nowrap"
+              className="inline-flex items-center gap-1 text-xs min-[480px]:text-sm font-semibold text-[#f26e21] hover:text-[#e05e15] transition-colors"
             >
               Show All
-              <ChevronRight size={16} />
+              <ChevronRight size={14} />
             </Link>
           )}
-        </div>
+        </motion.div>
 
         {/* Brand Row */}
         <div className="relative mb-6 min-[768px]:mb-8 border-b border-gray-200 max-w-[75%] mx-auto">
@@ -288,9 +288,9 @@ export default function BrandShowcase() {
                   key={brand.name}
                   onClick={() => setActiveBrand(brand)}
                   className="flex-shrink-0 flex items-center justify-center relative transition-all w-[calc(100%/3)] min-[480px]:w-[calc(100%/4)] min-[768px]:w-[calc(100%/5)] min-[1024px]:w-[calc(100%/6)]"
-                  style={{ height: "56px" }}
+                  style={{ height: "70px" }}
                 >
-                  <div className="w-[100px] min-[768px]:w-[120px] h-8 min-[768px]:h-9 flex items-center justify-center">
+                  <div className="w-full h-10 min-[768px]:h-12 px-3 flex items-center justify-center">
                     {brand.logo ? (
                       <img
                         src={brand.logo}
