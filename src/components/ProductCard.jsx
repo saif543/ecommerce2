@@ -79,7 +79,7 @@ export default function ProductCard({ product, index = 0 }) {
         {/* Info */}
         <div className="px-1.5 min-[480px]:px-2 pb-1.5 min-[480px]:pb-2 pt-1 flex-1 flex flex-col">
           {/* Name */}
-          <h3 className="text-[11px] min-[480px]:text-[13px] font-semibold text-gray-800 leading-snug line-clamp-2 mb-2">
+          <h3 className="text-[11px] min-[480px]:text-[13px] font-semibold text-gray-800 leading-snug line-clamp-2 mb-2 min-h-[calc(2*1em*1.375)]">
             {product.name}
           </h3>
 

@@ -15,6 +15,7 @@ import {
     CheckCircle2,
     AlertCircle,
     Tag,
+    Maximize2,
 } from 'lucide-react'
 
 export default function BrandManager({ getToken }) {
@@ -34,6 +35,13 @@ export default function BrandManager({ getToken }) {
 
     // Logo update
     const [updatingLogoFor, setUpdatingLogoFor] = useState(null)
+
+    // Logo scale + position
+    const [scaleEditing, setScaleEditing] = useState(null) // brand._id
+    const [scaleValue, setScaleValue] = useState(100)
+    const [offsetX, setOffsetX] = useState(0)
+    const [offsetY, setOffsetY] = useState(0)
+    const [savingScale, setSavingScale] = useState(false)
 
     // Toast
     const [toast, setToast] = useState(null)
@@ -166,6 +174,28 @@ export default function BrandManager({ getToken }) {
             showToast('error', err.message || 'Failed to update logo')
         } finally {
             setUpdatingLogoFor(null)
+        }
+    }
+
+    // ── Save Logo Scale ──
+    const handleSaveScale = async (brand) => {
+        setSavingScale(true)
+        try {
+            const token = await getToken()
+            const res = await fetch('/api/brand', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ id: brand._id, logoScale: scaleValue, logoOffsetX: offsetX, logoOffsetY: offsetY }),
+            })
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error || 'Failed to save scale')
+            showToast('success', `Logo size saved for ${brand.name}`)
+            setScaleEditing(null)
+            fetchBrands()
+        } catch (err) {
+            showToast('error', err.message || 'Failed to save scale')
+        } finally {
+            setSavingScale(false)
         }
     }
 
@@ -338,103 +368,214 @@ export default function BrandManager({ getToken }) {
                                 key={brand._id}
                                 initial={{ opacity: 0, y: 6 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-4 group hover:shadow-md transition-shadow"
+                                className="bg-white rounded-xl border border-gray-200 p-4 group hover:shadow-md transition-shadow"
                             >
-                                {/* Logo */}
-                                <div
-                                    className="relative flex-shrink-0 w-14 h-14 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center cursor-pointer overflow-hidden hover:border-[#f26e21] transition-colors"
-                                    title="Click to update logo"
-                                    onClick={() => {
-                                        // Programmatically open file picker for this brand
-                                        const inp = document.createElement('input')
-                                        inp.type = 'file'
-                                        inp.accept = 'image/jpeg,image/jpg,image/png,image/webp,image/svg+xml'
-                                        inp.onchange = (e) => {
-                                            const file = e.target.files?.[0]
-                                            if (file) handleUpdateLogo(brand, file)
-                                        }
-                                        inp.click()
-                                    }}
-                                >
-                                    {isUpdatingLogo ? (
-                                        <Loader2 size={22} className="animate-spin text-[#f26e21]" />
-                                    ) : brand.logo ? (
-                                        <>
-                                            <img
-                                                src={brand.logo}
-                                                alt={brand.name}
-                                                className="w-full h-full object-contain p-2"
+                                <div className="flex items-center gap-4">
+                                    {/* Logo */}
+                                    <div
+                                        className="relative flex-shrink-0 w-14 h-14 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center cursor-pointer overflow-hidden hover:border-[#f26e21] transition-colors"
+                                        title="Click to update logo"
+                                        onClick={() => {
+                                            const inp = document.createElement('input')
+                                            inp.type = 'file'
+                                            inp.accept = 'image/jpeg,image/jpg,image/png,image/webp,image/svg+xml'
+                                            inp.onchange = (e) => {
+                                                const file = e.target.files?.[0]
+                                                if (file) handleUpdateLogo(brand, file)
+                                            }
+                                            inp.click()
+                                        }}
+                                    >
+                                        {isUpdatingLogo ? (
+                                            <Loader2 size={22} className="animate-spin text-[#f26e21]" />
+                                        ) : brand.logo ? (
+                                            <>
+                                                <img
+                                                    src={brand.logo}
+                                                    alt={brand.name}
+                                                    className="w-full h-full object-contain p-2"
+                                                />
+                                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+                                                    <Upload size={14} className="text-white" />
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Tag size={24} className="text-gray-400" />
+                                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+                                                    <Upload size={14} className="text-gray-600" />
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+
+                                    {/* Name */}
+                                    <div className="flex-1 min-w-0">
+                                        {isRenaming ? (
+                                            <input
+                                                autoFocus
+                                                type="text"
+                                                value={renamingValue}
+                                                onChange={(e) => setRenamingValue(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') handleRename(brand)
+                                                    if (e.key === 'Escape') setRenamingId(null)
+                                                }}
+                                                className="w-full px-2 py-1 border border-[#f26e21] rounded-lg text-sm font-semibold focus:outline-none"
                                             />
-                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
-                                                <Upload size={14} className="text-white" />
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Tag size={24} className="text-gray-400" />
-                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
-                                                <Upload size={14} className="text-gray-600" />
-                                            </div>
-                                        </>
-                                    )}
+                                        ) : (
+                                            <p className="font-semibold text-gray-900 text-sm truncate">{brand.name}</p>
+                                        )}
+                                        <p className="text-xs text-gray-400 mt-0.5">
+                                            Logo size: {brand.logoScale || 100}%
+                                        </p>
+                                    </div>
+
+                                    {/* Actions */}
+                                    <div className="flex items-center gap-1 flex-shrink-0">
+                                        {isRenaming ? (
+                                            <>
+                                                <button
+                                                    onClick={() => handleRename(brand)}
+                                                    className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                                >
+                                                    <Check size={15} />
+                                                </button>
+                                                <button
+                                                    onClick={() => setRenamingId(null)}
+                                                    className="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg transition-colors"
+                                                >
+                                                    <X size={15} />
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                {brand.logo && (
+                                                    <button
+                                                        onClick={() => { setScaleEditing(brand._id); setScaleValue(brand.logoScale || 100); setOffsetX(brand.logoOffsetX || 0); setOffsetY(brand.logoOffsetY || 0) }}
+                                                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                        title="Resize & position logo"
+                                                    >
+                                                        <Maximize2 size={15} />
+                                                    </button>
+                                                )}
+                                                <button
+                                                    onClick={() => { setRenamingId(brand._id); setRenamingValue(brand.name) }}
+                                                    className="p-1.5 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
+                                                    title="Rename brand"
+                                                >
+                                                    <Edit2 size={15} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(brand)}
+                                                    className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                                    title="Delete brand"
+                                                >
+                                                    <Trash2 size={15} />
+                                                </button>
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
 
-                                {/* Name */}
-                                <div className="flex-1 min-w-0">
-                                    {isRenaming ? (
-                                        <input
-                                            autoFocus
-                                            type="text"
-                                            value={renamingValue}
-                                            onChange={(e) => setRenamingValue(e.target.value)}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') handleRename(brand)
-                                                if (e.key === 'Escape') setRenamingId(null)
-                                            }}
-                                            className="w-full px-2 py-1 border border-[#f26e21] rounded-lg text-sm font-semibold focus:outline-none"
-                                        />
-                                    ) : (
-                                        <p className="font-semibold text-gray-900 text-sm truncate">{brand.name}</p>
-                                    )}
-                                    <p className="text-xs text-gray-400 mt-0.5">Click logo to update</p>
-                                </div>
+                                {/* Scale + Position Editor — expandable */}
+                                {scaleEditing === brand._id && brand.logo && (
+                                    <motion.div
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: 'auto', opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        className="mt-4 pt-4 border-t border-gray-100"
+                                    >
+                                        <p className="text-xs font-semibold text-gray-600 mb-3">Homepage Preview</p>
+                                        {/* Preview — exact same aspect-ratio & overflow as storefront */}
+                                        <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4 flex items-center justify-center">
+                                            <div
+                                                className="relative flex items-center justify-center overflow-hidden"
+                                                style={{ width: '150px', aspectRatio: '5/2', outline: '2px dashed #f26e21', borderRadius: '6px' }}
+                                            >
+                                                <div className="w-full h-full px-3 flex items-center justify-center overflow-hidden">
+                                                    <img
+                                                        src={brand.logo}
+                                                        alt={brand.name}
+                                                        className="max-w-full max-h-full object-contain transition-all duration-200"
+                                                        style={{
+                                                            transform: `scale(${scaleValue / 100}) translate(${offsetX}px, ${offsetY}px)`,
+                                                        }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                {/* Actions */}
-                                <div className="flex items-center gap-1 flex-shrink-0">
-                                    {isRenaming ? (
-                                        <>
+                                        {/* Size slider */}
+                                        <div className="mb-3">
+                                            <div className="flex items-center justify-between mb-1">
+                                                <span className="text-[11px] font-semibold text-gray-500">Size</span>
+                                                <span className="text-[11px] font-bold text-[#f26e21]">{scaleValue}%</span>
+                                            </div>
+                                            <input
+                                                type="range" min={50} max={200} step={5}
+                                                value={scaleValue}
+                                                onChange={(e) => setScaleValue(Number(e.target.value))}
+                                                className="w-full h-2 rounded-full appearance-none cursor-pointer"
+                                                style={{ background: `linear-gradient(to right, #f26e21 ${((scaleValue - 50) / 150) * 100}%, #e5e7eb ${((scaleValue - 50) / 150) * 100}%)` }}
+                                            />
+                                        </div>
+
+                                        {/* X Position slider */}
+                                        <div className="mb-3">
+                                            <div className="flex items-center justify-between mb-1">
+                                                <span className="text-[11px] font-semibold text-gray-500">Horizontal</span>
+                                                <span className="text-[11px] font-bold text-gray-600">{offsetX}px</span>
+                                            </div>
+                                            <input
+                                                type="range" min={-50} max={50} step={1}
+                                                value={offsetX}
+                                                onChange={(e) => setOffsetX(Number(e.target.value))}
+                                                className="w-full h-2 rounded-full appearance-none cursor-pointer"
+                                                style={{ background: `linear-gradient(to right, #e5e7eb ${((offsetX + 50) / 100) * 100 - 1}%, #6366f1 ${((offsetX + 50) / 100) * 100 - 1}%, #6366f1 ${((offsetX + 50) / 100) * 100 + 1}%, #e5e7eb ${((offsetX + 50) / 100) * 100 + 1}%)` }}
+                                            />
+                                        </div>
+
+                                        {/* Y Position slider */}
+                                        <div className="mb-3">
+                                            <div className="flex items-center justify-between mb-1">
+                                                <span className="text-[11px] font-semibold text-gray-500">Vertical</span>
+                                                <span className="text-[11px] font-bold text-gray-600">{offsetY}px</span>
+                                            </div>
+                                            <input
+                                                type="range" min={-50} max={50} step={1}
+                                                value={offsetY}
+                                                onChange={(e) => setOffsetY(Number(e.target.value))}
+                                                className="w-full h-2 rounded-full appearance-none cursor-pointer"
+                                                style={{ background: `linear-gradient(to right, #e5e7eb ${((offsetY + 50) / 100) * 100 - 1}%, #6366f1 ${((offsetY + 50) / 100) * 100 - 1}%, #6366f1 ${((offsetY + 50) / 100) * 100 + 1}%, #e5e7eb ${((offsetY + 50) / 100) * 100 + 1}%)` }}
+                                            />
+                                        </div>
+
+                                        {/* Reset + Save / Cancel */}
+                                        <div className="flex gap-2 mt-3">
                                             <button
-                                                onClick={() => handleRename(brand)}
-                                                className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                                onClick={() => { setScaleValue(100); setOffsetX(0); setOffsetY(0) }}
+                                                className="px-3 py-2 text-gray-500 text-xs font-semibold border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                                             >
-                                                <Check size={15} />
+                                                Reset
                                             </button>
                                             <button
-                                                onClick={() => setRenamingId(null)}
-                                                className="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg transition-colors"
+                                                onClick={() => handleSaveScale(brand)}
+                                                disabled={savingScale}
+                                                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-[#f26e21] text-white text-xs font-semibold rounded-lg hover:bg-[#e05e15] transition-colors disabled:opacity-50"
                                             >
-                                                <X size={15} />
-                                            </button>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <button
-                                                onClick={() => { setRenamingId(brand._id); setRenamingValue(brand.name) }}
-                                                className="p-1.5 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
-                                                title="Rename brand"
-                                            >
-                                                <Edit2 size={15} />
+                                                {savingScale ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}
+                                                {savingScale ? 'Saving...' : 'Save'}
                                             </button>
                                             <button
-                                                onClick={() => handleDelete(brand)}
-                                                className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                                title="Delete brand"
+                                                onClick={() => setScaleEditing(null)}
+                                                className="px-3 py-2 text-gray-500 text-xs font-semibold border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                                             >
-                                                <Trash2 size={15} />
+                                                Cancel
                                             </button>
-                                        </>
-                                    )}
-                                </div>
+                                        </div>
+                                    </motion.div>
+                                )}
                             </motion.div>
                         )
                     })}

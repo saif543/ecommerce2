@@ -1,13 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Navbar from '@/components/Navbar'
 import Hero from '@/components/Hero'
+import PromoStrip from '@/components/PromoStrip'
 import TrustBadges from '@/components/TrustBadges'
 import VideoSection from '@/components/VideoSection'
 import Categories from '@/components/Categories'
 import BrandShowcase from '@/components/BrandShowcase'
 import Products from '@/components/Products'
+import PromoBanner from '@/components/PromoBanner'
 import Footer from '@/components/Footer'
 
 // Default fallback sections shown if no admin config exists
@@ -19,7 +21,7 @@ const DEFAULT_SECTIONS = [
     filterType: 'flag',
     filterValue: 'isLovedProduct=true',
     productLimit: 8,
-    bg: 'bg-white',
+    bg: 'bg-[#fafafa]',
     sectionBannerKey: 'most-loved',
     bannerGradient: 'linear-gradient(135deg, #111111 0%, #f26e21 60%, #ff8c42 100%)',
     seeAllLink: '/products',
@@ -33,7 +35,7 @@ const DEFAULT_SECTIONS = [
     filterType: 'flag',
     filterValue: 'isNewArrival=true',
     productLimit: 8,
-    bg: 'bg-offwhite',
+    bg: 'bg-[#f5f3ef]',
     sectionBannerKey: 'new-arrivals',
     bannerGradient: 'linear-gradient(135deg, #f26e21 0%, #111111 50%, #f26e21 100%)',
     seeAllLink: '/products',
@@ -47,7 +49,7 @@ const DEFAULT_SECTIONS = [
     filterType: 'category',
     filterValue: 'Headphones',
     productLimit: 8,
-    bg: 'bg-white',
+    bg: 'bg-[#fafafa]',
     sectionBannerKey: 'headphones',
     bannerGradient: 'linear-gradient(135deg, #ff8c42 0%, #f26e21 40%, #111111 100%)',
     seeAllLink: '/products?category=Headphones',
@@ -57,10 +59,14 @@ const DEFAULT_SECTIONS = [
 ]
 
 const DEFAULT_VIDEO = {
-  youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
   title: 'Watch & Explore',
   subtitle: 'See our products in action',
   isActive: true,
+  videos: [
+    { youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', label: 'Featured Product' },
+    { youtubeUrl: 'https://www.youtube.com/watch?v=9bZkp7q19f0', label: 'Top Picks' },
+    { youtubeUrl: 'https://www.youtube.com/watch?v=kJQP7kiw5Fk', label: 'New Arrivals' },
+  ],
 }
 
 function buildApiUrl(section) {
@@ -105,25 +111,30 @@ export default function Home() {
       .catch(() => { /* silently fall back to defaults */ })
   }, [])
 
+  const sectionBgs = ['bg-white', 'bg-[#f5f5f5]', 'bg-white']
+
   return (
-    <div className="min-h-screen bg-offwhite">
+    <div className="min-h-screen bg-[#f5f5f5]">
       <Navbar />
       <Hero />
+      <PromoStrip />
       <Categories />
       <BrandShowcase />
-      {sections.map(section => (
-      <Products
-          key={section.id}
-          title={section.title}
-          subtitle={section.subtitle}
-          apiUrl={buildApiUrl(section)}
-          bg={section.bg}
-          section={buildBannerKey(section)}
-          bannerGradient={section.bannerGradient}
-          seeAllLink={buildSeeAllLink(section)}
-        />
+      {sections.map((section, i) => (
+        <React.Fragment key={section.id}>
+          <Products
+            title={section.title}
+            subtitle={section.subtitle}
+            apiUrl={buildApiUrl(section)}
+            bg={sectionBgs[i % sectionBgs.length]}
+            section={buildBannerKey(section)}
+            bannerGradient={section.bannerGradient}
+            seeAllLink={buildSeeAllLink(section)}
+          />
+          {i === 0 && videoConfig.isActive && <VideoSection config={videoConfig} />}
+          {i === 0 && <PromoBanner />}
+        </React.Fragment>
       ))}
-      {videoConfig.isActive && <VideoSection config={videoConfig} />}
       <TrustBadges />
       <Footer />
     </div>

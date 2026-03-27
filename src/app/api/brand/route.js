@@ -253,9 +253,12 @@ export async function PUT(req) {
         const body = await req.json()
         const id = sanitizeString(body.id || '', 100)
         const name = sanitizeString(body.name || '', MAX_NAME_LENGTH)
+        const logoScale = body.logoScale !== undefined ? Math.min(200, Math.max(50, Number(body.logoScale) || 100)) : undefined
+        const logoOffsetX = body.logoOffsetX !== undefined ? Math.min(50, Math.max(-50, Number(body.logoOffsetX) || 0)) : undefined
+        const logoOffsetY = body.logoOffsetY !== undefined ? Math.min(50, Math.max(-50, Number(body.logoOffsetY) || 0)) : undefined
 
         if (!id) return NextResponse.json({ error: 'Brand id is required' }, { status: 400 })
-        if (!name) return NextResponse.json({ error: 'New name is required' }, { status: 400 })
+        if (!name && logoScale === undefined && logoOffsetX === undefined && logoOffsetY === undefined) return NextResponse.json({ error: 'Nothing to update' }, { status: 400 })
 
         const { ObjectId } = await import('mongodb')
         let oid
@@ -268,17 +271,25 @@ export async function PUT(req) {
         const brand = await db.collection('brands').findOne({ _id: oid })
         if (!brand) return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
 
-        // Check name conflict
-        const conflict = await db.collection('brands').findOne({
-            name: { $regex: `^${name}$`, $options: 'i' }, _id: { $ne: oid },
-        })
-        if (conflict) return NextResponse.json({ error: `Brand name "${name}" already exists` }, { status: 409 })
+        const updateFields = { updatedAt: new Date() }
 
-        await db.collection('brands').updateOne({ _id: oid }, { $set: { name, updatedAt: new Date() } })
+        if (name) {
+            // Check name conflict
+            const conflict = await db.collection('brands').findOne({
+                name: { $regex: `^${name}$`, $options: 'i' }, _id: { $ne: oid },
+            })
+            if (conflict) return NextResponse.json({ error: `Brand name "${name}" already exists` }, { status: 409 })
+            updateFields.name = name
+        }
+        if (logoScale !== undefined) updateFields.logoScale = logoScale
+        if (logoOffsetX !== undefined) updateFields.logoOffsetX = logoOffsetX
+        if (logoOffsetY !== undefined) updateFields.logoOffsetY = logoOffsetY
+
+        await db.collection('brands').updateOne({ _id: oid }, { $set: updateFields })
         const updated = await db.collection('brands').findOne({ _id: oid })
 
-        logAudit('BRAND_RENAMED', { userId: user.userId, userEmail: user.email, brandId: id, newName: name }, req)
-        return NextResponse.json({ message: 'Brand renamed successfully', brand: updated })
+        logAudit('BRAND_UPDATED', { userId: user.userId, userEmail: user.email, brandId: id, updates: Object.keys(updateFields) }, req)
+        return NextResponse.json({ message: 'Brand updated successfully', brand: updated })
 
     } catch (err) {
         console.error('❌ PUT /api/brand error:', err)

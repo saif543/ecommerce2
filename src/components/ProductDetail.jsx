@@ -602,19 +602,56 @@ export default function ProductDetail({ product, relatedProducts = [] }) {
       </div>
 
       {/* Mobile Sticky Add to Cart Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 p-3 flex items-center gap-3 z-50 lg:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
-        <div className="flex-1 min-w-0">
-          <p className="text-[10px] text-gray-400 truncate">{product.name}</p>
-          <p className="text-base font-bold text-gray-900">BDT {formatPrice(salePrice * qty)}</p>
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 p-3 z-50 lg:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+        {/* Stacked on small phones, inline on tablet */}
+        <div className="min-[480px]:hidden">
+          <p className="text-sm font-bold text-gray-900 mb-1.5">BDT {formatPrice(salePrice * qty)}</p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                addToCart(productId, qty);
+                router.push(`/cart?checkout=true&buyNowId=${productId}`);
+              }}
+              className="flex-1 border-2 border-[#f26e21] text-[#f26e21] text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 hover:bg-[#f26e21]/5 active:translate-y-[1px]"
+            >
+              <Zap size={14} />
+              Buy Now
+            </button>
+            <button
+              onClick={() => addToCart(productId, qty)}
+              className="flex-1 relative overflow-hidden bg-[#f26e21] hover:bg-[#e05e15] text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-[0_2px_6px_rgba(242,110,33,0.3)] border border-[#e05e15] active:translate-y-[1px]"
+            >
+              <span className="absolute inset-x-0 top-0 h-[45%] bg-gradient-to-b from-white/10 to-transparent rounded-t pointer-events-none" />
+              <ShoppingCart size={14} className="relative text-white" />
+              <span className="relative text-white">Add to Cart</span>
+            </button>
+          </div>
         </div>
-        <button
-          onClick={() => addToCart(productId, qty)}
-          className="relative overflow-hidden bg-[#f26e21] hover:bg-[#e05e15] text-sm font-bold px-5 py-3 rounded-xl transition-all flex items-center gap-2 flex-shrink-0 shadow-[0_2px_6px_rgba(242,110,33,0.3)] border border-[#e05e15]"
-        >
-          <span className="absolute inset-x-0 top-0 h-[45%] bg-gradient-to-b from-white/10 to-transparent rounded-t pointer-events-none" />
-          <ShoppingCart size={15} className="relative text-white" />
-          <span className="relative text-white">Add to Cart</span>
-        </button>
+        {/* Inline on 480px+ */}
+        <div className="hidden min-[480px]:flex items-center gap-3">
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] text-gray-400 truncate">{product.name}</p>
+            <p className="text-base font-bold text-gray-900">BDT {formatPrice(salePrice * qty)}</p>
+          </div>
+          <button
+            onClick={() => {
+              addToCart(productId, qty);
+              router.push(`/cart?checkout=true&buyNowId=${productId}`);
+            }}
+            className="border-2 border-[#f26e21] text-[#f26e21] text-sm font-bold px-4 py-3 rounded-xl transition-all flex items-center gap-1.5 flex-shrink-0 hover:bg-[#f26e21]/5 active:translate-y-[1px]"
+          >
+            <Zap size={14} />
+            Buy Now
+          </button>
+          <button
+            onClick={() => addToCart(productId, qty)}
+            className="relative overflow-hidden bg-[#f26e21] hover:bg-[#e05e15] text-sm font-bold px-5 py-3 rounded-xl transition-all flex items-center gap-2 flex-shrink-0 shadow-[0_2px_6px_rgba(242,110,33,0.3)] border border-[#e05e15] active:translate-y-[1px]"
+          >
+            <span className="absolute inset-x-0 top-0 h-[45%] bg-gradient-to-b from-white/10 to-transparent rounded-t pointer-events-none" />
+            <ShoppingCart size={14} className="relative text-white" />
+            <span className="relative text-white">Add to Cart</span>
+          </button>
+        </div>
       </div>
 
       {/* Spacer for mobile sticky bar */}
