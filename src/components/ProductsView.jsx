@@ -8,20 +8,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight, ChevronDown, Grid3X3, LayoutList, SlidersHorizontal, X, Loader2 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import ProductCard from "./ProductCard";
-import { sampleProducts, sampleHeadphones, sampleBrandProducts } from "@/data/sampleProducts";
-
-const allSampleProducts = [...sampleProducts, ...sampleHeadphones, ...sampleBrandProducts];
-
-function getFallbackProducts(category, subcategory) {
-    let filtered = allSampleProducts;
-    if (subcategory) {
-        filtered = filtered.filter(p => p.subcategory === subcategory);
-    } else if (category) {
-        filtered = filtered.filter(p => p.category === category);
-    }
-    return filtered;
-}
-
 function formatPrice(n) {
     return Math.round(n).toLocaleString("en-IN");
 }
@@ -155,22 +141,14 @@ export default function ProductsView() {
             .then((data) => {
                 if (data.sliderInfo) setSliderInfo(data.sliderInfo);
                 const prods = data.products || [];
+                setProducts(prods);
                 if (prods.length > 0) {
-                    setProducts(prods);
                     const prices = prods.map((p) => p.price || 0);
                     setPriceMax(Math.max(...prices));
-                } else {
-                    // DB returned empty — use sample fallback
-                    const fallback = getFallbackProducts(categoryParam, subcategoryParam);
-                    setProducts(fallback);
-                    if (fallback.length > 0) setPriceMax(Math.max(...fallback.map(p => p.price || 0)));
                 }
             })
             .catch(() => {
-                // API failed — use sample fallback
-                const fallback = getFallbackProducts(categoryParam, subcategoryParam);
-                setProducts(fallback);
-                if (fallback.length > 0) setPriceMax(Math.max(...fallback.map(p => p.price || 0)));
+                setProducts([]);
             })
             .finally(() => setLoading(false));
     }, [categoryParam, subcategoryParam, sliderParam, isLovedProduct, isNewArrival, isTrending]);

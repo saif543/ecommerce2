@@ -11,9 +11,6 @@ import {
   CreditCard, Clock, Star, Heart,
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
-import { sampleProducts, sampleHeadphones, sampleBrandProducts } from "@/data/sampleProducts";
-
-const allSampleProducts = [...sampleProducts, ...sampleHeadphones, ...sampleBrandProducts];
 
 const dhakaAreas = [
   "Dhanmondi", "Gulshan", "Banani", "Uttara", "Mirpur", "Mohammadpur", "Tejgaon",
@@ -110,11 +107,11 @@ export default function CartPage() {
       .then((r) => r.json())
       .then((data) => {
         const prods = data.products || [];
-        setDbProducts(prods.length > 0 ? prods : allSampleProducts);
+        setDbProducts(prods.length > 0 ? prods : []);
         setLoading(false);
       })
       .catch(() => {
-        setDbProducts(allSampleProducts);
+        setDbProducts([]);
         setLoading(false);
       });
   }, []);

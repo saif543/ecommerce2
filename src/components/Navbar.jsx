@@ -7,11 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Search, ShoppingCart, ChevronDown, ChevronRight, X, User, LogOut, Menu, Home, TrendingUp, HeadphonesIcon, Info, Tag } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/hooks/useAuth";
-import { sampleCategories } from "@/data/sampleProducts";
 import Swal from "sweetalert2";
-
-// Fallback categories for when DB is unavailable
-const fallbackCategories = sampleCategories;
 
 // Convert a category name to a URL-friendly slug
 function toSlug(name) {
@@ -76,7 +72,7 @@ export default function Navbar() {
   const [signingOut, setSigningOut] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [expandedMobileCategory, setExpandedMobileCategory] = useState(null);
-  const [categories, setCategories] = useState(fallbackCategories);
+  const [categories, setCategories] = useState([]);
   const searchRef = useRef(null);
   const { cartCount } = useCart();
 

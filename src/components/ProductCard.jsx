@@ -24,6 +24,7 @@ export default function ProductCard({ product, index = 0 }) {
       ? product.discount
       : regularPrice;
   const savedAmount = regularPrice - salePrice;
+  const discountPercent = savedAmount > 0 ? Math.round((savedAmount / regularPrice) * 100) : 0;
 
   return (
     <motion.div
@@ -31,55 +32,97 @@ export default function ProductCard({ product, index = 0 }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.35, delay: index * 0.04 }}
-      className="bg-white rounded-xl overflow-hidden group shadow-[0_4px_16px_rgba(0,0,0,0.15),0_0px_20px_rgba(255,255,255,0.08)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.25),0_0_24px_rgba(242,110,33,0.2)] hover:-translate-y-1 transition-all duration-300 flex flex-col h-full"
+      className="relative rounded-2xl overflow-hidden group flex flex-col h-full"
+      style={{
+        background: "linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85))",
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
+        border: "1px solid rgba(255,255,255,0.6)",
+        boxShadow: "0 2px 16px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.8)",
+      }}
     >
-      <Link href={`/product/${productId}`} className="flex-1 flex flex-col">
+      {/* Glass shine overlay */}
+      <div
+        className="absolute inset-0 z-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        style={{
+          background: "linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%, rgba(242,110,33,0.04) 100%)",
+        }}
+      />
+
+      <Link href={`/product/${productId}`} className="flex-1 flex flex-col relative z-[1]">
         {/* Image */}
-        <div className="relative aspect-square bg-gray-50 overflow-hidden">
-          {savedAmount > 0 && (
-            <span className="absolute top-2 left-2 bg-[#ff5500] text-white text-[9px] font-bold px-1.5 py-0.5 rounded z-10">
-              -{Math.round((savedAmount / regularPrice) * 100)}%
+        <div className="relative aspect-square overflow-hidden bg-gradient-to-b from-gray-50 to-gray-100/50 m-1.5 min-[480px]:m-2 rounded-xl">
+          {/* Discount badge */}
+          {discountPercent > 0 && (
+            <span className="absolute top-2 left-2 z-10 text-[9px] min-[480px]:text-[10px] font-bold text-white px-2 py-0.5 rounded-full"
+              style={{
+                background: "linear-gradient(135deg, #ff5500, #f26e21)",
+                boxShadow: "0 2px 8px rgba(242,110,33,0.35)",
+              }}
+            >
+              -{discountPercent}%
             </span>
           )}
+
           <Image
             src={imageUrl}
             alt={product.name}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            className="object-cover group-hover:scale-[1.06] transition-transform duration-700 ease-out"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
           />
+
+          {/* Bottom glass fade */}
+          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/30 to-transparent" />
         </div>
 
         {/* Info */}
-        <div className="p-2.5 min-[480px]:p-3 flex-1 flex flex-col">
+        <div className="px-1.5 min-[480px]:px-2 pb-1.5 min-[480px]:pb-2 pt-1 flex-1 flex flex-col">
           {/* Name */}
-          <h3 className="text-xs min-[480px]:text-[13px] font-medium text-gray-900 leading-snug line-clamp-2 mb-1.5">
+          <h3 className="text-[11px] min-[480px]:text-[13px] font-semibold text-gray-800 leading-snug line-clamp-2 mb-2">
             {product.name}
           </h3>
 
-          {/* Price */}
+          {/* Price + Cart */}
           <div className="mt-auto flex items-center justify-between gap-1">
-            <div className="flex items-baseline gap-1 min-[480px]:gap-1.5 min-w-0 overflow-hidden">
-              <span className="text-xs min-[360px]:text-sm min-[480px]:text-[15px] font-bold text-[#f26e21] whitespace-nowrap">
+            <div className="flex flex-col min-w-0">
+              <span className="text-xs min-[360px]:text-sm min-[480px]:text-[15px] font-bold text-gray-900 whitespace-nowrap">
                 Tk {formatPrice(salePrice)}
               </span>
               {savedAmount > 0 && (
-                <span className="text-[8px] min-[360px]:text-[10px] min-[480px]:text-xs text-gray-400 line-through whitespace-nowrap truncate">
+                <span className="text-[8px] min-[360px]:text-[10px] min-[480px]:text-[11px] text-gray-400 line-through whitespace-nowrap">
                   Tk {formatPrice(regularPrice)}
                 </span>
               )}
             </div>
 
-            {/* Add to Cart icon */}
+            {/* Add to Cart */}
             <button
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 addToCart(productId);
               }}
-              className="w-9 h-9 min-[480px]:w-10 min-[480px]:h-10 rounded-full bg-gradient-to-b from-[#f26e21] to-[#e05e15] text-white hover:w-11 hover:h-11 min-[480px]:hover:w-12 min-[480px]:hover:h-12 flex items-center justify-center transition-all duration-200 flex-shrink-0 shadow-[0_3px_10px_rgba(242,110,33,0.4),inset_0_1px_1px_rgba(255,255,255,0.2)] hover:shadow-[0_5px_16px_rgba(242,110,33,0.55),inset_0_1px_1px_rgba(255,255,255,0.2)] active:translate-y-[1px]"
+              className="w-8 h-8 min-[480px]:w-9 min-[480px]:h-9 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 active:scale-95"
+              style={{
+                background: "linear-gradient(135deg, rgba(242,110,33,0.12), rgba(242,110,33,0.06))",
+                border: "1px solid rgba(242,110,33,0.2)",
+                color: "#f26e21",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "linear-gradient(135deg, #f26e21, #e05e15)";
+                e.currentTarget.style.color = "white";
+                e.currentTarget.style.border = "1px solid #f26e21";
+                e.currentTarget.style.boxShadow = "0 4px 12px rgba(242,110,33,0.3)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "linear-gradient(135deg, rgba(242,110,33,0.12), rgba(242,110,33,0.06))";
+                e.currentTarget.style.color = "#f26e21";
+                e.currentTarget.style.border = "1px solid rgba(242,110,33,0.2)";
+                e.currentTarget.style.boxShadow = "none";
+              }}
             >
-              <ShoppingCart size={17} />
+              <ShoppingCart size={15} />
             </button>
           </div>
         </div>

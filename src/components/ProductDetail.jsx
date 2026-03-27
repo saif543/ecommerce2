@@ -213,7 +213,7 @@ export default function ProductDetail({ product, relatedProducts = [] }) {
                         </span>
                       )}
                       {discountPct > 0 && (
-                        <span className="bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">
+                        <span className="bg-emerald-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">
                           -{discountPct}%
                         </span>
                       )}

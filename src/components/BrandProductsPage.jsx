@@ -4,9 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, Tag, Loader2 } from "lucide-react";
 import ProductCard from "./ProductCard";
-import { sampleProducts, sampleHeadphones, sampleBrandProducts } from "@/data/sampleProducts";
-
-const allSampleProducts = [...sampleProducts, ...sampleHeadphones, ...sampleBrandProducts];
 
 function toSlug(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -20,13 +17,13 @@ function getProductsForBrand(slug, products) {
 }
 
 function getBrandDisplayName(slug) {
-  const allBrands = [...new Set(allSampleProducts.map((p) => p.brand).filter(Boolean))];
+  const allBrands = [...new Set([].map((p) => p.brand).filter(Boolean))];
   return allBrands.find((b) => toSlug(b) === slug) || decodeURIComponent(slug).replace(/-/g, " ");
 }
 
 export default function BrandProductsPage({ slug }) {
   const displayName = getBrandDisplayName(slug);
-  const sampleFiltered = getProductsForBrand(slug, allSampleProducts);
+  const sampleFiltered = getProductsForBrand(slug, []);
 
   // Start with sample products immediately
   const [products, setProducts] = useState(sampleFiltered);

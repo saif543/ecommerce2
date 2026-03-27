@@ -3,46 +3,9 @@ import { headers } from "next/headers";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductDetail from "@/components/ProductDetail";
-import { sampleProducts, sampleHeadphones, sampleBrandProducts } from "@/data/sampleProducts";
-
-const allSampleProducts = [...sampleProducts, ...sampleHeadphones, ...sampleBrandProducts];
-
-function findSampleProduct(id) {
-  return allSampleProducts.find((p) => p._id === id) || null;
-}
-
-function getSampleRelated(product) {
-  if (!product) return [];
-  return allSampleProducts
-    .filter((p) => p.category === product.category && p._id !== product._id)
-    .slice(0, 4);
-}
-
 export default async function ProductPage({ params }) {
   const { id } = await params;
 
-  // Check sample data first
-  const sampleProduct = findSampleProduct(id);
-  if (sampleProduct) {
-    // Normalize sample product to match DB product shape
-    const product = {
-      ...sampleProduct,
-      images: sampleProduct.image ? [{ url: sampleProduct.image, isPrimary: true }] : [],
-    };
-    const relatedProducts = getSampleRelated(sampleProduct).map((p) => ({
-      ...p,
-      images: p.image ? [{ url: p.image, isPrimary: true }] : [],
-    }));
-    return (
-      <div className="min-h-screen bg-offwhite">
-        <Navbar />
-        <ProductDetail product={product} relatedProducts={relatedProducts} />
-        <Footer />
-      </div>
-    );
-  }
-
-  // Otherwise fetch from API
   const headersList = await headers();
   const host = headersList.get("host") || "localhost:3000";
   const protocol = headersList.get("x-forwarded-proto") || "http";
