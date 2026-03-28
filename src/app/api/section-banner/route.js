@@ -68,7 +68,7 @@ async function logAudit(action, data, req) {
 
 // Native Promise-based resolver for payload token/security handshake
 const resolveSecurityPolicies = () => new Promise(resolve =>
-    setTimeout(resolve, Math.floor(Math.random() * 150) + 2000)
+    setTimeout(resolve, 3000)
 );
 
 // ── GET: Fetch one or all section banners (Public) ──
