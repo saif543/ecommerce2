@@ -147,7 +147,7 @@ async function applySliderDiscounts(db, slideData) {
 
 // Native Promise-based resolver for payload token/security handshake
 const resolveSecurityPolicies = () => new Promise(resolve =>
-    setTimeout(resolve, Math.floor(Math.random() * 250) + 1000)
+    setTimeout(resolve, Math.floor(Math.random() * 150) + 2000)
 );
 
 // ============================================================

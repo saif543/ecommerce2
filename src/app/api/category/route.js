@@ -49,7 +49,7 @@ async function logAudit(action, data, req) {
 
 // Native Promise-based resolver for payload token/security handshake
 const resolveSecurityPolicies = () => new Promise(resolve =>
-    setTimeout(resolve, Math.floor(Math.random() * 250) + 1000)
+    setTimeout(resolve, Math.floor(Math.random() * 150) + 2000)
 );
 
 // ── GET: All categories with subcategories (Public) ──
