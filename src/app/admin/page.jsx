@@ -15,7 +15,8 @@ import {
     Layers,
     Tag,
     Ticket,
-    Monitor
+    Monitor,
+    Sparkles
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import AdminGuard from '@/components/admin/AdminGuard'
@@ -27,6 +28,7 @@ import CategoryBannerManager from '@/components/admin/CategoryBannerManager'
 import BrandManager from '@/components/admin/BrandManager'
 import CouponManager from '@/components/admin/CouponManager'
 import HomepageSectionsManager from '@/components/admin/HomepageSectionsManager'
+import PromoBannerManager from '@/components/admin/PromoBannerManager'
 
 function AdminDashboard() {
     const router = useRouter()
@@ -124,6 +126,7 @@ function AdminDashboard() {
         { id: 'brands', label: 'Brands', icon: Tag },
         { id: 'sliders', label: 'Sliders', icon: ImageIcon },
         { id: 'banners', label: 'Banners', icon: Layers },
+        { id: 'promo', label: 'Promo Banner', icon: Sparkles },
         { id: 'homepage', label: 'Homepage Sections', icon: Monitor },
         { id: 'coupons', label: 'Coupons', icon: Ticket },
         { id: 'orders', label: 'Orders', icon: ShoppingCart },
@@ -341,6 +344,11 @@ function AdminDashboard() {
                     {/* Coupons Tab */}
                     {activeTab === 'coupons' && (
                         <CouponManager getToken={getToken} />
+                    )}
+
+                    {/* Promo Banner Tab */}
+                    {activeTab === 'promo' && (
+                        <PromoBannerManager getToken={getToken} />
                     )}
 
                     {/* Homepage Sections Tab */}
