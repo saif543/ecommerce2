@@ -124,11 +124,6 @@ export default function Categories() {
         <div className="text-center mb-5 min-[480px]:mb-7 min-[768px]:mb-10">
           <p className="text-[#f26e21] text-[10px] min-[480px]:text-xs font-semibold uppercase tracking-[0.15em] mb-1 min-[480px]:mb-2">Explore</p>
           <h2 className="text-xl min-[480px]:text-2xl md:text-3xl font-semibold text-text-primary mb-2 min-[480px]:mb-3">Browse by Category</h2>
-          <div className="flex items-center justify-center gap-2 mb-2 min-[480px]:mb-3">
-            <span className="h-[1.5px] w-8 min-[480px]:w-12 bg-gradient-to-r from-transparent to-[#f26e21]/60 rounded-full" />
-            <span className="h-1.5 w-1.5 rounded-full bg-[#f26e21]" />
-            <span className="h-[1.5px] w-8 min-[480px]:w-12 bg-gradient-to-l from-transparent to-[#f26e21]/60 rounded-full" />
-          </div>
           <p className="text-text-muted text-xs min-[480px]:text-sm">Find what you need, fast</p>
         </div>
 
